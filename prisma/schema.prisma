@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/lib/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String  @id @default(cuid())
+  fullName     String?
+  avatar       String?
+  userName     String  @unique
+  email        String  @unique
+  passwordHash String
+
+  isSuperAdmin Boolean    @default(false)
+  userRoles    UserRole[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// --- Role model ---
+model Role {
+  id          String  @id @default(uuid()) // Changed from roleId
+  name        String  @unique
+  description String?
+  isPublic    Boolean @default(false)
+
+  permissions RolePermission[]
+  users       UserRole[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserRole {
+  id     String @id @default(uuid())
+  userId String
+  roleId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, roleId])
+}
+
+// --- Role Permission Catalog ---
+model RolePermission {
+  id          String  @id @default(ulid())
+  action      String  @unique // e.g., "users:view"
+  label       String // e.g., "View Users"
+  description String?
+
+  roles Role[] // Implicit M-N relation with Role
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
