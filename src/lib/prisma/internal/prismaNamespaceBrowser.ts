@@ -54,7 +54,12 @@ export const ModelName = {
   User: 'User',
   Role: 'Role',
   UserRole: 'UserRole',
-  RolePermission: 'RolePermission'
+  RolePermission: 'RolePermission',
+  BiFolder: 'BiFolder',
+  BiDashboard: 'BiDashboard',
+  BiDashboardMember: 'BiDashboardMember',
+  BiDataSet: 'BiDataSet',
+  BiPanel: 'BiPanel'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -123,12 +128,87 @@ export const RolePermissionScalarFieldEnum = {
 export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
 
 
+export const BiFolderScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  parentId: 'parentId',
+  createdAt: 'createdAt'
+} as const
+
+export type BiFolderScalarFieldEnum = (typeof BiFolderScalarFieldEnum)[keyof typeof BiFolderScalarFieldEnum]
+
+
+export const BiDashboardScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  isPublic: 'isPublic',
+  folderId: 'folderId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type BiDashboardScalarFieldEnum = (typeof BiDashboardScalarFieldEnum)[keyof typeof BiDashboardScalarFieldEnum]
+
+
+export const BiDashboardMemberScalarFieldEnum = {
+  id: 'id',
+  dashboardId: 'dashboardId',
+  userId: 'userId',
+  role: 'role'
+} as const
+
+export type BiDashboardMemberScalarFieldEnum = (typeof BiDashboardMemberScalarFieldEnum)[keyof typeof BiDashboardMemberScalarFieldEnum]
+
+
+export const BiDataSetScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  sql: 'sql',
+  description: 'description',
+  isPublic: 'isPublic',
+  lastRunAt: 'lastRunAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type BiDataSetScalarFieldEnum = (typeof BiDataSetScalarFieldEnum)[keyof typeof BiDataSetScalarFieldEnum]
+
+
+export const BiPanelScalarFieldEnum = {
+  id: 'id',
+  dashboardId: 'dashboardId',
+  dataSetId: 'dataSetId',
+  title: 'title',
+  chartType: 'chartType',
+  config: 'config',
+  x: 'x',
+  y: 'y',
+  w: 'w',
+  h: 'h',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BiPanelScalarFieldEnum = (typeof BiPanelScalarFieldEnum)[keyof typeof BiPanelScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -145,4 +225,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

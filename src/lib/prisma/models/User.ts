@@ -215,6 +215,9 @@ export type UserWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   userRoles?: Prisma.UserRoleListRelationFilter
+  biDashboards?: Prisma.BiDashboardListRelationFilter
+  biDashboardMembers?: Prisma.BiDashboardMemberListRelationFilter
+  biDataSets?: Prisma.BiDataSetListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -228,6 +231,9 @@ export type UserOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userRoles?: Prisma.UserRoleOrderByRelationAggregateInput
+  biDashboards?: Prisma.BiDashboardOrderByRelationAggregateInput
+  biDashboardMembers?: Prisma.BiDashboardMemberOrderByRelationAggregateInput
+  biDataSets?: Prisma.BiDataSetOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -244,6 +250,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   userRoles?: Prisma.UserRoleListRelationFilter
+  biDashboards?: Prisma.BiDashboardListRelationFilter
+  biDashboardMembers?: Prisma.BiDashboardMemberListRelationFilter
+  biDataSets?: Prisma.BiDataSetListRelationFilter
 }, "id" | "userName" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -287,6 +296,9 @@ export type UserCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  biDashboards?: Prisma.BiDashboardCreateNestedManyWithoutUserInput
+  biDashboardMembers?: Prisma.BiDashboardMemberCreateNestedManyWithoutUserInput
+  biDataSets?: Prisma.BiDataSetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -300,6 +312,9 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  biDashboards?: Prisma.BiDashboardUncheckedCreateNestedManyWithoutUserInput
+  biDashboardMembers?: Prisma.BiDashboardMemberUncheckedCreateNestedManyWithoutUserInput
+  biDataSets?: Prisma.BiDataSetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -313,6 +328,9 @@ export type UserUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  biDashboards?: Prisma.BiDashboardUpdateManyWithoutUserNestedInput
+  biDashboardMembers?: Prisma.BiDashboardMemberUpdateManyWithoutUserNestedInput
+  biDataSets?: Prisma.BiDataSetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -326,6 +344,9 @@ export type UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  biDashboards?: Prisma.BiDashboardUncheckedUpdateManyWithoutUserNestedInput
+  biDashboardMembers?: Prisma.BiDashboardMemberUncheckedUpdateManyWithoutUserNestedInput
+  biDataSets?: Prisma.BiDataSetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -405,6 +426,11 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -435,6 +461,52 @@ export type UserUpdateOneRequiredWithoutUserRolesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUserRolesInput, Prisma.UserUpdateWithoutUserRolesInput>, Prisma.UserUncheckedUpdateWithoutUserRolesInput>
 }
 
+export type UserCreateNestedOneWithoutBiDashboardsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBiDashboardsInput, Prisma.UserUncheckedCreateWithoutBiDashboardsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBiDashboardsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutBiDashboardsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBiDashboardsInput, Prisma.UserUncheckedCreateWithoutBiDashboardsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBiDashboardsInput
+  upsert?: Prisma.UserUpsertWithoutBiDashboardsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBiDashboardsInput, Prisma.UserUpdateWithoutBiDashboardsInput>, Prisma.UserUncheckedUpdateWithoutBiDashboardsInput>
+}
+
+export type UserCreateNestedOneWithoutBiDashboardMembersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBiDashboardMembersInput, Prisma.UserUncheckedCreateWithoutBiDashboardMembersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBiDashboardMembersInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutBiDashboardMembersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBiDashboardMembersInput, Prisma.UserUncheckedCreateWithoutBiDashboardMembersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBiDashboardMembersInput
+  upsert?: Prisma.UserUpsertWithoutBiDashboardMembersInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBiDashboardMembersInput, Prisma.UserUpdateWithoutBiDashboardMembersInput>, Prisma.UserUncheckedUpdateWithoutBiDashboardMembersInput>
+}
+
+export type UserCreateNestedOneWithoutBiDataSetsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBiDataSetsInput, Prisma.UserUncheckedCreateWithoutBiDataSetsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBiDataSetsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutBiDataSetsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBiDataSetsInput, Prisma.UserUncheckedCreateWithoutBiDataSetsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBiDataSetsInput
+  upsert?: Prisma.UserUpsertWithoutBiDataSetsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBiDataSetsInput, Prisma.UserUpdateWithoutBiDataSetsInput>, Prisma.UserUncheckedUpdateWithoutBiDataSetsInput>
+}
+
 export type UserCreateWithoutUserRolesInput = {
   id?: string
   fullName?: string | null
@@ -445,6 +517,9 @@ export type UserCreateWithoutUserRolesInput = {
   isSuperAdmin?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  biDashboards?: Prisma.BiDashboardCreateNestedManyWithoutUserInput
+  biDashboardMembers?: Prisma.BiDashboardMemberCreateNestedManyWithoutUserInput
+  biDataSets?: Prisma.BiDataSetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUserRolesInput = {
@@ -457,6 +532,9 @@ export type UserUncheckedCreateWithoutUserRolesInput = {
   isSuperAdmin?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  biDashboards?: Prisma.BiDashboardUncheckedCreateNestedManyWithoutUserInput
+  biDashboardMembers?: Prisma.BiDashboardMemberUncheckedCreateNestedManyWithoutUserInput
+  biDataSets?: Prisma.BiDataSetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUserRolesInput = {
@@ -485,6 +563,9 @@ export type UserUpdateWithoutUserRolesInput = {
   isSuperAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  biDashboards?: Prisma.BiDashboardUpdateManyWithoutUserNestedInput
+  biDashboardMembers?: Prisma.BiDashboardMemberUpdateManyWithoutUserNestedInput
+  biDataSets?: Prisma.BiDataSetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserRolesInput = {
@@ -497,6 +578,237 @@ export type UserUncheckedUpdateWithoutUserRolesInput = {
   isSuperAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  biDashboards?: Prisma.BiDashboardUncheckedUpdateManyWithoutUserNestedInput
+  biDashboardMembers?: Prisma.BiDashboardMemberUncheckedUpdateManyWithoutUserNestedInput
+  biDataSets?: Prisma.BiDataSetUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutBiDashboardsInput = {
+  id?: string
+  fullName?: string | null
+  avatar?: string | null
+  userName: string
+  email: string
+  passwordHash: string
+  isSuperAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  biDashboardMembers?: Prisma.BiDashboardMemberCreateNestedManyWithoutUserInput
+  biDataSets?: Prisma.BiDataSetCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutBiDashboardsInput = {
+  id?: string
+  fullName?: string | null
+  avatar?: string | null
+  userName: string
+  email: string
+  passwordHash: string
+  isSuperAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  biDashboardMembers?: Prisma.BiDashboardMemberUncheckedCreateNestedManyWithoutUserInput
+  biDataSets?: Prisma.BiDataSetUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutBiDashboardsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutBiDashboardsInput, Prisma.UserUncheckedCreateWithoutBiDashboardsInput>
+}
+
+export type UserUpsertWithoutBiDashboardsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutBiDashboardsInput, Prisma.UserUncheckedUpdateWithoutBiDashboardsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBiDashboardsInput, Prisma.UserUncheckedCreateWithoutBiDashboardsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutBiDashboardsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutBiDashboardsInput, Prisma.UserUncheckedUpdateWithoutBiDashboardsInput>
+}
+
+export type UserUpdateWithoutBiDashboardsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  isSuperAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  biDashboardMembers?: Prisma.BiDashboardMemberUpdateManyWithoutUserNestedInput
+  biDataSets?: Prisma.BiDataSetUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutBiDashboardsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  isSuperAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  biDashboardMembers?: Prisma.BiDashboardMemberUncheckedUpdateManyWithoutUserNestedInput
+  biDataSets?: Prisma.BiDataSetUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutBiDashboardMembersInput = {
+  id?: string
+  fullName?: string | null
+  avatar?: string | null
+  userName: string
+  email: string
+  passwordHash: string
+  isSuperAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  biDashboards?: Prisma.BiDashboardCreateNestedManyWithoutUserInput
+  biDataSets?: Prisma.BiDataSetCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutBiDashboardMembersInput = {
+  id?: string
+  fullName?: string | null
+  avatar?: string | null
+  userName: string
+  email: string
+  passwordHash: string
+  isSuperAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  biDashboards?: Prisma.BiDashboardUncheckedCreateNestedManyWithoutUserInput
+  biDataSets?: Prisma.BiDataSetUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutBiDashboardMembersInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutBiDashboardMembersInput, Prisma.UserUncheckedCreateWithoutBiDashboardMembersInput>
+}
+
+export type UserUpsertWithoutBiDashboardMembersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutBiDashboardMembersInput, Prisma.UserUncheckedUpdateWithoutBiDashboardMembersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBiDashboardMembersInput, Prisma.UserUncheckedCreateWithoutBiDashboardMembersInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutBiDashboardMembersInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutBiDashboardMembersInput, Prisma.UserUncheckedUpdateWithoutBiDashboardMembersInput>
+}
+
+export type UserUpdateWithoutBiDashboardMembersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  isSuperAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  biDashboards?: Prisma.BiDashboardUpdateManyWithoutUserNestedInput
+  biDataSets?: Prisma.BiDataSetUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutBiDashboardMembersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  isSuperAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  biDashboards?: Prisma.BiDashboardUncheckedUpdateManyWithoutUserNestedInput
+  biDataSets?: Prisma.BiDataSetUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutBiDataSetsInput = {
+  id?: string
+  fullName?: string | null
+  avatar?: string | null
+  userName: string
+  email: string
+  passwordHash: string
+  isSuperAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  biDashboards?: Prisma.BiDashboardCreateNestedManyWithoutUserInput
+  biDashboardMembers?: Prisma.BiDashboardMemberCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutBiDataSetsInput = {
+  id?: string
+  fullName?: string | null
+  avatar?: string | null
+  userName: string
+  email: string
+  passwordHash: string
+  isSuperAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  biDashboards?: Prisma.BiDashboardUncheckedCreateNestedManyWithoutUserInput
+  biDashboardMembers?: Prisma.BiDashboardMemberUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutBiDataSetsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutBiDataSetsInput, Prisma.UserUncheckedCreateWithoutBiDataSetsInput>
+}
+
+export type UserUpsertWithoutBiDataSetsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutBiDataSetsInput, Prisma.UserUncheckedUpdateWithoutBiDataSetsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBiDataSetsInput, Prisma.UserUncheckedCreateWithoutBiDataSetsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutBiDataSetsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutBiDataSetsInput, Prisma.UserUncheckedUpdateWithoutBiDataSetsInput>
+}
+
+export type UserUpdateWithoutBiDataSetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  isSuperAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  biDashboards?: Prisma.BiDashboardUpdateManyWithoutUserNestedInput
+  biDashboardMembers?: Prisma.BiDashboardMemberUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutBiDataSetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  isSuperAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  biDashboards?: Prisma.BiDashboardUncheckedUpdateManyWithoutUserNestedInput
+  biDashboardMembers?: Prisma.BiDashboardMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -506,10 +818,16 @@ export type UserUncheckedUpdateWithoutUserRolesInput = {
 
 export type UserCountOutputType = {
   userRoles: number
+  biDashboards: number
+  biDashboardMembers: number
+  biDataSets: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   userRoles?: boolean | UserCountOutputTypeCountUserRolesArgs
+  biDashboards?: boolean | UserCountOutputTypeCountBiDashboardsArgs
+  biDashboardMembers?: boolean | UserCountOutputTypeCountBiDashboardMembersArgs
+  biDataSets?: boolean | UserCountOutputTypeCountBiDataSetsArgs
 }
 
 /**
@@ -529,6 +847,27 @@ export type UserCountOutputTypeCountUserRolesArgs<ExtArgs extends runtime.Types.
   where?: Prisma.UserRoleWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountBiDashboardsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BiDashboardWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountBiDashboardMembersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BiDashboardMemberWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountBiDataSetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BiDataSetWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -541,6 +880,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   userRoles?: boolean | Prisma.User$userRolesArgs<ExtArgs>
+  biDashboards?: boolean | Prisma.User$biDashboardsArgs<ExtArgs>
+  biDashboardMembers?: boolean | Prisma.User$biDashboardMembersArgs<ExtArgs>
+  biDataSets?: boolean | Prisma.User$biDataSetsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -583,6 +925,9 @@ export type UserSelectScalar = {
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "avatar" | "userName" | "email" | "passwordHash" | "isSuperAdmin" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   userRoles?: boolean | Prisma.User$userRolesArgs<ExtArgs>
+  biDashboards?: boolean | Prisma.User$biDashboardsArgs<ExtArgs>
+  biDashboardMembers?: boolean | Prisma.User$biDashboardMembersArgs<ExtArgs>
+  biDataSets?: boolean | Prisma.User$biDataSetsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -592,6 +937,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     userRoles: Prisma.$UserRolePayload<ExtArgs>[]
+    biDashboards: Prisma.$BiDashboardPayload<ExtArgs>[]
+    biDashboardMembers: Prisma.$BiDashboardMemberPayload<ExtArgs>[]
+    biDataSets: Prisma.$BiDataSetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -998,6 +1346,9 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   userRoles<T extends Prisma.User$userRolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$userRolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  biDashboards<T extends Prisma.User$biDashboardsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$biDashboardsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiDashboardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  biDashboardMembers<T extends Prisma.User$biDashboardMembersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$biDashboardMembersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiDashboardMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  biDataSets<T extends Prisma.User$biDataSetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$biDataSetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiDataSetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1450,6 +1801,78 @@ export type User$userRolesArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.UserRoleScalarFieldEnum | Prisma.UserRoleScalarFieldEnum[]
+}
+
+/**
+ * User.biDashboards
+ */
+export type User$biDashboardsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BiDashboard
+   */
+  select?: Prisma.BiDashboardSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BiDashboard
+   */
+  omit?: Prisma.BiDashboardOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BiDashboardInclude<ExtArgs> | null
+  where?: Prisma.BiDashboardWhereInput
+  orderBy?: Prisma.BiDashboardOrderByWithRelationInput | Prisma.BiDashboardOrderByWithRelationInput[]
+  cursor?: Prisma.BiDashboardWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BiDashboardScalarFieldEnum | Prisma.BiDashboardScalarFieldEnum[]
+}
+
+/**
+ * User.biDashboardMembers
+ */
+export type User$biDashboardMembersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BiDashboardMember
+   */
+  select?: Prisma.BiDashboardMemberSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BiDashboardMember
+   */
+  omit?: Prisma.BiDashboardMemberOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BiDashboardMemberInclude<ExtArgs> | null
+  where?: Prisma.BiDashboardMemberWhereInput
+  orderBy?: Prisma.BiDashboardMemberOrderByWithRelationInput | Prisma.BiDashboardMemberOrderByWithRelationInput[]
+  cursor?: Prisma.BiDashboardMemberWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BiDashboardMemberScalarFieldEnum | Prisma.BiDashboardMemberScalarFieldEnum[]
+}
+
+/**
+ * User.biDataSets
+ */
+export type User$biDataSetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BiDataSet
+   */
+  select?: Prisma.BiDataSetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BiDataSet
+   */
+  omit?: Prisma.BiDataSetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BiDataSetInclude<ExtArgs> | null
+  where?: Prisma.BiDataSetWhereInput
+  orderBy?: Prisma.BiDataSetOrderByWithRelationInput | Prisma.BiDataSetOrderByWithRelationInput[]
+  cursor?: Prisma.BiDataSetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BiDataSetScalarFieldEnum | Prisma.BiDataSetScalarFieldEnum[]
 }
 
 /**

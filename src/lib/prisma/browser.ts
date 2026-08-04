@@ -37,3 +37,28 @@ export type UserRole = Prisma.UserRoleModel
  * 
  */
 export type RolePermission = Prisma.RolePermissionModel
+/**
+ * Model BiFolder
+ * 
+ */
+export type BiFolder = Prisma.BiFolderModel
+/**
+ * Model BiDashboard
+ * 
+ */
+export type BiDashboard = Prisma.BiDashboardModel
+/**
+ * Model BiDashboardMember
+ * 
+ */
+export type BiDashboardMember = Prisma.BiDashboardMemberModel
+/**
+ * Model BiDataSet
+ * 
+ */
+export type BiDataSet = Prisma.BiDataSetModel
+/**
+ * Model BiPanel
+ * 
+ */
+export type BiPanel = Prisma.BiPanelModel

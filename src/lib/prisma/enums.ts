@@ -9,7 +9,9 @@
 * 🟢 You can import this file directly.
 */
 
+export const BiRole = {
+  VIEWER: 'VIEWER',
+  EDITOR: 'EDITOR'
+} as const
 
-
-// This file is empty because there are no enums in the schema.
-export {}
+export type BiRole = (typeof BiRole)[keyof typeof BiRole]

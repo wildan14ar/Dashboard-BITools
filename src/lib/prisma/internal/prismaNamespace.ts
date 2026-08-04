@@ -400,7 +400,12 @@ export const ModelName = {
   User: 'User',
   Role: 'Role',
   UserRole: 'UserRole',
-  RolePermission: 'RolePermission'
+  RolePermission: 'RolePermission',
+  BiFolder: 'BiFolder',
+  BiDashboard: 'BiDashboard',
+  BiDashboardMember: 'BiDashboardMember',
+  BiDataSet: 'BiDataSet',
+  BiPanel: 'BiPanel'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -416,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "role" | "userRole" | "rolePermission"
+    modelProps: "user" | "role" | "userRole" | "rolePermission" | "biFolder" | "biDashboard" | "biDashboardMember" | "biDataSet" | "biPanel"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -716,6 +721,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    BiFolder: {
+      payload: Prisma.$BiFolderPayload<ExtArgs>
+      fields: Prisma.BiFolderFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BiFolderFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BiFolderFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>
+        }
+        findFirst: {
+          args: Prisma.BiFolderFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BiFolderFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>
+        }
+        findMany: {
+          args: Prisma.BiFolderFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>[]
+        }
+        create: {
+          args: Prisma.BiFolderCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>
+        }
+        createMany: {
+          args: Prisma.BiFolderCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BiFolderCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>[]
+        }
+        delete: {
+          args: Prisma.BiFolderDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>
+        }
+        update: {
+          args: Prisma.BiFolderUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>
+        }
+        deleteMany: {
+          args: Prisma.BiFolderDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BiFolderUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BiFolderUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>[]
+        }
+        upsert: {
+          args: Prisma.BiFolderUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>
+        }
+        aggregate: {
+          args: Prisma.BiFolderAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBiFolder>
+        }
+        groupBy: {
+          args: Prisma.BiFolderGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiFolderGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BiFolderCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiFolderCountAggregateOutputType> | number
+        }
+      }
+    }
+    BiDashboard: {
+      payload: Prisma.$BiDashboardPayload<ExtArgs>
+      fields: Prisma.BiDashboardFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BiDashboardFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BiDashboardFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardPayload>
+        }
+        findFirst: {
+          args: Prisma.BiDashboardFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BiDashboardFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardPayload>
+        }
+        findMany: {
+          args: Prisma.BiDashboardFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardPayload>[]
+        }
+        create: {
+          args: Prisma.BiDashboardCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardPayload>
+        }
+        createMany: {
+          args: Prisma.BiDashboardCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BiDashboardCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardPayload>[]
+        }
+        delete: {
+          args: Prisma.BiDashboardDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardPayload>
+        }
+        update: {
+          args: Prisma.BiDashboardUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardPayload>
+        }
+        deleteMany: {
+          args: Prisma.BiDashboardDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BiDashboardUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BiDashboardUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardPayload>[]
+        }
+        upsert: {
+          args: Prisma.BiDashboardUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardPayload>
+        }
+        aggregate: {
+          args: Prisma.BiDashboardAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBiDashboard>
+        }
+        groupBy: {
+          args: Prisma.BiDashboardGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiDashboardGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BiDashboardCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiDashboardCountAggregateOutputType> | number
+        }
+      }
+    }
+    BiDashboardMember: {
+      payload: Prisma.$BiDashboardMemberPayload<ExtArgs>
+      fields: Prisma.BiDashboardMemberFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BiDashboardMemberFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardMemberPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BiDashboardMemberFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardMemberPayload>
+        }
+        findFirst: {
+          args: Prisma.BiDashboardMemberFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardMemberPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BiDashboardMemberFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardMemberPayload>
+        }
+        findMany: {
+          args: Prisma.BiDashboardMemberFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardMemberPayload>[]
+        }
+        create: {
+          args: Prisma.BiDashboardMemberCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardMemberPayload>
+        }
+        createMany: {
+          args: Prisma.BiDashboardMemberCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BiDashboardMemberCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardMemberPayload>[]
+        }
+        delete: {
+          args: Prisma.BiDashboardMemberDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardMemberPayload>
+        }
+        update: {
+          args: Prisma.BiDashboardMemberUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardMemberPayload>
+        }
+        deleteMany: {
+          args: Prisma.BiDashboardMemberDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BiDashboardMemberUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BiDashboardMemberUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardMemberPayload>[]
+        }
+        upsert: {
+          args: Prisma.BiDashboardMemberUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDashboardMemberPayload>
+        }
+        aggregate: {
+          args: Prisma.BiDashboardMemberAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBiDashboardMember>
+        }
+        groupBy: {
+          args: Prisma.BiDashboardMemberGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiDashboardMemberGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BiDashboardMemberCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiDashboardMemberCountAggregateOutputType> | number
+        }
+      }
+    }
+    BiDataSet: {
+      payload: Prisma.$BiDataSetPayload<ExtArgs>
+      fields: Prisma.BiDataSetFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BiDataSetFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BiDataSetFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>
+        }
+        findFirst: {
+          args: Prisma.BiDataSetFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BiDataSetFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>
+        }
+        findMany: {
+          args: Prisma.BiDataSetFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>[]
+        }
+        create: {
+          args: Prisma.BiDataSetCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>
+        }
+        createMany: {
+          args: Prisma.BiDataSetCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BiDataSetCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>[]
+        }
+        delete: {
+          args: Prisma.BiDataSetDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>
+        }
+        update: {
+          args: Prisma.BiDataSetUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>
+        }
+        deleteMany: {
+          args: Prisma.BiDataSetDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BiDataSetUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BiDataSetUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>[]
+        }
+        upsert: {
+          args: Prisma.BiDataSetUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>
+        }
+        aggregate: {
+          args: Prisma.BiDataSetAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBiDataSet>
+        }
+        groupBy: {
+          args: Prisma.BiDataSetGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiDataSetGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BiDataSetCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiDataSetCountAggregateOutputType> | number
+        }
+      }
+    }
+    BiPanel: {
+      payload: Prisma.$BiPanelPayload<ExtArgs>
+      fields: Prisma.BiPanelFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BiPanelFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiPanelPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BiPanelFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiPanelPayload>
+        }
+        findFirst: {
+          args: Prisma.BiPanelFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiPanelPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BiPanelFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiPanelPayload>
+        }
+        findMany: {
+          args: Prisma.BiPanelFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiPanelPayload>[]
+        }
+        create: {
+          args: Prisma.BiPanelCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiPanelPayload>
+        }
+        createMany: {
+          args: Prisma.BiPanelCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BiPanelCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiPanelPayload>[]
+        }
+        delete: {
+          args: Prisma.BiPanelDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiPanelPayload>
+        }
+        update: {
+          args: Prisma.BiPanelUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiPanelPayload>
+        }
+        deleteMany: {
+          args: Prisma.BiPanelDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BiPanelUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BiPanelUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiPanelPayload>[]
+        }
+        upsert: {
+          args: Prisma.BiPanelUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiPanelPayload>
+        }
+        aggregate: {
+          args: Prisma.BiPanelAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBiPanel>
+        }
+        groupBy: {
+          args: Prisma.BiPanelGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiPanelGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BiPanelCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiPanelCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -805,12 +1180,87 @@ export const RolePermissionScalarFieldEnum = {
 export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
 
 
+export const BiFolderScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  parentId: 'parentId',
+  createdAt: 'createdAt'
+} as const
+
+export type BiFolderScalarFieldEnum = (typeof BiFolderScalarFieldEnum)[keyof typeof BiFolderScalarFieldEnum]
+
+
+export const BiDashboardScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  isPublic: 'isPublic',
+  folderId: 'folderId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type BiDashboardScalarFieldEnum = (typeof BiDashboardScalarFieldEnum)[keyof typeof BiDashboardScalarFieldEnum]
+
+
+export const BiDashboardMemberScalarFieldEnum = {
+  id: 'id',
+  dashboardId: 'dashboardId',
+  userId: 'userId',
+  role: 'role'
+} as const
+
+export type BiDashboardMemberScalarFieldEnum = (typeof BiDashboardMemberScalarFieldEnum)[keyof typeof BiDashboardMemberScalarFieldEnum]
+
+
+export const BiDataSetScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  sql: 'sql',
+  description: 'description',
+  isPublic: 'isPublic',
+  lastRunAt: 'lastRunAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type BiDataSetScalarFieldEnum = (typeof BiDataSetScalarFieldEnum)[keyof typeof BiDataSetScalarFieldEnum]
+
+
+export const BiPanelScalarFieldEnum = {
+  id: 'id',
+  dashboardId: 'dashboardId',
+  dataSetId: 'dataSetId',
+  title: 'title',
+  chartType: 'chartType',
+  config: 'config',
+  x: 'x',
+  y: 'y',
+  w: 'w',
+  h: 'h',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BiPanelScalarFieldEnum = (typeof BiPanelScalarFieldEnum)[keyof typeof BiPanelScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -827,6 +1277,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -871,6 +1330,34 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
+ * Reference to a field of type 'BiRole'
+ */
+export type EnumBiRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BiRole'>
+    
+
+
+/**
+ * Reference to a field of type 'BiRole[]'
+ */
+export type ListEnumBiRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BiRole[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -881,6 +1368,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**
@@ -1038,6 +1539,11 @@ export type GlobalOmitConfig = {
   role?: Prisma.RoleOmit
   userRole?: Prisma.UserRoleOmit
   rolePermission?: Prisma.RolePermissionOmit
+  biFolder?: Prisma.BiFolderOmit
+  biDashboard?: Prisma.BiDashboardOmit
+  biDashboardMember?: Prisma.BiDashboardMemberOmit
+  biDataSet?: Prisma.BiDataSetOmit
+  biPanel?: Prisma.BiPanelOmit
 }
 
 /* Types for Logging */
