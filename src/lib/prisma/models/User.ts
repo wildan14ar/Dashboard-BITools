@@ -217,7 +217,7 @@ export type UserWhereInput = {
   userRoles?: Prisma.UserRoleListRelationFilter
   biDashboards?: Prisma.BiDashboardListRelationFilter
   biDashboardMembers?: Prisma.BiDashboardMemberListRelationFilter
-  biDataSets?: Prisma.BiDataSetListRelationFilter
+  biDatasets?: Prisma.BiDatasetListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -233,7 +233,7 @@ export type UserOrderByWithRelationInput = {
   userRoles?: Prisma.UserRoleOrderByRelationAggregateInput
   biDashboards?: Prisma.BiDashboardOrderByRelationAggregateInput
   biDashboardMembers?: Prisma.BiDashboardMemberOrderByRelationAggregateInput
-  biDataSets?: Prisma.BiDataSetOrderByRelationAggregateInput
+  biDatasets?: Prisma.BiDatasetOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -252,7 +252,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   userRoles?: Prisma.UserRoleListRelationFilter
   biDashboards?: Prisma.BiDashboardListRelationFilter
   biDashboardMembers?: Prisma.BiDashboardMemberListRelationFilter
-  biDataSets?: Prisma.BiDataSetListRelationFilter
+  biDatasets?: Prisma.BiDatasetListRelationFilter
 }, "id" | "userName" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -298,7 +298,7 @@ export type UserCreateInput = {
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   biDashboards?: Prisma.BiDashboardCreateNestedManyWithoutUserInput
   biDashboardMembers?: Prisma.BiDashboardMemberCreateNestedManyWithoutUserInput
-  biDataSets?: Prisma.BiDataSetCreateNestedManyWithoutUserInput
+  biDatasets?: Prisma.BiDatasetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -314,7 +314,7 @@ export type UserUncheckedCreateInput = {
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   biDashboards?: Prisma.BiDashboardUncheckedCreateNestedManyWithoutUserInput
   biDashboardMembers?: Prisma.BiDashboardMemberUncheckedCreateNestedManyWithoutUserInput
-  biDataSets?: Prisma.BiDataSetUncheckedCreateNestedManyWithoutUserInput
+  biDatasets?: Prisma.BiDatasetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -330,7 +330,7 @@ export type UserUpdateInput = {
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   biDashboards?: Prisma.BiDashboardUpdateManyWithoutUserNestedInput
   biDashboardMembers?: Prisma.BiDashboardMemberUpdateManyWithoutUserNestedInput
-  biDataSets?: Prisma.BiDataSetUpdateManyWithoutUserNestedInput
+  biDatasets?: Prisma.BiDatasetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -346,7 +346,7 @@ export type UserUncheckedUpdateInput = {
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   biDashboards?: Prisma.BiDashboardUncheckedUpdateManyWithoutUserNestedInput
   biDashboardMembers?: Prisma.BiDashboardMemberUncheckedUpdateManyWithoutUserNestedInput
-  biDataSets?: Prisma.BiDataSetUncheckedUpdateManyWithoutUserNestedInput
+  biDatasets?: Prisma.BiDatasetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -491,20 +491,20 @@ export type UserUpdateOneRequiredWithoutBiDashboardMembersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBiDashboardMembersInput, Prisma.UserUpdateWithoutBiDashboardMembersInput>, Prisma.UserUncheckedUpdateWithoutBiDashboardMembersInput>
 }
 
-export type UserCreateNestedOneWithoutBiDataSetsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutBiDataSetsInput, Prisma.UserUncheckedCreateWithoutBiDataSetsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBiDataSetsInput
+export type UserCreateNestedOneWithoutBiDatasetsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBiDatasetsInput, Prisma.UserUncheckedCreateWithoutBiDatasetsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBiDatasetsInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneWithoutBiDataSetsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutBiDataSetsInput, Prisma.UserUncheckedCreateWithoutBiDataSetsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBiDataSetsInput
-  upsert?: Prisma.UserUpsertWithoutBiDataSetsInput
+export type UserUpdateOneWithoutBiDatasetsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBiDatasetsInput, Prisma.UserUncheckedCreateWithoutBiDatasetsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBiDatasetsInput
+  upsert?: Prisma.UserUpsertWithoutBiDatasetsInput
   disconnect?: Prisma.UserWhereInput | boolean
   delete?: Prisma.UserWhereInput | boolean
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBiDataSetsInput, Prisma.UserUpdateWithoutBiDataSetsInput>, Prisma.UserUncheckedUpdateWithoutBiDataSetsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBiDatasetsInput, Prisma.UserUpdateWithoutBiDatasetsInput>, Prisma.UserUncheckedUpdateWithoutBiDatasetsInput>
 }
 
 export type UserCreateWithoutUserRolesInput = {
@@ -519,7 +519,7 @@ export type UserCreateWithoutUserRolesInput = {
   updatedAt?: Date | string
   biDashboards?: Prisma.BiDashboardCreateNestedManyWithoutUserInput
   biDashboardMembers?: Prisma.BiDashboardMemberCreateNestedManyWithoutUserInput
-  biDataSets?: Prisma.BiDataSetCreateNestedManyWithoutUserInput
+  biDatasets?: Prisma.BiDatasetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUserRolesInput = {
@@ -534,7 +534,7 @@ export type UserUncheckedCreateWithoutUserRolesInput = {
   updatedAt?: Date | string
   biDashboards?: Prisma.BiDashboardUncheckedCreateNestedManyWithoutUserInput
   biDashboardMembers?: Prisma.BiDashboardMemberUncheckedCreateNestedManyWithoutUserInput
-  biDataSets?: Prisma.BiDataSetUncheckedCreateNestedManyWithoutUserInput
+  biDatasets?: Prisma.BiDatasetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUserRolesInput = {
@@ -565,7 +565,7 @@ export type UserUpdateWithoutUserRolesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   biDashboards?: Prisma.BiDashboardUpdateManyWithoutUserNestedInput
   biDashboardMembers?: Prisma.BiDashboardMemberUpdateManyWithoutUserNestedInput
-  biDataSets?: Prisma.BiDataSetUpdateManyWithoutUserNestedInput
+  biDatasets?: Prisma.BiDatasetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUserRolesInput = {
@@ -580,7 +580,7 @@ export type UserUncheckedUpdateWithoutUserRolesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   biDashboards?: Prisma.BiDashboardUncheckedUpdateManyWithoutUserNestedInput
   biDashboardMembers?: Prisma.BiDashboardMemberUncheckedUpdateManyWithoutUserNestedInput
-  biDataSets?: Prisma.BiDataSetUncheckedUpdateManyWithoutUserNestedInput
+  biDatasets?: Prisma.BiDatasetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBiDashboardsInput = {
@@ -595,7 +595,7 @@ export type UserCreateWithoutBiDashboardsInput = {
   updatedAt?: Date | string
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   biDashboardMembers?: Prisma.BiDashboardMemberCreateNestedManyWithoutUserInput
-  biDataSets?: Prisma.BiDataSetCreateNestedManyWithoutUserInput
+  biDatasets?: Prisma.BiDatasetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBiDashboardsInput = {
@@ -610,7 +610,7 @@ export type UserUncheckedCreateWithoutBiDashboardsInput = {
   updatedAt?: Date | string
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   biDashboardMembers?: Prisma.BiDashboardMemberUncheckedCreateNestedManyWithoutUserInput
-  biDataSets?: Prisma.BiDataSetUncheckedCreateNestedManyWithoutUserInput
+  biDatasets?: Prisma.BiDatasetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBiDashboardsInput = {
@@ -641,7 +641,7 @@ export type UserUpdateWithoutBiDashboardsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   biDashboardMembers?: Prisma.BiDashboardMemberUpdateManyWithoutUserNestedInput
-  biDataSets?: Prisma.BiDataSetUpdateManyWithoutUserNestedInput
+  biDatasets?: Prisma.BiDatasetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBiDashboardsInput = {
@@ -656,7 +656,7 @@ export type UserUncheckedUpdateWithoutBiDashboardsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   biDashboardMembers?: Prisma.BiDashboardMemberUncheckedUpdateManyWithoutUserNestedInput
-  biDataSets?: Prisma.BiDataSetUncheckedUpdateManyWithoutUserNestedInput
+  biDatasets?: Prisma.BiDatasetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBiDashboardMembersInput = {
@@ -671,7 +671,7 @@ export type UserCreateWithoutBiDashboardMembersInput = {
   updatedAt?: Date | string
   userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   biDashboards?: Prisma.BiDashboardCreateNestedManyWithoutUserInput
-  biDataSets?: Prisma.BiDataSetCreateNestedManyWithoutUserInput
+  biDatasets?: Prisma.BiDatasetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBiDashboardMembersInput = {
@@ -686,7 +686,7 @@ export type UserUncheckedCreateWithoutBiDashboardMembersInput = {
   updatedAt?: Date | string
   userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   biDashboards?: Prisma.BiDashboardUncheckedCreateNestedManyWithoutUserInput
-  biDataSets?: Prisma.BiDataSetUncheckedCreateNestedManyWithoutUserInput
+  biDatasets?: Prisma.BiDatasetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBiDashboardMembersInput = {
@@ -717,7 +717,7 @@ export type UserUpdateWithoutBiDashboardMembersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   biDashboards?: Prisma.BiDashboardUpdateManyWithoutUserNestedInput
-  biDataSets?: Prisma.BiDataSetUpdateManyWithoutUserNestedInput
+  biDatasets?: Prisma.BiDatasetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBiDashboardMembersInput = {
@@ -732,10 +732,10 @@ export type UserUncheckedUpdateWithoutBiDashboardMembersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   biDashboards?: Prisma.BiDashboardUncheckedUpdateManyWithoutUserNestedInput
-  biDataSets?: Prisma.BiDataSetUncheckedUpdateManyWithoutUserNestedInput
+  biDatasets?: Prisma.BiDatasetUncheckedUpdateManyWithoutUserNestedInput
 }
 
-export type UserCreateWithoutBiDataSetsInput = {
+export type UserCreateWithoutBiDatasetsInput = {
   id?: string
   fullName?: string | null
   avatar?: string | null
@@ -750,7 +750,7 @@ export type UserCreateWithoutBiDataSetsInput = {
   biDashboardMembers?: Prisma.BiDashboardMemberCreateNestedManyWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutBiDataSetsInput = {
+export type UserUncheckedCreateWithoutBiDatasetsInput = {
   id?: string
   fullName?: string | null
   avatar?: string | null
@@ -765,23 +765,23 @@ export type UserUncheckedCreateWithoutBiDataSetsInput = {
   biDashboardMembers?: Prisma.BiDashboardMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutBiDataSetsInput = {
+export type UserCreateOrConnectWithoutBiDatasetsInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutBiDataSetsInput, Prisma.UserUncheckedCreateWithoutBiDataSetsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBiDatasetsInput, Prisma.UserUncheckedCreateWithoutBiDatasetsInput>
 }
 
-export type UserUpsertWithoutBiDataSetsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutBiDataSetsInput, Prisma.UserUncheckedUpdateWithoutBiDataSetsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutBiDataSetsInput, Prisma.UserUncheckedCreateWithoutBiDataSetsInput>
+export type UserUpsertWithoutBiDatasetsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutBiDatasetsInput, Prisma.UserUncheckedUpdateWithoutBiDatasetsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBiDatasetsInput, Prisma.UserUncheckedCreateWithoutBiDatasetsInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutBiDataSetsInput = {
+export type UserUpdateToOneWithWhereWithoutBiDatasetsInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutBiDataSetsInput, Prisma.UserUncheckedUpdateWithoutBiDataSetsInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutBiDatasetsInput, Prisma.UserUncheckedUpdateWithoutBiDatasetsInput>
 }
 
-export type UserUpdateWithoutBiDataSetsInput = {
+export type UserUpdateWithoutBiDatasetsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -796,7 +796,7 @@ export type UserUpdateWithoutBiDataSetsInput = {
   biDashboardMembers?: Prisma.BiDashboardMemberUpdateManyWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutBiDataSetsInput = {
+export type UserUncheckedUpdateWithoutBiDatasetsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -820,14 +820,14 @@ export type UserCountOutputType = {
   userRoles: number
   biDashboards: number
   biDashboardMembers: number
-  biDataSets: number
+  biDatasets: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   userRoles?: boolean | UserCountOutputTypeCountUserRolesArgs
   biDashboards?: boolean | UserCountOutputTypeCountBiDashboardsArgs
   biDashboardMembers?: boolean | UserCountOutputTypeCountBiDashboardMembersArgs
-  biDataSets?: boolean | UserCountOutputTypeCountBiDataSetsArgs
+  biDatasets?: boolean | UserCountOutputTypeCountBiDatasetsArgs
 }
 
 /**
@@ -864,8 +864,8 @@ export type UserCountOutputTypeCountBiDashboardMembersArgs<ExtArgs extends runti
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountBiDataSetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.BiDataSetWhereInput
+export type UserCountOutputTypeCountBiDatasetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BiDatasetWhereInput
 }
 
 
@@ -882,7 +882,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   userRoles?: boolean | Prisma.User$userRolesArgs<ExtArgs>
   biDashboards?: boolean | Prisma.User$biDashboardsArgs<ExtArgs>
   biDashboardMembers?: boolean | Prisma.User$biDashboardMembersArgs<ExtArgs>
-  biDataSets?: boolean | Prisma.User$biDataSetsArgs<ExtArgs>
+  biDatasets?: boolean | Prisma.User$biDatasetsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -927,7 +927,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   userRoles?: boolean | Prisma.User$userRolesArgs<ExtArgs>
   biDashboards?: boolean | Prisma.User$biDashboardsArgs<ExtArgs>
   biDashboardMembers?: boolean | Prisma.User$biDashboardMembersArgs<ExtArgs>
-  biDataSets?: boolean | Prisma.User$biDataSetsArgs<ExtArgs>
+  biDatasets?: boolean | Prisma.User$biDatasetsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -939,7 +939,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     userRoles: Prisma.$UserRolePayload<ExtArgs>[]
     biDashboards: Prisma.$BiDashboardPayload<ExtArgs>[]
     biDashboardMembers: Prisma.$BiDashboardMemberPayload<ExtArgs>[]
-    biDataSets: Prisma.$BiDataSetPayload<ExtArgs>[]
+    biDatasets: Prisma.$BiDatasetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1348,7 +1348,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   userRoles<T extends Prisma.User$userRolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$userRolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   biDashboards<T extends Prisma.User$biDashboardsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$biDashboardsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiDashboardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   biDashboardMembers<T extends Prisma.User$biDashboardMembersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$biDashboardMembersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiDashboardMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  biDataSets<T extends Prisma.User$biDataSetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$biDataSetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiDataSetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  biDatasets<T extends Prisma.User$biDatasetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$biDatasetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiDatasetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1852,27 +1852,27 @@ export type User$biDashboardMembersArgs<ExtArgs extends runtime.Types.Extensions
 }
 
 /**
- * User.biDataSets
+ * User.biDatasets
  */
-export type User$biDataSetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$biDatasetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BiDataSet
+   * Select specific fields to fetch from the BiDataset
    */
-  select?: Prisma.BiDataSetSelect<ExtArgs> | null
+  select?: Prisma.BiDatasetSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the BiDataSet
+   * Omit specific fields from the BiDataset
    */
-  omit?: Prisma.BiDataSetOmit<ExtArgs> | null
+  omit?: Prisma.BiDatasetOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BiDataSetInclude<ExtArgs> | null
-  where?: Prisma.BiDataSetWhereInput
-  orderBy?: Prisma.BiDataSetOrderByWithRelationInput | Prisma.BiDataSetOrderByWithRelationInput[]
-  cursor?: Prisma.BiDataSetWhereUniqueInput
+  include?: Prisma.BiDatasetInclude<ExtArgs> | null
+  where?: Prisma.BiDatasetWhereInput
+  orderBy?: Prisma.BiDatasetOrderByWithRelationInput | Prisma.BiDatasetOrderByWithRelationInput[]
+  cursor?: Prisma.BiDatasetWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.BiDataSetScalarFieldEnum | Prisma.BiDataSetScalarFieldEnum[]
+  distinct?: Prisma.BiDatasetScalarFieldEnum | Prisma.BiDatasetScalarFieldEnum[]
 }
 
 /**

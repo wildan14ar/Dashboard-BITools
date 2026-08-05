@@ -77,12 +77,22 @@ export type BiDashboard = Prisma.BiDashboardModel
  */
 export type BiDashboardMember = Prisma.BiDashboardMemberModel
 /**
- * Model BiDataSet
+ * Model BiDataset
  * 
  */
-export type BiDataSet = Prisma.BiDataSetModel
+export type BiDataset = Prisma.BiDatasetModel
+/**
+ * Model BiSource
+ * 
+ */
+export type BiSource = Prisma.BiSourceModel
 /**
  * Model BiPanel
  * 
  */
 export type BiPanel = Prisma.BiPanelModel
+/**
+ * Model BiFilter
+ * 
+ */
+export type BiFilter = Prisma.BiFilterModel

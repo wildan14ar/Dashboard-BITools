@@ -58,8 +58,10 @@ export const ModelName = {
   BiFolder: 'BiFolder',
   BiDashboard: 'BiDashboard',
   BiDashboardMember: 'BiDashboardMember',
-  BiDataSet: 'BiDataSet',
-  BiPanel: 'BiPanel'
+  BiDataset: 'BiDataset',
+  BiSource: 'BiSource',
+  BiPanel: 'BiPanel',
+  BiFilter: 'BiFilter'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -162,19 +164,32 @@ export const BiDashboardMemberScalarFieldEnum = {
 export type BiDashboardMemberScalarFieldEnum = (typeof BiDashboardMemberScalarFieldEnum)[keyof typeof BiDashboardMemberScalarFieldEnum]
 
 
-export const BiDataSetScalarFieldEnum = {
+export const BiDatasetScalarFieldEnum = {
   id: 'id',
   name: 'name',
   sql: 'sql',
   description: 'description',
   isPublic: 'isPublic',
+  sourceId: 'sourceId',
   lastRunAt: 'lastRunAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId'
 } as const
 
-export type BiDataSetScalarFieldEnum = (typeof BiDataSetScalarFieldEnum)[keyof typeof BiDataSetScalarFieldEnum]
+export type BiDatasetScalarFieldEnum = (typeof BiDatasetScalarFieldEnum)[keyof typeof BiDatasetScalarFieldEnum]
+
+
+export const BiSourceScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  type: 'type',
+  config: 'config',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BiSourceScalarFieldEnum = (typeof BiSourceScalarFieldEnum)[keyof typeof BiSourceScalarFieldEnum]
 
 
 export const BiPanelScalarFieldEnum = {
@@ -193,6 +208,19 @@ export const BiPanelScalarFieldEnum = {
 } as const
 
 export type BiPanelScalarFieldEnum = (typeof BiPanelScalarFieldEnum)[keyof typeof BiPanelScalarFieldEnum]
+
+
+export const BiFilterScalarFieldEnum = {
+  id: 'id',
+  dashboardId: 'dashboardId',
+  name: 'name',
+  label: 'label',
+  type: 'type',
+  config: 'config',
+  position: 'position'
+} as const
+
+export type BiFilterScalarFieldEnum = (typeof BiFilterScalarFieldEnum)[keyof typeof BiFilterScalarFieldEnum]
 
 
 export const SortOrder = {

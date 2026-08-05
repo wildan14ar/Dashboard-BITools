@@ -1,5 +1,5 @@
 {
-  "name": "bi-dashboard",
+  "name": "FYC-DashboardBI",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,6 +13,7 @@
     "@grpc/grpc-js": "^1.14.4",
     "@grpc/proto-loader": "^0.8.1",
     "@hookform/resolvers": "^5.7.1",
+    "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "@tanstack/react-query": "^5.101.4",
     "@xyflow/react": "^12.11.2",

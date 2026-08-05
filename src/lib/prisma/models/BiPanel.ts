@@ -281,7 +281,7 @@ export type BiPanelWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"BiPanel"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"BiPanel"> | Date | string
   dashboard?: Prisma.XOR<Prisma.BiDashboardScalarRelationFilter, Prisma.BiDashboardWhereInput>
-  dataSet?: Prisma.XOR<Prisma.BiDataSetNullableScalarRelationFilter, Prisma.BiDataSetWhereInput> | null
+  dataSet?: Prisma.XOR<Prisma.BiDatasetNullableScalarRelationFilter, Prisma.BiDatasetWhereInput> | null
 }
 
 export type BiPanelOrderByWithRelationInput = {
@@ -298,7 +298,7 @@ export type BiPanelOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   dashboard?: Prisma.BiDashboardOrderByWithRelationInput
-  dataSet?: Prisma.BiDataSetOrderByWithRelationInput
+  dataSet?: Prisma.BiDatasetOrderByWithRelationInput
 }
 
 export type BiPanelWhereUniqueInput = Prisma.AtLeast<{
@@ -318,7 +318,7 @@ export type BiPanelWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"BiPanel"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"BiPanel"> | Date | string
   dashboard?: Prisma.XOR<Prisma.BiDashboardScalarRelationFilter, Prisma.BiDashboardWhereInput>
-  dataSet?: Prisma.XOR<Prisma.BiDataSetNullableScalarRelationFilter, Prisma.BiDataSetWhereInput> | null
+  dataSet?: Prisma.XOR<Prisma.BiDatasetNullableScalarRelationFilter, Prisma.BiDatasetWhereInput> | null
 }, "id">
 
 export type BiPanelOrderByWithAggregationInput = {
@@ -371,7 +371,7 @@ export type BiPanelCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   dashboard: Prisma.BiDashboardCreateNestedOneWithoutPanelsInput
-  dataSet?: Prisma.BiDataSetCreateNestedOneWithoutPanelsInput
+  dataSet?: Prisma.BiDatasetCreateNestedOneWithoutPanelsInput
 }
 
 export type BiPanelUncheckedCreateInput = {
@@ -401,7 +401,7 @@ export type BiPanelUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dashboard?: Prisma.BiDashboardUpdateOneRequiredWithoutPanelsNestedInput
-  dataSet?: Prisma.BiDataSetUpdateOneWithoutPanelsNestedInput
+  dataSet?: Prisma.BiDatasetUpdateOneWithoutPanelsNestedInput
 }
 
 export type BiPanelUncheckedUpdateInput = {
@@ -632,7 +632,7 @@ export type BiPanelCreateWithoutDashboardInput = {
   h?: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  dataSet?: Prisma.BiDataSetCreateNestedOneWithoutPanelsInput
+  dataSet?: Prisma.BiDatasetCreateNestedOneWithoutPanelsInput
 }
 
 export type BiPanelUncheckedCreateWithoutDashboardInput = {
@@ -772,7 +772,7 @@ export type BiPanelUpdateWithoutDashboardInput = {
   h?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  dataSet?: Prisma.BiDataSetUpdateOneWithoutPanelsNestedInput
+  dataSet?: Prisma.BiDatasetUpdateOneWithoutPanelsNestedInput
 }
 
 export type BiPanelUncheckedUpdateWithoutDashboardInput = {
@@ -945,7 +945,7 @@ export type $BiPanelPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   name: "BiPanel"
   objects: {
     dashboard: Prisma.$BiDashboardPayload<ExtArgs>
-    dataSet: Prisma.$BiDataSetPayload<ExtArgs> | null
+    dataSet: Prisma.$BiDatasetPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1355,7 +1355,7 @@ readonly fields: BiPanelFieldRefs;
 export interface Prisma__BiPanelClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   dashboard<T extends Prisma.BiDashboardDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BiDashboardDefaultArgs<ExtArgs>>): Prisma.Prisma__BiDashboardClient<runtime.Types.Result.GetResult<Prisma.$BiDashboardPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  dataSet<T extends Prisma.BiPanel$dataSetArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BiPanel$dataSetArgs<ExtArgs>>): Prisma.Prisma__BiDataSetClient<runtime.Types.Result.GetResult<Prisma.$BiDataSetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  dataSet<T extends Prisma.BiPanel$dataSetArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BiPanel$dataSetArgs<ExtArgs>>): Prisma.Prisma__BiDatasetClient<runtime.Types.Result.GetResult<Prisma.$BiDatasetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1802,18 +1802,18 @@ export type BiPanelDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
  */
 export type BiPanel$dataSetArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BiDataSet
+   * Select specific fields to fetch from the BiDataset
    */
-  select?: Prisma.BiDataSetSelect<ExtArgs> | null
+  select?: Prisma.BiDatasetSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the BiDataSet
+   * Omit specific fields from the BiDataset
    */
-  omit?: Prisma.BiDataSetOmit<ExtArgs> | null
+  omit?: Prisma.BiDatasetOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BiDataSetInclude<ExtArgs> | null
-  where?: Prisma.BiDataSetWhereInput
+  include?: Prisma.BiDatasetInclude<ExtArgs> | null
+  where?: Prisma.BiDatasetWhereInput
 }
 
 /**

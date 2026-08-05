@@ -404,8 +404,10 @@ export const ModelName = {
   BiFolder: 'BiFolder',
   BiDashboard: 'BiDashboard',
   BiDashboardMember: 'BiDashboardMember',
-  BiDataSet: 'BiDataSet',
-  BiPanel: 'BiPanel'
+  BiDataset: 'BiDataset',
+  BiSource: 'BiSource',
+  BiPanel: 'BiPanel',
+  BiFilter: 'BiFilter'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -421,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "role" | "userRole" | "rolePermission" | "biFolder" | "biDashboard" | "biDashboardMember" | "biDataSet" | "biPanel"
+    modelProps: "user" | "role" | "userRole" | "rolePermission" | "biFolder" | "biDashboard" | "biDashboardMember" | "biDataset" | "biSource" | "biPanel" | "biFilter"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -943,77 +945,151 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    BiDataSet: {
-      payload: Prisma.$BiDataSetPayload<ExtArgs>
-      fields: Prisma.BiDataSetFieldRefs
+    BiDataset: {
+      payload: Prisma.$BiDatasetPayload<ExtArgs>
+      fields: Prisma.BiDatasetFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.BiDataSetFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload> | null
+          args: Prisma.BiDatasetFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDatasetPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.BiDataSetFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>
+          args: Prisma.BiDatasetFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDatasetPayload>
         }
         findFirst: {
-          args: Prisma.BiDataSetFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload> | null
+          args: Prisma.BiDatasetFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDatasetPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.BiDataSetFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>
+          args: Prisma.BiDatasetFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDatasetPayload>
         }
         findMany: {
-          args: Prisma.BiDataSetFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>[]
+          args: Prisma.BiDatasetFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDatasetPayload>[]
         }
         create: {
-          args: Prisma.BiDataSetCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>
+          args: Prisma.BiDatasetCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDatasetPayload>
         }
         createMany: {
-          args: Prisma.BiDataSetCreateManyArgs<ExtArgs>
+          args: Prisma.BiDatasetCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.BiDataSetCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>[]
+          args: Prisma.BiDatasetCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDatasetPayload>[]
         }
         delete: {
-          args: Prisma.BiDataSetDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>
+          args: Prisma.BiDatasetDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDatasetPayload>
         }
         update: {
-          args: Prisma.BiDataSetUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>
+          args: Prisma.BiDatasetUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDatasetPayload>
         }
         deleteMany: {
-          args: Prisma.BiDataSetDeleteManyArgs<ExtArgs>
+          args: Prisma.BiDatasetDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.BiDataSetUpdateManyArgs<ExtArgs>
+          args: Prisma.BiDatasetUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.BiDataSetUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>[]
+          args: Prisma.BiDatasetUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDatasetPayload>[]
         }
         upsert: {
-          args: Prisma.BiDataSetUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDataSetPayload>
+          args: Prisma.BiDatasetUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiDatasetPayload>
         }
         aggregate: {
-          args: Prisma.BiDataSetAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateBiDataSet>
+          args: Prisma.BiDatasetAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBiDataset>
         }
         groupBy: {
-          args: Prisma.BiDataSetGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.BiDataSetGroupByOutputType>[]
+          args: Prisma.BiDatasetGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiDatasetGroupByOutputType>[]
         }
         count: {
-          args: Prisma.BiDataSetCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.BiDataSetCountAggregateOutputType> | number
+          args: Prisma.BiDatasetCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiDatasetCountAggregateOutputType> | number
+        }
+      }
+    }
+    BiSource: {
+      payload: Prisma.$BiSourcePayload<ExtArgs>
+      fields: Prisma.BiSourceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BiSourceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiSourcePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BiSourceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiSourcePayload>
+        }
+        findFirst: {
+          args: Prisma.BiSourceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiSourcePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BiSourceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiSourcePayload>
+        }
+        findMany: {
+          args: Prisma.BiSourceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiSourcePayload>[]
+        }
+        create: {
+          args: Prisma.BiSourceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiSourcePayload>
+        }
+        createMany: {
+          args: Prisma.BiSourceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BiSourceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiSourcePayload>[]
+        }
+        delete: {
+          args: Prisma.BiSourceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiSourcePayload>
+        }
+        update: {
+          args: Prisma.BiSourceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiSourcePayload>
+        }
+        deleteMany: {
+          args: Prisma.BiSourceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BiSourceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BiSourceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiSourcePayload>[]
+        }
+        upsert: {
+          args: Prisma.BiSourceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiSourcePayload>
+        }
+        aggregate: {
+          args: Prisma.BiSourceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBiSource>
+        }
+        groupBy: {
+          args: Prisma.BiSourceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiSourceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BiSourceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiSourceCountAggregateOutputType> | number
         }
       }
     }
@@ -1088,6 +1164,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.BiPanelCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.BiPanelCountAggregateOutputType> | number
+        }
+      }
+    }
+    BiFilter: {
+      payload: Prisma.$BiFilterPayload<ExtArgs>
+      fields: Prisma.BiFilterFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BiFilterFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFilterPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BiFilterFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFilterPayload>
+        }
+        findFirst: {
+          args: Prisma.BiFilterFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFilterPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BiFilterFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFilterPayload>
+        }
+        findMany: {
+          args: Prisma.BiFilterFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFilterPayload>[]
+        }
+        create: {
+          args: Prisma.BiFilterCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFilterPayload>
+        }
+        createMany: {
+          args: Prisma.BiFilterCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BiFilterCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFilterPayload>[]
+        }
+        delete: {
+          args: Prisma.BiFilterDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFilterPayload>
+        }
+        update: {
+          args: Prisma.BiFilterUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFilterPayload>
+        }
+        deleteMany: {
+          args: Prisma.BiFilterDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BiFilterUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BiFilterUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFilterPayload>[]
+        }
+        upsert: {
+          args: Prisma.BiFilterUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFilterPayload>
+        }
+        aggregate: {
+          args: Prisma.BiFilterAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBiFilter>
+        }
+        groupBy: {
+          args: Prisma.BiFilterGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiFilterGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BiFilterCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BiFilterCountAggregateOutputType> | number
         }
       }
     }
@@ -1214,19 +1364,32 @@ export const BiDashboardMemberScalarFieldEnum = {
 export type BiDashboardMemberScalarFieldEnum = (typeof BiDashboardMemberScalarFieldEnum)[keyof typeof BiDashboardMemberScalarFieldEnum]
 
 
-export const BiDataSetScalarFieldEnum = {
+export const BiDatasetScalarFieldEnum = {
   id: 'id',
   name: 'name',
   sql: 'sql',
   description: 'description',
   isPublic: 'isPublic',
+  sourceId: 'sourceId',
   lastRunAt: 'lastRunAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId'
 } as const
 
-export type BiDataSetScalarFieldEnum = (typeof BiDataSetScalarFieldEnum)[keyof typeof BiDataSetScalarFieldEnum]
+export type BiDatasetScalarFieldEnum = (typeof BiDatasetScalarFieldEnum)[keyof typeof BiDatasetScalarFieldEnum]
+
+
+export const BiSourceScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  type: 'type',
+  config: 'config',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BiSourceScalarFieldEnum = (typeof BiSourceScalarFieldEnum)[keyof typeof BiSourceScalarFieldEnum]
 
 
 export const BiPanelScalarFieldEnum = {
@@ -1245,6 +1408,19 @@ export const BiPanelScalarFieldEnum = {
 } as const
 
 export type BiPanelScalarFieldEnum = (typeof BiPanelScalarFieldEnum)[keyof typeof BiPanelScalarFieldEnum]
+
+
+export const BiFilterScalarFieldEnum = {
+  id: 'id',
+  dashboardId: 'dashboardId',
+  name: 'name',
+  label: 'label',
+  type: 'type',
+  config: 'config',
+  position: 'position'
+} as const
+
+export type BiFilterScalarFieldEnum = (typeof BiFilterScalarFieldEnum)[keyof typeof BiFilterScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1542,8 +1718,10 @@ export type GlobalOmitConfig = {
   biFolder?: Prisma.BiFolderOmit
   biDashboard?: Prisma.BiDashboardOmit
   biDashboardMember?: Prisma.BiDashboardMemberOmit
-  biDataSet?: Prisma.BiDataSetOmit
+  biDataset?: Prisma.BiDatasetOmit
+  biSource?: Prisma.BiSourceOmit
   biPanel?: Prisma.BiPanelOmit
+  biFilter?: Prisma.BiFilterOmit
 }
 
 /* Types for Logging */

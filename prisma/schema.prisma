@@ -19,7 +19,7 @@ model User {
   userRoles          UserRole[]
   biDashboards       BiDashboard[]
   biDashboardMembers BiDashboardMember[]
-  biDataSets         BiDataSet[]
+  biDatasets         BiDataset[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -90,6 +90,7 @@ model BiDashboard {
   folderId    String?             @map("folder_id")
   folder      BiFolder?           @relation(fields: [folderId], references: [id], onDelete: SetNull)
   panels      BiPanel[]
+  filters     BiFilter[]
   members     BiDashboardMember[]
   createdAt   DateTime            @default(now()) @map("created_at")
   updatedAt   DateTime            @updatedAt @map("updated_at")
@@ -111,12 +112,14 @@ model BiDashboardMember {
   @@map("bi_dashboard_members")
 }
 
-model BiDataSet {
+model BiDataset {
   id          String    @id @default(cuid())
   name        String
   sql         String
   description String?
   isPublic    Boolean   @default(false) @map("is_public")
+  sourceId    String?   @map("source_id")
+  source      BiSource? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
   panels      BiPanel[]
   lastRunAt   DateTime? @map("last_run_at")
   createdAt   DateTime  @default(now()) @map("created_at")
@@ -124,7 +127,19 @@ model BiDataSet {
   user        User?     @relation(fields: [userId], references: [id])
   userId      String?
 
-  @@map("bi_data_sets")
+  @@map("bi_datasets")
+}
+
+model BiSource {
+  id       String      @id @default(cuid())
+  name     String
+  type     String      @default("postgresql")
+  config   Json?
+  datasets BiDataset[]
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  @@map("bi_sources")
 }
 
 model BiPanel {
@@ -132,7 +147,7 @@ model BiPanel {
   dashboardId String      @map("dashboard_id")
   dashboard   BiDashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
   dataSetId   String?     @map("data_set_id")
-  dataSet     BiDataSet?  @relation(fields: [dataSetId], references: [id], onDelete: SetNull)
+  dataSet     BiDataset? @relation(fields: [dataSetId], references: [id], onDelete: SetNull)
   title       String
   chartType   String      @default("table")
   config      Json?
@@ -145,4 +160,17 @@ model BiPanel {
 
   @@index([dashboardId])
   @@map("bi_panels")
+}
+
+model BiFilter {
+  id          String      @id @default(cuid())
+  dashboardId String      @map("dashboard_id")
+  dashboard   BiDashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  name        String
+  label       String
+  type        String      @default("text")
+  config      Json?
+  position    Int         @default(0)
+
+  @@map("bi_filters")
 }

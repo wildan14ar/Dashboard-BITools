@@ -1,0 +1,50 @@
+services:
+  dashboard:
+    build:
+      context: ./FYC-DashboardBI
+      dockerfile: Dockerfile
+    container_name: fyc-dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DASHBOARD_DATABASE_URL}
+      - AUTH_SECRET=${DASHBOARD_AUTH_SECRET}
+      - QUERY_ENGINE_HOST=query-engine:50051
+    depends_on:
+      - query-engine
+    restart: unless-stopped
+    networks:
+      - bi-network
+
+  query-engine:
+    build:
+      context: ./engine
+      dockerfile: Dockerfile
+    container_name: fyc-query-engine
+    ports:
+      - "50051:50051"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - QUERY_CACHE_TTL_SEC=300
+    restart: unless-stopped
+    networks:
+      - bi-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: fyc-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - bi-network
+
+volumes:
+  redis_data:
+
+networks:
+  bi-network:
+    driver: bridge

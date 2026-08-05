@@ -4,7 +4,7 @@
 // biome-ignore-all lint: generated file
 // @ts-nocheck 
 /*
- * This file exports the `BiDataSet` model and its related types.
+ * This file exports the `BiDataset` model and its related types.
  *
  * 🟢 You can import this file directly.
  */
@@ -13,47 +13,50 @@ import type * as $Enums from "../enums"
 import type * as Prisma from "../internal/prismaNamespace"
 
 /**
- * Model BiDataSet
+ * Model BiDataset
  * 
  */
-export type BiDataSetModel = runtime.Types.Result.DefaultSelection<Prisma.$BiDataSetPayload>
+export type BiDatasetModel = runtime.Types.Result.DefaultSelection<Prisma.$BiDatasetPayload>
 
-export type AggregateBiDataSet = {
-  _count: BiDataSetCountAggregateOutputType | null
-  _min: BiDataSetMinAggregateOutputType | null
-  _max: BiDataSetMaxAggregateOutputType | null
+export type AggregateBiDataset = {
+  _count: BiDatasetCountAggregateOutputType | null
+  _min: BiDatasetMinAggregateOutputType | null
+  _max: BiDatasetMaxAggregateOutputType | null
 }
 
-export type BiDataSetMinAggregateOutputType = {
+export type BiDatasetMinAggregateOutputType = {
   id: string | null
   name: string | null
   sql: string | null
   description: string | null
   isPublic: boolean | null
+  sourceId: string | null
   lastRunAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   userId: string | null
 }
 
-export type BiDataSetMaxAggregateOutputType = {
+export type BiDatasetMaxAggregateOutputType = {
   id: string | null
   name: string | null
   sql: string | null
   description: string | null
   isPublic: boolean | null
+  sourceId: string | null
   lastRunAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   userId: string | null
 }
 
-export type BiDataSetCountAggregateOutputType = {
+export type BiDatasetCountAggregateOutputType = {
   id: number
   name: number
   sql: number
   description: number
   isPublic: number
+  sourceId: number
   lastRunAt: number
   createdAt: number
   updatedAt: number
@@ -62,36 +65,39 @@ export type BiDataSetCountAggregateOutputType = {
 }
 
 
-export type BiDataSetMinAggregateInputType = {
+export type BiDatasetMinAggregateInputType = {
   id?: true
   name?: true
   sql?: true
   description?: true
   isPublic?: true
+  sourceId?: true
   lastRunAt?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
 }
 
-export type BiDataSetMaxAggregateInputType = {
+export type BiDatasetMaxAggregateInputType = {
   id?: true
   name?: true
   sql?: true
   description?: true
   isPublic?: true
+  sourceId?: true
   lastRunAt?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
 }
 
-export type BiDataSetCountAggregateInputType = {
+export type BiDatasetCountAggregateInputType = {
   id?: true
   name?: true
   sql?: true
   description?: true
   isPublic?: true
+  sourceId?: true
   lastRunAt?: true
   createdAt?: true
   updatedAt?: true
@@ -99,187 +105,196 @@ export type BiDataSetCountAggregateInputType = {
   _all?: true
 }
 
-export type BiDataSetAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Filter which BiDataSet to aggregate.
+   * Filter which BiDataset to aggregate.
    */
-  where?: Prisma.BiDataSetWhereInput
+  where?: Prisma.BiDatasetWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
-   * Determine the order of BiDataSets to fetch.
+   * Determine the order of BiDatasets to fetch.
    */
-  orderBy?: Prisma.BiDataSetOrderByWithRelationInput | Prisma.BiDataSetOrderByWithRelationInput[]
+  orderBy?: Prisma.BiDatasetOrderByWithRelationInput | Prisma.BiDatasetOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
    * Sets the start position
    */
-  cursor?: Prisma.BiDataSetWhereUniqueInput
+  cursor?: Prisma.BiDatasetWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
-   * Take `±n` BiDataSets from the position of the cursor.
+   * Take `±n` BiDatasets from the position of the cursor.
    */
   take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
-   * Skip the first `n` BiDataSets.
+   * Skip the first `n` BiDatasets.
    */
   skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
-   * Count returned BiDataSets
+   * Count returned BiDatasets
   **/
-  _count?: true | BiDataSetCountAggregateInputType
+  _count?: true | BiDatasetCountAggregateInputType
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
    * Select which fields to find the minimum value
   **/
-  _min?: BiDataSetMinAggregateInputType
+  _min?: BiDatasetMinAggregateInputType
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
    * Select which fields to find the maximum value
   **/
-  _max?: BiDataSetMaxAggregateInputType
+  _max?: BiDatasetMaxAggregateInputType
 }
 
-export type GetBiDataSetAggregateType<T extends BiDataSetAggregateArgs> = {
-      [P in keyof T & keyof AggregateBiDataSet]: P extends '_count' | 'count'
+export type GetBiDatasetAggregateType<T extends BiDatasetAggregateArgs> = {
+      [P in keyof T & keyof AggregateBiDataset]: P extends '_count' | 'count'
     ? T[P] extends true
       ? number
-      : Prisma.GetScalarType<T[P], AggregateBiDataSet[P]>
-    : Prisma.GetScalarType<T[P], AggregateBiDataSet[P]>
+      : Prisma.GetScalarType<T[P], AggregateBiDataset[P]>
+    : Prisma.GetScalarType<T[P], AggregateBiDataset[P]>
 }
 
 
 
 
-export type BiDataSetGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.BiDataSetWhereInput
-  orderBy?: Prisma.BiDataSetOrderByWithAggregationInput | Prisma.BiDataSetOrderByWithAggregationInput[]
-  by: Prisma.BiDataSetScalarFieldEnum[] | Prisma.BiDataSetScalarFieldEnum
-  having?: Prisma.BiDataSetScalarWhereWithAggregatesInput
+export type BiDatasetGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BiDatasetWhereInput
+  orderBy?: Prisma.BiDatasetOrderByWithAggregationInput | Prisma.BiDatasetOrderByWithAggregationInput[]
+  by: Prisma.BiDatasetScalarFieldEnum[] | Prisma.BiDatasetScalarFieldEnum
+  having?: Prisma.BiDatasetScalarWhereWithAggregatesInput
   take?: number
   skip?: number
-  _count?: BiDataSetCountAggregateInputType | true
-  _min?: BiDataSetMinAggregateInputType
-  _max?: BiDataSetMaxAggregateInputType
+  _count?: BiDatasetCountAggregateInputType | true
+  _min?: BiDatasetMinAggregateInputType
+  _max?: BiDatasetMaxAggregateInputType
 }
 
-export type BiDataSetGroupByOutputType = {
+export type BiDatasetGroupByOutputType = {
   id: string
   name: string
   sql: string
   description: string | null
   isPublic: boolean
+  sourceId: string | null
   lastRunAt: Date | null
   createdAt: Date
   updatedAt: Date
   userId: string | null
-  _count: BiDataSetCountAggregateOutputType | null
-  _min: BiDataSetMinAggregateOutputType | null
-  _max: BiDataSetMaxAggregateOutputType | null
+  _count: BiDatasetCountAggregateOutputType | null
+  _min: BiDatasetMinAggregateOutputType | null
+  _max: BiDatasetMaxAggregateOutputType | null
 }
 
-export type GetBiDataSetGroupByPayload<T extends BiDataSetGroupByArgs> = Prisma.PrismaPromise<
+export type GetBiDatasetGroupByPayload<T extends BiDatasetGroupByArgs> = Prisma.PrismaPromise<
   Array<
-    Prisma.PickEnumerable<BiDataSetGroupByOutputType, T['by']> &
+    Prisma.PickEnumerable<BiDatasetGroupByOutputType, T['by']> &
       {
-        [P in ((keyof T) & (keyof BiDataSetGroupByOutputType))]: P extends '_count'
+        [P in ((keyof T) & (keyof BiDatasetGroupByOutputType))]: P extends '_count'
           ? T[P] extends boolean
             ? number
-            : Prisma.GetScalarType<T[P], BiDataSetGroupByOutputType[P]>
-          : Prisma.GetScalarType<T[P], BiDataSetGroupByOutputType[P]>
+            : Prisma.GetScalarType<T[P], BiDatasetGroupByOutputType[P]>
+          : Prisma.GetScalarType<T[P], BiDatasetGroupByOutputType[P]>
       }
     >
   >
 
 
 
-export type BiDataSetWhereInput = {
-  AND?: Prisma.BiDataSetWhereInput | Prisma.BiDataSetWhereInput[]
-  OR?: Prisma.BiDataSetWhereInput[]
-  NOT?: Prisma.BiDataSetWhereInput | Prisma.BiDataSetWhereInput[]
-  id?: Prisma.StringFilter<"BiDataSet"> | string
-  name?: Prisma.StringFilter<"BiDataSet"> | string
-  sql?: Prisma.StringFilter<"BiDataSet"> | string
-  description?: Prisma.StringNullableFilter<"BiDataSet"> | string | null
-  isPublic?: Prisma.BoolFilter<"BiDataSet"> | boolean
-  lastRunAt?: Prisma.DateTimeNullableFilter<"BiDataSet"> | Date | string | null
-  createdAt?: Prisma.DateTimeFilter<"BiDataSet"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"BiDataSet"> | Date | string
-  userId?: Prisma.StringNullableFilter<"BiDataSet"> | string | null
+export type BiDatasetWhereInput = {
+  AND?: Prisma.BiDatasetWhereInput | Prisma.BiDatasetWhereInput[]
+  OR?: Prisma.BiDatasetWhereInput[]
+  NOT?: Prisma.BiDatasetWhereInput | Prisma.BiDatasetWhereInput[]
+  id?: Prisma.StringFilter<"BiDataset"> | string
+  name?: Prisma.StringFilter<"BiDataset"> | string
+  sql?: Prisma.StringFilter<"BiDataset"> | string
+  description?: Prisma.StringNullableFilter<"BiDataset"> | string | null
+  isPublic?: Prisma.BoolFilter<"BiDataset"> | boolean
+  sourceId?: Prisma.StringNullableFilter<"BiDataset"> | string | null
+  lastRunAt?: Prisma.DateTimeNullableFilter<"BiDataset"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"BiDataset"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"BiDataset"> | Date | string
+  userId?: Prisma.StringNullableFilter<"BiDataset"> | string | null
+  source?: Prisma.XOR<Prisma.BiSourceNullableScalarRelationFilter, Prisma.BiSourceWhereInput> | null
   panels?: Prisma.BiPanelListRelationFilter
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
-export type BiDataSetOrderByWithRelationInput = {
+export type BiDatasetOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   sql?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  sourceId?: Prisma.SortOrderInput | Prisma.SortOrder
   lastRunAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
+  source?: Prisma.BiSourceOrderByWithRelationInput
   panels?: Prisma.BiPanelOrderByRelationAggregateInput
   user?: Prisma.UserOrderByWithRelationInput
 }
 
-export type BiDataSetWhereUniqueInput = Prisma.AtLeast<{
+export type BiDatasetWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  AND?: Prisma.BiDataSetWhereInput | Prisma.BiDataSetWhereInput[]
-  OR?: Prisma.BiDataSetWhereInput[]
-  NOT?: Prisma.BiDataSetWhereInput | Prisma.BiDataSetWhereInput[]
-  name?: Prisma.StringFilter<"BiDataSet"> | string
-  sql?: Prisma.StringFilter<"BiDataSet"> | string
-  description?: Prisma.StringNullableFilter<"BiDataSet"> | string | null
-  isPublic?: Prisma.BoolFilter<"BiDataSet"> | boolean
-  lastRunAt?: Prisma.DateTimeNullableFilter<"BiDataSet"> | Date | string | null
-  createdAt?: Prisma.DateTimeFilter<"BiDataSet"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"BiDataSet"> | Date | string
-  userId?: Prisma.StringNullableFilter<"BiDataSet"> | string | null
+  AND?: Prisma.BiDatasetWhereInput | Prisma.BiDatasetWhereInput[]
+  OR?: Prisma.BiDatasetWhereInput[]
+  NOT?: Prisma.BiDatasetWhereInput | Prisma.BiDatasetWhereInput[]
+  name?: Prisma.StringFilter<"BiDataset"> | string
+  sql?: Prisma.StringFilter<"BiDataset"> | string
+  description?: Prisma.StringNullableFilter<"BiDataset"> | string | null
+  isPublic?: Prisma.BoolFilter<"BiDataset"> | boolean
+  sourceId?: Prisma.StringNullableFilter<"BiDataset"> | string | null
+  lastRunAt?: Prisma.DateTimeNullableFilter<"BiDataset"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"BiDataset"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"BiDataset"> | Date | string
+  userId?: Prisma.StringNullableFilter<"BiDataset"> | string | null
+  source?: Prisma.XOR<Prisma.BiSourceNullableScalarRelationFilter, Prisma.BiSourceWhereInput> | null
   panels?: Prisma.BiPanelListRelationFilter
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id">
 
-export type BiDataSetOrderByWithAggregationInput = {
+export type BiDatasetOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   sql?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  sourceId?: Prisma.SortOrderInput | Prisma.SortOrder
   lastRunAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
-  _count?: Prisma.BiDataSetCountOrderByAggregateInput
-  _max?: Prisma.BiDataSetMaxOrderByAggregateInput
-  _min?: Prisma.BiDataSetMinOrderByAggregateInput
+  _count?: Prisma.BiDatasetCountOrderByAggregateInput
+  _max?: Prisma.BiDatasetMaxOrderByAggregateInput
+  _min?: Prisma.BiDatasetMinOrderByAggregateInput
 }
 
-export type BiDataSetScalarWhereWithAggregatesInput = {
-  AND?: Prisma.BiDataSetScalarWhereWithAggregatesInput | Prisma.BiDataSetScalarWhereWithAggregatesInput[]
-  OR?: Prisma.BiDataSetScalarWhereWithAggregatesInput[]
-  NOT?: Prisma.BiDataSetScalarWhereWithAggregatesInput | Prisma.BiDataSetScalarWhereWithAggregatesInput[]
-  id?: Prisma.StringWithAggregatesFilter<"BiDataSet"> | string
-  name?: Prisma.StringWithAggregatesFilter<"BiDataSet"> | string
-  sql?: Prisma.StringWithAggregatesFilter<"BiDataSet"> | string
-  description?: Prisma.StringNullableWithAggregatesFilter<"BiDataSet"> | string | null
-  isPublic?: Prisma.BoolWithAggregatesFilter<"BiDataSet"> | boolean
-  lastRunAt?: Prisma.DateTimeNullableWithAggregatesFilter<"BiDataSet"> | Date | string | null
-  createdAt?: Prisma.DateTimeWithAggregatesFilter<"BiDataSet"> | Date | string
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"BiDataSet"> | Date | string
-  userId?: Prisma.StringNullableWithAggregatesFilter<"BiDataSet"> | string | null
+export type BiDatasetScalarWhereWithAggregatesInput = {
+  AND?: Prisma.BiDatasetScalarWhereWithAggregatesInput | Prisma.BiDatasetScalarWhereWithAggregatesInput[]
+  OR?: Prisma.BiDatasetScalarWhereWithAggregatesInput[]
+  NOT?: Prisma.BiDatasetScalarWhereWithAggregatesInput | Prisma.BiDatasetScalarWhereWithAggregatesInput[]
+  id?: Prisma.StringWithAggregatesFilter<"BiDataset"> | string
+  name?: Prisma.StringWithAggregatesFilter<"BiDataset"> | string
+  sql?: Prisma.StringWithAggregatesFilter<"BiDataset"> | string
+  description?: Prisma.StringNullableWithAggregatesFilter<"BiDataset"> | string | null
+  isPublic?: Prisma.BoolWithAggregatesFilter<"BiDataset"> | boolean
+  sourceId?: Prisma.StringNullableWithAggregatesFilter<"BiDataset"> | string | null
+  lastRunAt?: Prisma.DateTimeNullableWithAggregatesFilter<"BiDataset"> | Date | string | null
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"BiDataset"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"BiDataset"> | Date | string
+  userId?: Prisma.StringNullableWithAggregatesFilter<"BiDataset"> | string | null
 }
 
-export type BiDataSetCreateInput = {
+export type BiDatasetCreateInput = {
   id?: string
   name: string
   sql: string
@@ -288,16 +303,18 @@ export type BiDataSetCreateInput = {
   lastRunAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  source?: Prisma.BiSourceCreateNestedOneWithoutDatasetsInput
   panels?: Prisma.BiPanelCreateNestedManyWithoutDataSetInput
-  user?: Prisma.UserCreateNestedOneWithoutBiDataSetsInput
+  user?: Prisma.UserCreateNestedOneWithoutBiDatasetsInput
 }
 
-export type BiDataSetUncheckedCreateInput = {
+export type BiDatasetUncheckedCreateInput = {
   id?: string
   name: string
   sql: string
   description?: string | null
   isPublic?: boolean
+  sourceId?: string | null
   lastRunAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -305,7 +322,7 @@ export type BiDataSetUncheckedCreateInput = {
   panels?: Prisma.BiPanelUncheckedCreateNestedManyWithoutDataSetInput
 }
 
-export type BiDataSetUpdateInput = {
+export type BiDatasetUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   sql?: Prisma.StringFieldUpdateOperationsInput | string
@@ -314,16 +331,18 @@ export type BiDataSetUpdateInput = {
   lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  source?: Prisma.BiSourceUpdateOneWithoutDatasetsNestedInput
   panels?: Prisma.BiPanelUpdateManyWithoutDataSetNestedInput
-  user?: Prisma.UserUpdateOneWithoutBiDataSetsNestedInput
+  user?: Prisma.UserUpdateOneWithoutBiDatasetsNestedInput
 }
 
-export type BiDataSetUncheckedUpdateInput = {
+export type BiDatasetUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   sql?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -331,19 +350,20 @@ export type BiDataSetUncheckedUpdateInput = {
   panels?: Prisma.BiPanelUncheckedUpdateManyWithoutDataSetNestedInput
 }
 
-export type BiDataSetCreateManyInput = {
+export type BiDatasetCreateManyInput = {
   id?: string
   name: string
   sql: string
   description?: string | null
   isPublic?: boolean
+  sourceId?: string | null
   lastRunAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId?: string | null
 }
 
-export type BiDataSetUpdateManyMutationInput = {
+export type BiDatasetUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   sql?: Prisma.StringFieldUpdateOperationsInput | string
@@ -354,132 +374,246 @@ export type BiDataSetUpdateManyMutationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type BiDataSetUncheckedUpdateManyInput = {
+export type BiDatasetUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   sql?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
-export type BiDataSetListRelationFilter = {
-  every?: Prisma.BiDataSetWhereInput
-  some?: Prisma.BiDataSetWhereInput
-  none?: Prisma.BiDataSetWhereInput
+export type BiDatasetListRelationFilter = {
+  every?: Prisma.BiDatasetWhereInput
+  some?: Prisma.BiDatasetWhereInput
+  none?: Prisma.BiDatasetWhereInput
 }
 
-export type BiDataSetOrderByRelationAggregateInput = {
+export type BiDatasetOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type BiDataSetCountOrderByAggregateInput = {
+export type BiDatasetCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   sql?: Prisma.SortOrder
   description?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  sourceId?: Prisma.SortOrder
   lastRunAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
 
-export type BiDataSetMaxOrderByAggregateInput = {
+export type BiDatasetMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   sql?: Prisma.SortOrder
   description?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  sourceId?: Prisma.SortOrder
   lastRunAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
 
-export type BiDataSetMinOrderByAggregateInput = {
+export type BiDatasetMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   sql?: Prisma.SortOrder
   description?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  sourceId?: Prisma.SortOrder
   lastRunAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
 
-export type BiDataSetNullableScalarRelationFilter = {
-  is?: Prisma.BiDataSetWhereInput | null
-  isNot?: Prisma.BiDataSetWhereInput | null
+export type BiDatasetNullableScalarRelationFilter = {
+  is?: Prisma.BiDatasetWhereInput | null
+  isNot?: Prisma.BiDatasetWhereInput | null
 }
 
-export type BiDataSetCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.BiDataSetCreateWithoutUserInput, Prisma.BiDataSetUncheckedCreateWithoutUserInput> | Prisma.BiDataSetCreateWithoutUserInput[] | Prisma.BiDataSetUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.BiDataSetCreateOrConnectWithoutUserInput | Prisma.BiDataSetCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.BiDataSetCreateManyUserInputEnvelope
-  connect?: Prisma.BiDataSetWhereUniqueInput | Prisma.BiDataSetWhereUniqueInput[]
+export type BiDatasetCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.BiDatasetCreateWithoutUserInput, Prisma.BiDatasetUncheckedCreateWithoutUserInput> | Prisma.BiDatasetCreateWithoutUserInput[] | Prisma.BiDatasetUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.BiDatasetCreateOrConnectWithoutUserInput | Prisma.BiDatasetCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.BiDatasetCreateManyUserInputEnvelope
+  connect?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
 }
 
-export type BiDataSetUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.BiDataSetCreateWithoutUserInput, Prisma.BiDataSetUncheckedCreateWithoutUserInput> | Prisma.BiDataSetCreateWithoutUserInput[] | Prisma.BiDataSetUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.BiDataSetCreateOrConnectWithoutUserInput | Prisma.BiDataSetCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.BiDataSetCreateManyUserInputEnvelope
-  connect?: Prisma.BiDataSetWhereUniqueInput | Prisma.BiDataSetWhereUniqueInput[]
+export type BiDatasetUncheckedCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.BiDatasetCreateWithoutUserInput, Prisma.BiDatasetUncheckedCreateWithoutUserInput> | Prisma.BiDatasetCreateWithoutUserInput[] | Prisma.BiDatasetUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.BiDatasetCreateOrConnectWithoutUserInput | Prisma.BiDatasetCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.BiDatasetCreateManyUserInputEnvelope
+  connect?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
 }
 
-export type BiDataSetUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.BiDataSetCreateWithoutUserInput, Prisma.BiDataSetUncheckedCreateWithoutUserInput> | Prisma.BiDataSetCreateWithoutUserInput[] | Prisma.BiDataSetUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.BiDataSetCreateOrConnectWithoutUserInput | Prisma.BiDataSetCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.BiDataSetUpsertWithWhereUniqueWithoutUserInput | Prisma.BiDataSetUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.BiDataSetCreateManyUserInputEnvelope
-  set?: Prisma.BiDataSetWhereUniqueInput | Prisma.BiDataSetWhereUniqueInput[]
-  disconnect?: Prisma.BiDataSetWhereUniqueInput | Prisma.BiDataSetWhereUniqueInput[]
-  delete?: Prisma.BiDataSetWhereUniqueInput | Prisma.BiDataSetWhereUniqueInput[]
-  connect?: Prisma.BiDataSetWhereUniqueInput | Prisma.BiDataSetWhereUniqueInput[]
-  update?: Prisma.BiDataSetUpdateWithWhereUniqueWithoutUserInput | Prisma.BiDataSetUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.BiDataSetUpdateManyWithWhereWithoutUserInput | Prisma.BiDataSetUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.BiDataSetScalarWhereInput | Prisma.BiDataSetScalarWhereInput[]
+export type BiDatasetUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.BiDatasetCreateWithoutUserInput, Prisma.BiDatasetUncheckedCreateWithoutUserInput> | Prisma.BiDatasetCreateWithoutUserInput[] | Prisma.BiDatasetUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.BiDatasetCreateOrConnectWithoutUserInput | Prisma.BiDatasetCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.BiDatasetUpsertWithWhereUniqueWithoutUserInput | Prisma.BiDatasetUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.BiDatasetCreateManyUserInputEnvelope
+  set?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  disconnect?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  delete?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  connect?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  update?: Prisma.BiDatasetUpdateWithWhereUniqueWithoutUserInput | Prisma.BiDatasetUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.BiDatasetUpdateManyWithWhereWithoutUserInput | Prisma.BiDatasetUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.BiDatasetScalarWhereInput | Prisma.BiDatasetScalarWhereInput[]
 }
 
-export type BiDataSetUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.BiDataSetCreateWithoutUserInput, Prisma.BiDataSetUncheckedCreateWithoutUserInput> | Prisma.BiDataSetCreateWithoutUserInput[] | Prisma.BiDataSetUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.BiDataSetCreateOrConnectWithoutUserInput | Prisma.BiDataSetCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.BiDataSetUpsertWithWhereUniqueWithoutUserInput | Prisma.BiDataSetUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.BiDataSetCreateManyUserInputEnvelope
-  set?: Prisma.BiDataSetWhereUniqueInput | Prisma.BiDataSetWhereUniqueInput[]
-  disconnect?: Prisma.BiDataSetWhereUniqueInput | Prisma.BiDataSetWhereUniqueInput[]
-  delete?: Prisma.BiDataSetWhereUniqueInput | Prisma.BiDataSetWhereUniqueInput[]
-  connect?: Prisma.BiDataSetWhereUniqueInput | Prisma.BiDataSetWhereUniqueInput[]
-  update?: Prisma.BiDataSetUpdateWithWhereUniqueWithoutUserInput | Prisma.BiDataSetUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.BiDataSetUpdateManyWithWhereWithoutUserInput | Prisma.BiDataSetUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.BiDataSetScalarWhereInput | Prisma.BiDataSetScalarWhereInput[]
+export type BiDatasetUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.BiDatasetCreateWithoutUserInput, Prisma.BiDatasetUncheckedCreateWithoutUserInput> | Prisma.BiDatasetCreateWithoutUserInput[] | Prisma.BiDatasetUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.BiDatasetCreateOrConnectWithoutUserInput | Prisma.BiDatasetCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.BiDatasetUpsertWithWhereUniqueWithoutUserInput | Prisma.BiDatasetUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.BiDatasetCreateManyUserInputEnvelope
+  set?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  disconnect?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  delete?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  connect?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  update?: Prisma.BiDatasetUpdateWithWhereUniqueWithoutUserInput | Prisma.BiDatasetUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.BiDatasetUpdateManyWithWhereWithoutUserInput | Prisma.BiDatasetUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.BiDatasetScalarWhereInput | Prisma.BiDatasetScalarWhereInput[]
 }
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
 
-export type BiDataSetCreateNestedOneWithoutPanelsInput = {
-  create?: Prisma.XOR<Prisma.BiDataSetCreateWithoutPanelsInput, Prisma.BiDataSetUncheckedCreateWithoutPanelsInput>
-  connectOrCreate?: Prisma.BiDataSetCreateOrConnectWithoutPanelsInput
-  connect?: Prisma.BiDataSetWhereUniqueInput
+export type BiDatasetCreateNestedManyWithoutSourceInput = {
+  create?: Prisma.XOR<Prisma.BiDatasetCreateWithoutSourceInput, Prisma.BiDatasetUncheckedCreateWithoutSourceInput> | Prisma.BiDatasetCreateWithoutSourceInput[] | Prisma.BiDatasetUncheckedCreateWithoutSourceInput[]
+  connectOrCreate?: Prisma.BiDatasetCreateOrConnectWithoutSourceInput | Prisma.BiDatasetCreateOrConnectWithoutSourceInput[]
+  createMany?: Prisma.BiDatasetCreateManySourceInputEnvelope
+  connect?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
 }
 
-export type BiDataSetUpdateOneWithoutPanelsNestedInput = {
-  create?: Prisma.XOR<Prisma.BiDataSetCreateWithoutPanelsInput, Prisma.BiDataSetUncheckedCreateWithoutPanelsInput>
-  connectOrCreate?: Prisma.BiDataSetCreateOrConnectWithoutPanelsInput
-  upsert?: Prisma.BiDataSetUpsertWithoutPanelsInput
-  disconnect?: Prisma.BiDataSetWhereInput | boolean
-  delete?: Prisma.BiDataSetWhereInput | boolean
-  connect?: Prisma.BiDataSetWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.BiDataSetUpdateToOneWithWhereWithoutPanelsInput, Prisma.BiDataSetUpdateWithoutPanelsInput>, Prisma.BiDataSetUncheckedUpdateWithoutPanelsInput>
+export type BiDatasetUncheckedCreateNestedManyWithoutSourceInput = {
+  create?: Prisma.XOR<Prisma.BiDatasetCreateWithoutSourceInput, Prisma.BiDatasetUncheckedCreateWithoutSourceInput> | Prisma.BiDatasetCreateWithoutSourceInput[] | Prisma.BiDatasetUncheckedCreateWithoutSourceInput[]
+  connectOrCreate?: Prisma.BiDatasetCreateOrConnectWithoutSourceInput | Prisma.BiDatasetCreateOrConnectWithoutSourceInput[]
+  createMany?: Prisma.BiDatasetCreateManySourceInputEnvelope
+  connect?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
 }
 
-export type BiDataSetCreateWithoutUserInput = {
+export type BiDatasetUpdateManyWithoutSourceNestedInput = {
+  create?: Prisma.XOR<Prisma.BiDatasetCreateWithoutSourceInput, Prisma.BiDatasetUncheckedCreateWithoutSourceInput> | Prisma.BiDatasetCreateWithoutSourceInput[] | Prisma.BiDatasetUncheckedCreateWithoutSourceInput[]
+  connectOrCreate?: Prisma.BiDatasetCreateOrConnectWithoutSourceInput | Prisma.BiDatasetCreateOrConnectWithoutSourceInput[]
+  upsert?: Prisma.BiDatasetUpsertWithWhereUniqueWithoutSourceInput | Prisma.BiDatasetUpsertWithWhereUniqueWithoutSourceInput[]
+  createMany?: Prisma.BiDatasetCreateManySourceInputEnvelope
+  set?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  disconnect?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  delete?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  connect?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  update?: Prisma.BiDatasetUpdateWithWhereUniqueWithoutSourceInput | Prisma.BiDatasetUpdateWithWhereUniqueWithoutSourceInput[]
+  updateMany?: Prisma.BiDatasetUpdateManyWithWhereWithoutSourceInput | Prisma.BiDatasetUpdateManyWithWhereWithoutSourceInput[]
+  deleteMany?: Prisma.BiDatasetScalarWhereInput | Prisma.BiDatasetScalarWhereInput[]
+}
+
+export type BiDatasetUncheckedUpdateManyWithoutSourceNestedInput = {
+  create?: Prisma.XOR<Prisma.BiDatasetCreateWithoutSourceInput, Prisma.BiDatasetUncheckedCreateWithoutSourceInput> | Prisma.BiDatasetCreateWithoutSourceInput[] | Prisma.BiDatasetUncheckedCreateWithoutSourceInput[]
+  connectOrCreate?: Prisma.BiDatasetCreateOrConnectWithoutSourceInput | Prisma.BiDatasetCreateOrConnectWithoutSourceInput[]
+  upsert?: Prisma.BiDatasetUpsertWithWhereUniqueWithoutSourceInput | Prisma.BiDatasetUpsertWithWhereUniqueWithoutSourceInput[]
+  createMany?: Prisma.BiDatasetCreateManySourceInputEnvelope
+  set?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  disconnect?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  delete?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  connect?: Prisma.BiDatasetWhereUniqueInput | Prisma.BiDatasetWhereUniqueInput[]
+  update?: Prisma.BiDatasetUpdateWithWhereUniqueWithoutSourceInput | Prisma.BiDatasetUpdateWithWhereUniqueWithoutSourceInput[]
+  updateMany?: Prisma.BiDatasetUpdateManyWithWhereWithoutSourceInput | Prisma.BiDatasetUpdateManyWithWhereWithoutSourceInput[]
+  deleteMany?: Prisma.BiDatasetScalarWhereInput | Prisma.BiDatasetScalarWhereInput[]
+}
+
+export type BiDatasetCreateNestedOneWithoutPanelsInput = {
+  create?: Prisma.XOR<Prisma.BiDatasetCreateWithoutPanelsInput, Prisma.BiDatasetUncheckedCreateWithoutPanelsInput>
+  connectOrCreate?: Prisma.BiDatasetCreateOrConnectWithoutPanelsInput
+  connect?: Prisma.BiDatasetWhereUniqueInput
+}
+
+export type BiDatasetUpdateOneWithoutPanelsNestedInput = {
+  create?: Prisma.XOR<Prisma.BiDatasetCreateWithoutPanelsInput, Prisma.BiDatasetUncheckedCreateWithoutPanelsInput>
+  connectOrCreate?: Prisma.BiDatasetCreateOrConnectWithoutPanelsInput
+  upsert?: Prisma.BiDatasetUpsertWithoutPanelsInput
+  disconnect?: Prisma.BiDatasetWhereInput | boolean
+  delete?: Prisma.BiDatasetWhereInput | boolean
+  connect?: Prisma.BiDatasetWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BiDatasetUpdateToOneWithWhereWithoutPanelsInput, Prisma.BiDatasetUpdateWithoutPanelsInput>, Prisma.BiDatasetUncheckedUpdateWithoutPanelsInput>
+}
+
+export type BiDatasetCreateWithoutUserInput = {
+  id?: string
+  name: string
+  sql: string
+  description?: string | null
+  isPublic?: boolean
+  lastRunAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  source?: Prisma.BiSourceCreateNestedOneWithoutDatasetsInput
+  panels?: Prisma.BiPanelCreateNestedManyWithoutDataSetInput
+}
+
+export type BiDatasetUncheckedCreateWithoutUserInput = {
+  id?: string
+  name: string
+  sql: string
+  description?: string | null
+  isPublic?: boolean
+  sourceId?: string | null
+  lastRunAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  panels?: Prisma.BiPanelUncheckedCreateNestedManyWithoutDataSetInput
+}
+
+export type BiDatasetCreateOrConnectWithoutUserInput = {
+  where: Prisma.BiDatasetWhereUniqueInput
+  create: Prisma.XOR<Prisma.BiDatasetCreateWithoutUserInput, Prisma.BiDatasetUncheckedCreateWithoutUserInput>
+}
+
+export type BiDatasetCreateManyUserInputEnvelope = {
+  data: Prisma.BiDatasetCreateManyUserInput | Prisma.BiDatasetCreateManyUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type BiDatasetUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.BiDatasetWhereUniqueInput
+  update: Prisma.XOR<Prisma.BiDatasetUpdateWithoutUserInput, Prisma.BiDatasetUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.BiDatasetCreateWithoutUserInput, Prisma.BiDatasetUncheckedCreateWithoutUserInput>
+}
+
+export type BiDatasetUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.BiDatasetWhereUniqueInput
+  data: Prisma.XOR<Prisma.BiDatasetUpdateWithoutUserInput, Prisma.BiDatasetUncheckedUpdateWithoutUserInput>
+}
+
+export type BiDatasetUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.BiDatasetScalarWhereInput
+  data: Prisma.XOR<Prisma.BiDatasetUpdateManyMutationInput, Prisma.BiDatasetUncheckedUpdateManyWithoutUserInput>
+}
+
+export type BiDatasetScalarWhereInput = {
+  AND?: Prisma.BiDatasetScalarWhereInput | Prisma.BiDatasetScalarWhereInput[]
+  OR?: Prisma.BiDatasetScalarWhereInput[]
+  NOT?: Prisma.BiDatasetScalarWhereInput | Prisma.BiDatasetScalarWhereInput[]
+  id?: Prisma.StringFilter<"BiDataset"> | string
+  name?: Prisma.StringFilter<"BiDataset"> | string
+  sql?: Prisma.StringFilter<"BiDataset"> | string
+  description?: Prisma.StringNullableFilter<"BiDataset"> | string | null
+  isPublic?: Prisma.BoolFilter<"BiDataset"> | boolean
+  sourceId?: Prisma.StringNullableFilter<"BiDataset"> | string | null
+  lastRunAt?: Prisma.DateTimeNullableFilter<"BiDataset"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"BiDataset"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"BiDataset"> | Date | string
+  userId?: Prisma.StringNullableFilter<"BiDataset"> | string | null
+}
+
+export type BiDatasetCreateWithoutSourceInput = {
   id?: string
   name: string
   sql: string
@@ -489,9 +623,10 @@ export type BiDataSetCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   panels?: Prisma.BiPanelCreateNestedManyWithoutDataSetInput
+  user?: Prisma.UserCreateNestedOneWithoutBiDatasetsInput
 }
 
-export type BiDataSetUncheckedCreateWithoutUserInput = {
+export type BiDatasetUncheckedCreateWithoutSourceInput = {
   id?: string
   name: string
   sql: string
@@ -500,51 +635,37 @@ export type BiDataSetUncheckedCreateWithoutUserInput = {
   lastRunAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  userId?: string | null
   panels?: Prisma.BiPanelUncheckedCreateNestedManyWithoutDataSetInput
 }
 
-export type BiDataSetCreateOrConnectWithoutUserInput = {
-  where: Prisma.BiDataSetWhereUniqueInput
-  create: Prisma.XOR<Prisma.BiDataSetCreateWithoutUserInput, Prisma.BiDataSetUncheckedCreateWithoutUserInput>
+export type BiDatasetCreateOrConnectWithoutSourceInput = {
+  where: Prisma.BiDatasetWhereUniqueInput
+  create: Prisma.XOR<Prisma.BiDatasetCreateWithoutSourceInput, Prisma.BiDatasetUncheckedCreateWithoutSourceInput>
 }
 
-export type BiDataSetCreateManyUserInputEnvelope = {
-  data: Prisma.BiDataSetCreateManyUserInput | Prisma.BiDataSetCreateManyUserInput[]
+export type BiDatasetCreateManySourceInputEnvelope = {
+  data: Prisma.BiDatasetCreateManySourceInput | Prisma.BiDatasetCreateManySourceInput[]
   skipDuplicates?: boolean
 }
 
-export type BiDataSetUpsertWithWhereUniqueWithoutUserInput = {
-  where: Prisma.BiDataSetWhereUniqueInput
-  update: Prisma.XOR<Prisma.BiDataSetUpdateWithoutUserInput, Prisma.BiDataSetUncheckedUpdateWithoutUserInput>
-  create: Prisma.XOR<Prisma.BiDataSetCreateWithoutUserInput, Prisma.BiDataSetUncheckedCreateWithoutUserInput>
+export type BiDatasetUpsertWithWhereUniqueWithoutSourceInput = {
+  where: Prisma.BiDatasetWhereUniqueInput
+  update: Prisma.XOR<Prisma.BiDatasetUpdateWithoutSourceInput, Prisma.BiDatasetUncheckedUpdateWithoutSourceInput>
+  create: Prisma.XOR<Prisma.BiDatasetCreateWithoutSourceInput, Prisma.BiDatasetUncheckedCreateWithoutSourceInput>
 }
 
-export type BiDataSetUpdateWithWhereUniqueWithoutUserInput = {
-  where: Prisma.BiDataSetWhereUniqueInput
-  data: Prisma.XOR<Prisma.BiDataSetUpdateWithoutUserInput, Prisma.BiDataSetUncheckedUpdateWithoutUserInput>
+export type BiDatasetUpdateWithWhereUniqueWithoutSourceInput = {
+  where: Prisma.BiDatasetWhereUniqueInput
+  data: Prisma.XOR<Prisma.BiDatasetUpdateWithoutSourceInput, Prisma.BiDatasetUncheckedUpdateWithoutSourceInput>
 }
 
-export type BiDataSetUpdateManyWithWhereWithoutUserInput = {
-  where: Prisma.BiDataSetScalarWhereInput
-  data: Prisma.XOR<Prisma.BiDataSetUpdateManyMutationInput, Prisma.BiDataSetUncheckedUpdateManyWithoutUserInput>
+export type BiDatasetUpdateManyWithWhereWithoutSourceInput = {
+  where: Prisma.BiDatasetScalarWhereInput
+  data: Prisma.XOR<Prisma.BiDatasetUpdateManyMutationInput, Prisma.BiDatasetUncheckedUpdateManyWithoutSourceInput>
 }
 
-export type BiDataSetScalarWhereInput = {
-  AND?: Prisma.BiDataSetScalarWhereInput | Prisma.BiDataSetScalarWhereInput[]
-  OR?: Prisma.BiDataSetScalarWhereInput[]
-  NOT?: Prisma.BiDataSetScalarWhereInput | Prisma.BiDataSetScalarWhereInput[]
-  id?: Prisma.StringFilter<"BiDataSet"> | string
-  name?: Prisma.StringFilter<"BiDataSet"> | string
-  sql?: Prisma.StringFilter<"BiDataSet"> | string
-  description?: Prisma.StringNullableFilter<"BiDataSet"> | string | null
-  isPublic?: Prisma.BoolFilter<"BiDataSet"> | boolean
-  lastRunAt?: Prisma.DateTimeNullableFilter<"BiDataSet"> | Date | string | null
-  createdAt?: Prisma.DateTimeFilter<"BiDataSet"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"BiDataSet"> | Date | string
-  userId?: Prisma.StringNullableFilter<"BiDataSet"> | string | null
-}
-
-export type BiDataSetCreateWithoutPanelsInput = {
+export type BiDatasetCreateWithoutPanelsInput = {
   id?: string
   name: string
   sql: string
@@ -553,10 +674,116 @@ export type BiDataSetCreateWithoutPanelsInput = {
   lastRunAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  user?: Prisma.UserCreateNestedOneWithoutBiDataSetsInput
+  source?: Prisma.BiSourceCreateNestedOneWithoutDatasetsInput
+  user?: Prisma.UserCreateNestedOneWithoutBiDatasetsInput
 }
 
-export type BiDataSetUncheckedCreateWithoutPanelsInput = {
+export type BiDatasetUncheckedCreateWithoutPanelsInput = {
+  id?: string
+  name: string
+  sql: string
+  description?: string | null
+  isPublic?: boolean
+  sourceId?: string | null
+  lastRunAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userId?: string | null
+}
+
+export type BiDatasetCreateOrConnectWithoutPanelsInput = {
+  where: Prisma.BiDatasetWhereUniqueInput
+  create: Prisma.XOR<Prisma.BiDatasetCreateWithoutPanelsInput, Prisma.BiDatasetUncheckedCreateWithoutPanelsInput>
+}
+
+export type BiDatasetUpsertWithoutPanelsInput = {
+  update: Prisma.XOR<Prisma.BiDatasetUpdateWithoutPanelsInput, Prisma.BiDatasetUncheckedUpdateWithoutPanelsInput>
+  create: Prisma.XOR<Prisma.BiDatasetCreateWithoutPanelsInput, Prisma.BiDatasetUncheckedCreateWithoutPanelsInput>
+  where?: Prisma.BiDatasetWhereInput
+}
+
+export type BiDatasetUpdateToOneWithWhereWithoutPanelsInput = {
+  where?: Prisma.BiDatasetWhereInput
+  data: Prisma.XOR<Prisma.BiDatasetUpdateWithoutPanelsInput, Prisma.BiDatasetUncheckedUpdateWithoutPanelsInput>
+}
+
+export type BiDatasetUpdateWithoutPanelsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sql?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  source?: Prisma.BiSourceUpdateOneWithoutDatasetsNestedInput
+  user?: Prisma.UserUpdateOneWithoutBiDatasetsNestedInput
+}
+
+export type BiDatasetUncheckedUpdateWithoutPanelsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sql?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type BiDatasetCreateManyUserInput = {
+  id?: string
+  name: string
+  sql: string
+  description?: string | null
+  isPublic?: boolean
+  sourceId?: string | null
+  lastRunAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type BiDatasetUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sql?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  source?: Prisma.BiSourceUpdateOneWithoutDatasetsNestedInput
+  panels?: Prisma.BiPanelUpdateManyWithoutDataSetNestedInput
+}
+
+export type BiDatasetUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sql?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  panels?: Prisma.BiPanelUncheckedUpdateManyWithoutDataSetNestedInput
+}
+
+export type BiDatasetUncheckedUpdateManyWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sql?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type BiDatasetCreateManySourceInput = {
   id?: string
   name: string
   sql: string
@@ -568,23 +795,7 @@ export type BiDataSetUncheckedCreateWithoutPanelsInput = {
   userId?: string | null
 }
 
-export type BiDataSetCreateOrConnectWithoutPanelsInput = {
-  where: Prisma.BiDataSetWhereUniqueInput
-  create: Prisma.XOR<Prisma.BiDataSetCreateWithoutPanelsInput, Prisma.BiDataSetUncheckedCreateWithoutPanelsInput>
-}
-
-export type BiDataSetUpsertWithoutPanelsInput = {
-  update: Prisma.XOR<Prisma.BiDataSetUpdateWithoutPanelsInput, Prisma.BiDataSetUncheckedUpdateWithoutPanelsInput>
-  create: Prisma.XOR<Prisma.BiDataSetCreateWithoutPanelsInput, Prisma.BiDataSetUncheckedCreateWithoutPanelsInput>
-  where?: Prisma.BiDataSetWhereInput
-}
-
-export type BiDataSetUpdateToOneWithWhereWithoutPanelsInput = {
-  where?: Prisma.BiDataSetWhereInput
-  data: Prisma.XOR<Prisma.BiDataSetUpdateWithoutPanelsInput, Prisma.BiDataSetUncheckedUpdateWithoutPanelsInput>
-}
-
-export type BiDataSetUpdateWithoutPanelsInput = {
+export type BiDatasetUpdateWithoutSourceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   sql?: Prisma.StringFieldUpdateOperationsInput | string
@@ -593,10 +804,24 @@ export type BiDataSetUpdateWithoutPanelsInput = {
   lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneWithoutBiDataSetsNestedInput
+  panels?: Prisma.BiPanelUpdateManyWithoutDataSetNestedInput
+  user?: Prisma.UserUpdateOneWithoutBiDatasetsNestedInput
 }
 
-export type BiDataSetUncheckedUpdateWithoutPanelsInput = {
+export type BiDatasetUncheckedUpdateWithoutSourceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sql?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  panels?: Prisma.BiPanelUncheckedUpdateManyWithoutDataSetNestedInput
+}
+
+export type BiDatasetUncheckedUpdateManyWithoutSourceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   sql?: Prisma.StringFieldUpdateOperationsInput | string
@@ -608,152 +833,117 @@ export type BiDataSetUncheckedUpdateWithoutPanelsInput = {
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
-export type BiDataSetCreateManyUserInput = {
-  id?: string
-  name: string
-  sql: string
-  description?: string | null
-  isPublic?: boolean
-  lastRunAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type BiDataSetUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  sql?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  panels?: Prisma.BiPanelUpdateManyWithoutDataSetNestedInput
-}
-
-export type BiDataSetUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  sql?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  panels?: Prisma.BiPanelUncheckedUpdateManyWithoutDataSetNestedInput
-}
-
-export type BiDataSetUncheckedUpdateManyWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  sql?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  lastRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
 
 /**
- * Count Type BiDataSetCountOutputType
+ * Count Type BiDatasetCountOutputType
  */
 
-export type BiDataSetCountOutputType = {
+export type BiDatasetCountOutputType = {
   panels: number
 }
 
-export type BiDataSetCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  panels?: boolean | BiDataSetCountOutputTypeCountPanelsArgs
+export type BiDatasetCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  panels?: boolean | BiDatasetCountOutputTypeCountPanelsArgs
 }
 
 /**
- * BiDataSetCountOutputType without action
+ * BiDatasetCountOutputType without action
  */
-export type BiDataSetCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BiDataSetCountOutputType
+   * Select specific fields to fetch from the BiDatasetCountOutputType
    */
-  select?: Prisma.BiDataSetCountOutputTypeSelect<ExtArgs> | null
+  select?: Prisma.BiDatasetCountOutputTypeSelect<ExtArgs> | null
 }
 
 /**
- * BiDataSetCountOutputType without action
+ * BiDatasetCountOutputType without action
  */
-export type BiDataSetCountOutputTypeCountPanelsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetCountOutputTypeCountPanelsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.BiPanelWhereInput
 }
 
 
-export type BiDataSetSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+export type BiDatasetSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   sql?: boolean
   description?: boolean
   isPublic?: boolean
+  sourceId?: boolean
   lastRunAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
-  panels?: boolean | Prisma.BiDataSet$panelsArgs<ExtArgs>
-  user?: boolean | Prisma.BiDataSet$userArgs<ExtArgs>
-  _count?: boolean | Prisma.BiDataSetCountOutputTypeDefaultArgs<ExtArgs>
-}, ExtArgs["result"]["biDataSet"]>
+  source?: boolean | Prisma.BiDataset$sourceArgs<ExtArgs>
+  panels?: boolean | Prisma.BiDataset$panelsArgs<ExtArgs>
+  user?: boolean | Prisma.BiDataset$userArgs<ExtArgs>
+  _count?: boolean | Prisma.BiDatasetCountOutputTypeDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["biDataset"]>
 
-export type BiDataSetSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+export type BiDatasetSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   sql?: boolean
   description?: boolean
   isPublic?: boolean
+  sourceId?: boolean
   lastRunAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
-  user?: boolean | Prisma.BiDataSet$userArgs<ExtArgs>
-}, ExtArgs["result"]["biDataSet"]>
+  source?: boolean | Prisma.BiDataset$sourceArgs<ExtArgs>
+  user?: boolean | Prisma.BiDataset$userArgs<ExtArgs>
+}, ExtArgs["result"]["biDataset"]>
 
-export type BiDataSetSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+export type BiDatasetSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   sql?: boolean
   description?: boolean
   isPublic?: boolean
+  sourceId?: boolean
   lastRunAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
-  user?: boolean | Prisma.BiDataSet$userArgs<ExtArgs>
-}, ExtArgs["result"]["biDataSet"]>
+  source?: boolean | Prisma.BiDataset$sourceArgs<ExtArgs>
+  user?: boolean | Prisma.BiDataset$userArgs<ExtArgs>
+}, ExtArgs["result"]["biDataset"]>
 
-export type BiDataSetSelectScalar = {
+export type BiDatasetSelectScalar = {
   id?: boolean
   name?: boolean
   sql?: boolean
   description?: boolean
   isPublic?: boolean
+  sourceId?: boolean
   lastRunAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
 }
 
-export type BiDataSetOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "sql" | "description" | "isPublic" | "lastRunAt" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["biDataSet"]>
-export type BiDataSetInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  panels?: boolean | Prisma.BiDataSet$panelsArgs<ExtArgs>
-  user?: boolean | Prisma.BiDataSet$userArgs<ExtArgs>
-  _count?: boolean | Prisma.BiDataSetCountOutputTypeDefaultArgs<ExtArgs>
+export type BiDatasetOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "sql" | "description" | "isPublic" | "sourceId" | "lastRunAt" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["biDataset"]>
+export type BiDatasetInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  source?: boolean | Prisma.BiDataset$sourceArgs<ExtArgs>
+  panels?: boolean | Prisma.BiDataset$panelsArgs<ExtArgs>
+  user?: boolean | Prisma.BiDataset$userArgs<ExtArgs>
+  _count?: boolean | Prisma.BiDatasetCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type BiDataSetIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.BiDataSet$userArgs<ExtArgs>
+export type BiDatasetIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  source?: boolean | Prisma.BiDataset$sourceArgs<ExtArgs>
+  user?: boolean | Prisma.BiDataset$userArgs<ExtArgs>
 }
-export type BiDataSetIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.BiDataSet$userArgs<ExtArgs>
+export type BiDatasetIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  source?: boolean | Prisma.BiDataset$sourceArgs<ExtArgs>
+  user?: boolean | Prisma.BiDataset$userArgs<ExtArgs>
 }
 
-export type $BiDataSetPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  name: "BiDataSet"
+export type $BiDatasetPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  name: "BiDataset"
   objects: {
+    source: Prisma.$BiSourcePayload<ExtArgs> | null
     panels: Prisma.$BiPanelPayload<ExtArgs>[]
     user: Prisma.$UserPayload<ExtArgs> | null
   }
@@ -763,140 +953,141 @@ export type $BiDataSetPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     sql: string
     description: string | null
     isPublic: boolean
+    sourceId: string | null
     lastRunAt: Date | null
     createdAt: Date
     updatedAt: Date
     userId: string | null
-  }, ExtArgs["result"]["biDataSet"]>
+  }, ExtArgs["result"]["biDataset"]>
   composites: {}
 }
 
-export type BiDataSetGetPayload<S extends boolean | null | undefined | BiDataSetDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$BiDataSetPayload, S>
+export type BiDatasetGetPayload<S extends boolean | null | undefined | BiDatasetDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$BiDatasetPayload, S>
 
-export type BiDataSetCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<BiDataSetFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-    select?: BiDataSetCountAggregateInputType | true
+export type BiDatasetCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
+  Omit<BiDatasetFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: BiDatasetCountAggregateInputType | true
   }
 
-export interface BiDataSetDelegate<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-  [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BiDataSet'], meta: { name: 'BiDataSet' } }
+export interface BiDatasetDelegate<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+  [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BiDataset'], meta: { name: 'BiDataset' } }
   /**
-   * Find zero or one BiDataSet that matches the filter.
-   * @param {BiDataSetFindUniqueArgs} args - Arguments to find a BiDataSet
+   * Find zero or one BiDataset that matches the filter.
+   * @param {BiDatasetFindUniqueArgs} args - Arguments to find a BiDataset
    * @example
-   * // Get one BiDataSet
-   * const biDataSet = await prisma.biDataSet.findUnique({
+   * // Get one BiDataset
+   * const biDataset = await prisma.biDataset.findUnique({
    *   where: {
    *     // ... provide filter here
    *   }
    * })
    */
-  findUnique<T extends BiDataSetFindUniqueArgs>(args: Prisma.SelectSubset<T, BiDataSetFindUniqueArgs<ExtArgs>>): Prisma.Prisma__BiDataSetClient<runtime.Types.Result.GetResult<Prisma.$BiDataSetPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  findUnique<T extends BiDatasetFindUniqueArgs>(args: Prisma.SelectSubset<T, BiDatasetFindUniqueArgs<ExtArgs>>): Prisma.Prisma__BiDatasetClient<runtime.Types.Result.GetResult<Prisma.$BiDatasetPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
   /**
-   * Find one BiDataSet that matches the filter or throw an error with `error.code='P2025'`
+   * Find one BiDataset that matches the filter or throw an error with `error.code='P2025'`
    * if no matches were found.
-   * @param {BiDataSetFindUniqueOrThrowArgs} args - Arguments to find a BiDataSet
+   * @param {BiDatasetFindUniqueOrThrowArgs} args - Arguments to find a BiDataset
    * @example
-   * // Get one BiDataSet
-   * const biDataSet = await prisma.biDataSet.findUniqueOrThrow({
+   * // Get one BiDataset
+   * const biDataset = await prisma.biDataset.findUniqueOrThrow({
    *   where: {
    *     // ... provide filter here
    *   }
    * })
    */
-  findUniqueOrThrow<T extends BiDataSetFindUniqueOrThrowArgs>(args: Prisma.SelectSubset<T, BiDataSetFindUniqueOrThrowArgs<ExtArgs>>): Prisma.Prisma__BiDataSetClient<runtime.Types.Result.GetResult<Prisma.$BiDataSetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+  findUniqueOrThrow<T extends BiDatasetFindUniqueOrThrowArgs>(args: Prisma.SelectSubset<T, BiDatasetFindUniqueOrThrowArgs<ExtArgs>>): Prisma.Prisma__BiDatasetClient<runtime.Types.Result.GetResult<Prisma.$BiDatasetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
   /**
-   * Find the first BiDataSet that matches the filter.
+   * Find the first BiDataset that matches the filter.
    * Note, that providing `undefined` is treated as the value not being there.
    * Read more here: https://pris.ly/d/null-undefined
-   * @param {BiDataSetFindFirstArgs} args - Arguments to find a BiDataSet
+   * @param {BiDatasetFindFirstArgs} args - Arguments to find a BiDataset
    * @example
-   * // Get one BiDataSet
-   * const biDataSet = await prisma.biDataSet.findFirst({
+   * // Get one BiDataset
+   * const biDataset = await prisma.biDataset.findFirst({
    *   where: {
    *     // ... provide filter here
    *   }
    * })
    */
-  findFirst<T extends BiDataSetFindFirstArgs>(args?: Prisma.SelectSubset<T, BiDataSetFindFirstArgs<ExtArgs>>): Prisma.Prisma__BiDataSetClient<runtime.Types.Result.GetResult<Prisma.$BiDataSetPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  findFirst<T extends BiDatasetFindFirstArgs>(args?: Prisma.SelectSubset<T, BiDatasetFindFirstArgs<ExtArgs>>): Prisma.Prisma__BiDatasetClient<runtime.Types.Result.GetResult<Prisma.$BiDatasetPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
   /**
-   * Find the first BiDataSet that matches the filter or
+   * Find the first BiDataset that matches the filter or
    * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
    * Note, that providing `undefined` is treated as the value not being there.
    * Read more here: https://pris.ly/d/null-undefined
-   * @param {BiDataSetFindFirstOrThrowArgs} args - Arguments to find a BiDataSet
+   * @param {BiDatasetFindFirstOrThrowArgs} args - Arguments to find a BiDataset
    * @example
-   * // Get one BiDataSet
-   * const biDataSet = await prisma.biDataSet.findFirstOrThrow({
+   * // Get one BiDataset
+   * const biDataset = await prisma.biDataset.findFirstOrThrow({
    *   where: {
    *     // ... provide filter here
    *   }
    * })
    */
-  findFirstOrThrow<T extends BiDataSetFindFirstOrThrowArgs>(args?: Prisma.SelectSubset<T, BiDataSetFindFirstOrThrowArgs<ExtArgs>>): Prisma.Prisma__BiDataSetClient<runtime.Types.Result.GetResult<Prisma.$BiDataSetPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+  findFirstOrThrow<T extends BiDatasetFindFirstOrThrowArgs>(args?: Prisma.SelectSubset<T, BiDatasetFindFirstOrThrowArgs<ExtArgs>>): Prisma.Prisma__BiDatasetClient<runtime.Types.Result.GetResult<Prisma.$BiDatasetPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
   /**
-   * Find zero or more BiDataSets that matches the filter.
+   * Find zero or more BiDatasets that matches the filter.
    * Note, that providing `undefined` is treated as the value not being there.
    * Read more here: https://pris.ly/d/null-undefined
-   * @param {BiDataSetFindManyArgs} args - Arguments to filter and select certain fields only.
+   * @param {BiDatasetFindManyArgs} args - Arguments to filter and select certain fields only.
    * @example
-   * // Get all BiDataSets
-   * const biDataSets = await prisma.biDataSet.findMany()
+   * // Get all BiDatasets
+   * const biDatasets = await prisma.biDataset.findMany()
    * 
-   * // Get first 10 BiDataSets
-   * const biDataSets = await prisma.biDataSet.findMany({ take: 10 })
+   * // Get first 10 BiDatasets
+   * const biDatasets = await prisma.biDataset.findMany({ take: 10 })
    * 
    * // Only select the `id`
-   * const biDataSetWithIdOnly = await prisma.biDataSet.findMany({ select: { id: true } })
+   * const biDatasetWithIdOnly = await prisma.biDataset.findMany({ select: { id: true } })
    * 
    */
-  findMany<T extends BiDataSetFindManyArgs>(args?: Prisma.SelectSubset<T, BiDataSetFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiDataSetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+  findMany<T extends BiDatasetFindManyArgs>(args?: Prisma.SelectSubset<T, BiDatasetFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiDatasetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
   /**
-   * Create a BiDataSet.
-   * @param {BiDataSetCreateArgs} args - Arguments to create a BiDataSet.
+   * Create a BiDataset.
+   * @param {BiDatasetCreateArgs} args - Arguments to create a BiDataset.
    * @example
-   * // Create one BiDataSet
-   * const BiDataSet = await prisma.biDataSet.create({
+   * // Create one BiDataset
+   * const BiDataset = await prisma.biDataset.create({
    *   data: {
-   *     // ... data to create a BiDataSet
+   *     // ... data to create a BiDataset
    *   }
    * })
    * 
    */
-  create<T extends BiDataSetCreateArgs>(args: Prisma.SelectSubset<T, BiDataSetCreateArgs<ExtArgs>>): Prisma.Prisma__BiDataSetClient<runtime.Types.Result.GetResult<Prisma.$BiDataSetPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+  create<T extends BiDatasetCreateArgs>(args: Prisma.SelectSubset<T, BiDatasetCreateArgs<ExtArgs>>): Prisma.Prisma__BiDatasetClient<runtime.Types.Result.GetResult<Prisma.$BiDatasetPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
   /**
-   * Create many BiDataSets.
-   * @param {BiDataSetCreateManyArgs} args - Arguments to create many BiDataSets.
+   * Create many BiDatasets.
+   * @param {BiDatasetCreateManyArgs} args - Arguments to create many BiDatasets.
    * @example
-   * // Create many BiDataSets
-   * const biDataSet = await prisma.biDataSet.createMany({
+   * // Create many BiDatasets
+   * const biDataset = await prisma.biDataset.createMany({
    *   data: [
    *     // ... provide data here
    *   ]
    * })
    *     
    */
-  createMany<T extends BiDataSetCreateManyArgs>(args?: Prisma.SelectSubset<T, BiDataSetCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+  createMany<T extends BiDatasetCreateManyArgs>(args?: Prisma.SelectSubset<T, BiDatasetCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
-   * Create many BiDataSets and returns the data saved in the database.
-   * @param {BiDataSetCreateManyAndReturnArgs} args - Arguments to create many BiDataSets.
+   * Create many BiDatasets and returns the data saved in the database.
+   * @param {BiDatasetCreateManyAndReturnArgs} args - Arguments to create many BiDatasets.
    * @example
-   * // Create many BiDataSets
-   * const biDataSet = await prisma.biDataSet.createManyAndReturn({
+   * // Create many BiDatasets
+   * const biDataset = await prisma.biDataset.createManyAndReturn({
    *   data: [
    *     // ... provide data here
    *   ]
    * })
    * 
-   * // Create many BiDataSets and only return the `id`
-   * const biDataSetWithIdOnly = await prisma.biDataSet.createManyAndReturn({
+   * // Create many BiDatasets and only return the `id`
+   * const biDatasetWithIdOnly = await prisma.biDataset.createManyAndReturn({
    *   select: { id: true },
    *   data: [
    *     // ... provide data here
@@ -906,28 +1097,28 @@ export interface BiDataSetDelegate<ExtArgs extends runtime.Types.Extensions.Inte
    * Read more here: https://pris.ly/d/null-undefined
    * 
    */
-  createManyAndReturn<T extends BiDataSetCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, BiDataSetCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiDataSetPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+  createManyAndReturn<T extends BiDatasetCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, BiDatasetCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiDatasetPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
   /**
-   * Delete a BiDataSet.
-   * @param {BiDataSetDeleteArgs} args - Arguments to delete one BiDataSet.
+   * Delete a BiDataset.
+   * @param {BiDatasetDeleteArgs} args - Arguments to delete one BiDataset.
    * @example
-   * // Delete one BiDataSet
-   * const BiDataSet = await prisma.biDataSet.delete({
+   * // Delete one BiDataset
+   * const BiDataset = await prisma.biDataset.delete({
    *   where: {
-   *     // ... filter to delete one BiDataSet
+   *     // ... filter to delete one BiDataset
    *   }
    * })
    * 
    */
-  delete<T extends BiDataSetDeleteArgs>(args: Prisma.SelectSubset<T, BiDataSetDeleteArgs<ExtArgs>>): Prisma.Prisma__BiDataSetClient<runtime.Types.Result.GetResult<Prisma.$BiDataSetPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+  delete<T extends BiDatasetDeleteArgs>(args: Prisma.SelectSubset<T, BiDatasetDeleteArgs<ExtArgs>>): Prisma.Prisma__BiDatasetClient<runtime.Types.Result.GetResult<Prisma.$BiDatasetPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
   /**
-   * Update one BiDataSet.
-   * @param {BiDataSetUpdateArgs} args - Arguments to update one BiDataSet.
+   * Update one BiDataset.
+   * @param {BiDatasetUpdateArgs} args - Arguments to update one BiDataset.
    * @example
-   * // Update one BiDataSet
-   * const biDataSet = await prisma.biDataSet.update({
+   * // Update one BiDataset
+   * const biDataset = await prisma.biDataset.update({
    *   where: {
    *     // ... provide filter here
    *   },
@@ -937,30 +1128,30 @@ export interface BiDataSetDelegate<ExtArgs extends runtime.Types.Extensions.Inte
    * })
    * 
    */
-  update<T extends BiDataSetUpdateArgs>(args: Prisma.SelectSubset<T, BiDataSetUpdateArgs<ExtArgs>>): Prisma.Prisma__BiDataSetClient<runtime.Types.Result.GetResult<Prisma.$BiDataSetPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+  update<T extends BiDatasetUpdateArgs>(args: Prisma.SelectSubset<T, BiDatasetUpdateArgs<ExtArgs>>): Prisma.Prisma__BiDatasetClient<runtime.Types.Result.GetResult<Prisma.$BiDatasetPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
   /**
-   * Delete zero or more BiDataSets.
-   * @param {BiDataSetDeleteManyArgs} args - Arguments to filter BiDataSets to delete.
+   * Delete zero or more BiDatasets.
+   * @param {BiDatasetDeleteManyArgs} args - Arguments to filter BiDatasets to delete.
    * @example
-   * // Delete a few BiDataSets
-   * const { count } = await prisma.biDataSet.deleteMany({
+   * // Delete a few BiDatasets
+   * const { count } = await prisma.biDataset.deleteMany({
    *   where: {
    *     // ... provide filter here
    *   }
    * })
    * 
    */
-  deleteMany<T extends BiDataSetDeleteManyArgs>(args?: Prisma.SelectSubset<T, BiDataSetDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+  deleteMany<T extends BiDatasetDeleteManyArgs>(args?: Prisma.SelectSubset<T, BiDatasetDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
-   * Update zero or more BiDataSets.
+   * Update zero or more BiDatasets.
    * Note, that providing `undefined` is treated as the value not being there.
    * Read more here: https://pris.ly/d/null-undefined
-   * @param {BiDataSetUpdateManyArgs} args - Arguments to update one or more rows.
+   * @param {BiDatasetUpdateManyArgs} args - Arguments to update one or more rows.
    * @example
-   * // Update many BiDataSets
-   * const biDataSet = await prisma.biDataSet.updateMany({
+   * // Update many BiDatasets
+   * const biDataset = await prisma.biDataset.updateMany({
    *   where: {
    *     // ... provide filter here
    *   },
@@ -970,14 +1161,14 @@ export interface BiDataSetDelegate<ExtArgs extends runtime.Types.Extensions.Inte
    * })
    * 
    */
-  updateMany<T extends BiDataSetUpdateManyArgs>(args: Prisma.SelectSubset<T, BiDataSetUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+  updateMany<T extends BiDatasetUpdateManyArgs>(args: Prisma.SelectSubset<T, BiDatasetUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
-   * Update zero or more BiDataSets and returns the data updated in the database.
-   * @param {BiDataSetUpdateManyAndReturnArgs} args - Arguments to update many BiDataSets.
+   * Update zero or more BiDatasets and returns the data updated in the database.
+   * @param {BiDatasetUpdateManyAndReturnArgs} args - Arguments to update many BiDatasets.
    * @example
-   * // Update many BiDataSets
-   * const biDataSet = await prisma.biDataSet.updateManyAndReturn({
+   * // Update many BiDatasets
+   * const biDataset = await prisma.biDataset.updateManyAndReturn({
    *   where: {
    *     // ... provide filter here
    *   },
@@ -986,8 +1177,8 @@ export interface BiDataSetDelegate<ExtArgs extends runtime.Types.Extensions.Inte
    *   ]
    * })
    * 
-   * // Update zero or more BiDataSets and only return the `id`
-   * const biDataSetWithIdOnly = await prisma.biDataSet.updateManyAndReturn({
+   * // Update zero or more BiDatasets and only return the `id`
+   * const biDatasetWithIdOnly = await prisma.biDataset.updateManyAndReturn({
    *   select: { id: true },
    *   where: {
    *     // ... provide filter here
@@ -1000,56 +1191,56 @@ export interface BiDataSetDelegate<ExtArgs extends runtime.Types.Extensions.Inte
    * Read more here: https://pris.ly/d/null-undefined
    * 
    */
-  updateManyAndReturn<T extends BiDataSetUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, BiDataSetUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiDataSetPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+  updateManyAndReturn<T extends BiDatasetUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, BiDatasetUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiDatasetPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
-   * Create or update one BiDataSet.
-   * @param {BiDataSetUpsertArgs} args - Arguments to update or create a BiDataSet.
+   * Create or update one BiDataset.
+   * @param {BiDatasetUpsertArgs} args - Arguments to update or create a BiDataset.
    * @example
-   * // Update or create a BiDataSet
-   * const biDataSet = await prisma.biDataSet.upsert({
+   * // Update or create a BiDataset
+   * const biDataset = await prisma.biDataset.upsert({
    *   create: {
-   *     // ... data to create a BiDataSet
+   *     // ... data to create a BiDataset
    *   },
    *   update: {
    *     // ... in case it already exists, update
    *   },
    *   where: {
-   *     // ... the filter for the BiDataSet we want to update
+   *     // ... the filter for the BiDataset we want to update
    *   }
    * })
    */
-  upsert<T extends BiDataSetUpsertArgs>(args: Prisma.SelectSubset<T, BiDataSetUpsertArgs<ExtArgs>>): Prisma.Prisma__BiDataSetClient<runtime.Types.Result.GetResult<Prisma.$BiDataSetPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+  upsert<T extends BiDatasetUpsertArgs>(args: Prisma.SelectSubset<T, BiDatasetUpsertArgs<ExtArgs>>): Prisma.Prisma__BiDatasetClient<runtime.Types.Result.GetResult<Prisma.$BiDatasetPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
   /**
-   * Count the number of BiDataSets.
+   * Count the number of BiDatasets.
    * Note, that providing `undefined` is treated as the value not being there.
    * Read more here: https://pris.ly/d/null-undefined
-   * @param {BiDataSetCountArgs} args - Arguments to filter BiDataSets to count.
+   * @param {BiDatasetCountArgs} args - Arguments to filter BiDatasets to count.
    * @example
-   * // Count the number of BiDataSets
-   * const count = await prisma.biDataSet.count({
+   * // Count the number of BiDatasets
+   * const count = await prisma.biDataset.count({
    *   where: {
-   *     // ... the filter for the BiDataSets we want to count
+   *     // ... the filter for the BiDatasets we want to count
    *   }
    * })
   **/
-  count<T extends BiDataSetCountArgs>(
-    args?: Prisma.Subset<T, BiDataSetCountArgs>,
+  count<T extends BiDatasetCountArgs>(
+    args?: Prisma.Subset<T, BiDatasetCountArgs>,
   ): Prisma.PrismaPromise<
     T extends runtime.Types.Utils.Record<'select', any>
       ? T['select'] extends true
         ? number
-        : Prisma.GetScalarType<T['select'], BiDataSetCountAggregateOutputType>
+        : Prisma.GetScalarType<T['select'], BiDatasetCountAggregateOutputType>
       : number
   >
 
   /**
-   * Allows you to perform aggregations operations on a BiDataSet.
+   * Allows you to perform aggregations operations on a BiDataset.
    * Note, that providing `undefined` is treated as the value not being there.
    * Read more here: https://pris.ly/d/null-undefined
-   * @param {BiDataSetAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+   * @param {BiDatasetAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
    * @example
    * // Ordered by age ascending
    * // Where email contains prisma.io
@@ -1069,13 +1260,13 @@ export interface BiDataSetDelegate<ExtArgs extends runtime.Types.Extensions.Inte
    *   take: 10,
    * })
   **/
-  aggregate<T extends BiDataSetAggregateArgs>(args: Prisma.Subset<T, BiDataSetAggregateArgs>): Prisma.PrismaPromise<GetBiDataSetAggregateType<T>>
+  aggregate<T extends BiDatasetAggregateArgs>(args: Prisma.Subset<T, BiDatasetAggregateArgs>): Prisma.PrismaPromise<GetBiDatasetAggregateType<T>>
 
   /**
-   * Group by BiDataSet.
+   * Group by BiDataset.
    * Note, that providing `undefined` is treated as the value not being there.
    * Read more here: https://pris.ly/d/null-undefined
-   * @param {BiDataSetGroupByArgs} args - Group by arguments.
+   * @param {BiDatasetGroupByArgs} args - Group by arguments.
    * @example
    * // Group by city, order by createdAt, get count
    * const result = await prisma.user.groupBy({
@@ -1090,14 +1281,14 @@ export interface BiDataSetDelegate<ExtArgs extends runtime.Types.Extensions.Inte
    * 
   **/
   groupBy<
-    T extends BiDataSetGroupByArgs,
+    T extends BiDatasetGroupByArgs,
     HasSelectOrTake extends Prisma.Or<
       Prisma.Extends<'skip', Prisma.Keys<T>>,
       Prisma.Extends<'take', Prisma.Keys<T>>
     >,
     OrderByArg extends Prisma.True extends HasSelectOrTake
-      ? { orderBy: BiDataSetGroupByArgs['orderBy'] }
-      : { orderBy?: BiDataSetGroupByArgs['orderBy'] },
+      ? { orderBy: BiDatasetGroupByArgs['orderBy'] }
+      : { orderBy?: BiDatasetGroupByArgs['orderBy'] },
     OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>,
     ByFields extends Prisma.MaybeTupleToUnion<T['by']>,
     ByValid extends Prisma.Has<ByFields, OrderFields>,
@@ -1146,23 +1337,24 @@ export interface BiDataSetDelegate<ExtArgs extends runtime.Types.Extensions.Inte
           ? never
           : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
       }[OrderFields]
-  >(args: Prisma.SubsetIntersection<T, BiDataSetGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBiDataSetGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  >(args: Prisma.SubsetIntersection<T, BiDatasetGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBiDatasetGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 /**
- * Fields of the BiDataSet model
+ * Fields of the BiDataset model
  */
-readonly fields: BiDataSetFieldRefs;
+readonly fields: BiDatasetFieldRefs;
 }
 
 /**
- * The delegate class that acts as a "Promise-like" for BiDataSet.
+ * The delegate class that acts as a "Promise-like" for BiDataset.
  * Why is this prefixed with `Prisma__`?
  * Because we want to prevent naming conflicts as mentioned in
  * https://github.com/prisma/prisma-client-js/issues/707
  */
-export interface Prisma__BiDataSetClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+export interface Prisma__BiDatasetClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  panels<T extends Prisma.BiDataSet$panelsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BiDataSet$panelsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiPanelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  user<T extends Prisma.BiDataSet$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BiDataSet$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  source<T extends Prisma.BiDataset$sourceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BiDataset$sourceArgs<ExtArgs>>): Prisma.Prisma__BiSourceClient<runtime.Types.Result.GetResult<Prisma.$BiSourcePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  panels<T extends Prisma.BiDataset$panelsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BiDataset$panelsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiPanelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  user<T extends Prisma.BiDataset$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BiDataset$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1189,422 +1381,442 @@ export interface Prisma__BiDataSetClient<T, Null = never, ExtArgs extends runtim
 
 
 /**
- * Fields of the BiDataSet model
+ * Fields of the BiDataset model
  */
-export interface BiDataSetFieldRefs {
-  readonly id: Prisma.FieldRef<"BiDataSet", 'String'>
-  readonly name: Prisma.FieldRef<"BiDataSet", 'String'>
-  readonly sql: Prisma.FieldRef<"BiDataSet", 'String'>
-  readonly description: Prisma.FieldRef<"BiDataSet", 'String'>
-  readonly isPublic: Prisma.FieldRef<"BiDataSet", 'Boolean'>
-  readonly lastRunAt: Prisma.FieldRef<"BiDataSet", 'DateTime'>
-  readonly createdAt: Prisma.FieldRef<"BiDataSet", 'DateTime'>
-  readonly updatedAt: Prisma.FieldRef<"BiDataSet", 'DateTime'>
-  readonly userId: Prisma.FieldRef<"BiDataSet", 'String'>
+export interface BiDatasetFieldRefs {
+  readonly id: Prisma.FieldRef<"BiDataset", 'String'>
+  readonly name: Prisma.FieldRef<"BiDataset", 'String'>
+  readonly sql: Prisma.FieldRef<"BiDataset", 'String'>
+  readonly description: Prisma.FieldRef<"BiDataset", 'String'>
+  readonly isPublic: Prisma.FieldRef<"BiDataset", 'Boolean'>
+  readonly sourceId: Prisma.FieldRef<"BiDataset", 'String'>
+  readonly lastRunAt: Prisma.FieldRef<"BiDataset", 'DateTime'>
+  readonly createdAt: Prisma.FieldRef<"BiDataset", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"BiDataset", 'DateTime'>
+  readonly userId: Prisma.FieldRef<"BiDataset", 'String'>
 }
     
 
 // Custom InputTypes
 /**
- * BiDataSet findUnique
+ * BiDataset findUnique
  */
-export type BiDataSetFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BiDataSet
+   * Select specific fields to fetch from the BiDataset
    */
-  select?: Prisma.BiDataSetSelect<ExtArgs> | null
+  select?: Prisma.BiDatasetSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the BiDataSet
+   * Omit specific fields from the BiDataset
    */
-  omit?: Prisma.BiDataSetOmit<ExtArgs> | null
+  omit?: Prisma.BiDatasetOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BiDataSetInclude<ExtArgs> | null
+  include?: Prisma.BiDatasetInclude<ExtArgs> | null
   /**
-   * Filter, which BiDataSet to fetch.
+   * Filter, which BiDataset to fetch.
    */
-  where: Prisma.BiDataSetWhereUniqueInput
+  where: Prisma.BiDatasetWhereUniqueInput
 }
 
 /**
- * BiDataSet findUniqueOrThrow
+ * BiDataset findUniqueOrThrow
  */
-export type BiDataSetFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BiDataSet
+   * Select specific fields to fetch from the BiDataset
    */
-  select?: Prisma.BiDataSetSelect<ExtArgs> | null
+  select?: Prisma.BiDatasetSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the BiDataSet
+   * Omit specific fields from the BiDataset
    */
-  omit?: Prisma.BiDataSetOmit<ExtArgs> | null
+  omit?: Prisma.BiDatasetOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BiDataSetInclude<ExtArgs> | null
+  include?: Prisma.BiDatasetInclude<ExtArgs> | null
   /**
-   * Filter, which BiDataSet to fetch.
+   * Filter, which BiDataset to fetch.
    */
-  where: Prisma.BiDataSetWhereUniqueInput
+  where: Prisma.BiDatasetWhereUniqueInput
 }
 
 /**
- * BiDataSet findFirst
+ * BiDataset findFirst
  */
-export type BiDataSetFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BiDataSet
+   * Select specific fields to fetch from the BiDataset
    */
-  select?: Prisma.BiDataSetSelect<ExtArgs> | null
+  select?: Prisma.BiDatasetSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the BiDataSet
+   * Omit specific fields from the BiDataset
    */
-  omit?: Prisma.BiDataSetOmit<ExtArgs> | null
+  omit?: Prisma.BiDatasetOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BiDataSetInclude<ExtArgs> | null
+  include?: Prisma.BiDatasetInclude<ExtArgs> | null
   /**
-   * Filter, which BiDataSet to fetch.
+   * Filter, which BiDataset to fetch.
    */
-  where?: Prisma.BiDataSetWhereInput
+  where?: Prisma.BiDatasetWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
-   * Determine the order of BiDataSets to fetch.
+   * Determine the order of BiDatasets to fetch.
    */
-  orderBy?: Prisma.BiDataSetOrderByWithRelationInput | Prisma.BiDataSetOrderByWithRelationInput[]
+  orderBy?: Prisma.BiDatasetOrderByWithRelationInput | Prisma.BiDatasetOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
-   * Sets the position for searching for BiDataSets.
+   * Sets the position for searching for BiDatasets.
    */
-  cursor?: Prisma.BiDataSetWhereUniqueInput
+  cursor?: Prisma.BiDatasetWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
-   * Take `±n` BiDataSets from the position of the cursor.
+   * Take `±n` BiDatasets from the position of the cursor.
    */
   take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
-   * Skip the first `n` BiDataSets.
+   * Skip the first `n` BiDatasets.
    */
   skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
-   * Filter by unique combinations of BiDataSets.
+   * Filter by unique combinations of BiDatasets.
    */
-  distinct?: Prisma.BiDataSetScalarFieldEnum | Prisma.BiDataSetScalarFieldEnum[]
+  distinct?: Prisma.BiDatasetScalarFieldEnum | Prisma.BiDatasetScalarFieldEnum[]
 }
 
 /**
- * BiDataSet findFirstOrThrow
+ * BiDataset findFirstOrThrow
  */
-export type BiDataSetFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BiDataSet
+   * Select specific fields to fetch from the BiDataset
    */
-  select?: Prisma.BiDataSetSelect<ExtArgs> | null
+  select?: Prisma.BiDatasetSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the BiDataSet
+   * Omit specific fields from the BiDataset
    */
-  omit?: Prisma.BiDataSetOmit<ExtArgs> | null
+  omit?: Prisma.BiDatasetOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BiDataSetInclude<ExtArgs> | null
+  include?: Prisma.BiDatasetInclude<ExtArgs> | null
   /**
-   * Filter, which BiDataSet to fetch.
+   * Filter, which BiDataset to fetch.
    */
-  where?: Prisma.BiDataSetWhereInput
+  where?: Prisma.BiDatasetWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
-   * Determine the order of BiDataSets to fetch.
+   * Determine the order of BiDatasets to fetch.
    */
-  orderBy?: Prisma.BiDataSetOrderByWithRelationInput | Prisma.BiDataSetOrderByWithRelationInput[]
+  orderBy?: Prisma.BiDatasetOrderByWithRelationInput | Prisma.BiDatasetOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
-   * Sets the position for searching for BiDataSets.
+   * Sets the position for searching for BiDatasets.
    */
-  cursor?: Prisma.BiDataSetWhereUniqueInput
+  cursor?: Prisma.BiDatasetWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
-   * Take `±n` BiDataSets from the position of the cursor.
+   * Take `±n` BiDatasets from the position of the cursor.
    */
   take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
-   * Skip the first `n` BiDataSets.
+   * Skip the first `n` BiDatasets.
    */
   skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
-   * Filter by unique combinations of BiDataSets.
+   * Filter by unique combinations of BiDatasets.
    */
-  distinct?: Prisma.BiDataSetScalarFieldEnum | Prisma.BiDataSetScalarFieldEnum[]
+  distinct?: Prisma.BiDatasetScalarFieldEnum | Prisma.BiDatasetScalarFieldEnum[]
 }
 
 /**
- * BiDataSet findMany
+ * BiDataset findMany
  */
-export type BiDataSetFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BiDataSet
+   * Select specific fields to fetch from the BiDataset
    */
-  select?: Prisma.BiDataSetSelect<ExtArgs> | null
+  select?: Prisma.BiDatasetSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the BiDataSet
+   * Omit specific fields from the BiDataset
    */
-  omit?: Prisma.BiDataSetOmit<ExtArgs> | null
+  omit?: Prisma.BiDatasetOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BiDataSetInclude<ExtArgs> | null
+  include?: Prisma.BiDatasetInclude<ExtArgs> | null
   /**
-   * Filter, which BiDataSets to fetch.
+   * Filter, which BiDatasets to fetch.
    */
-  where?: Prisma.BiDataSetWhereInput
+  where?: Prisma.BiDatasetWhereInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
    * 
-   * Determine the order of BiDataSets to fetch.
+   * Determine the order of BiDatasets to fetch.
    */
-  orderBy?: Prisma.BiDataSetOrderByWithRelationInput | Prisma.BiDataSetOrderByWithRelationInput[]
+  orderBy?: Prisma.BiDatasetOrderByWithRelationInput | Prisma.BiDatasetOrderByWithRelationInput[]
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
    * 
-   * Sets the position for listing BiDataSets.
+   * Sets the position for listing BiDatasets.
    */
-  cursor?: Prisma.BiDataSetWhereUniqueInput
+  cursor?: Prisma.BiDatasetWhereUniqueInput
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
-   * Take `±n` BiDataSets from the position of the cursor.
+   * Take `±n` BiDatasets from the position of the cursor.
    */
   take?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
    * 
-   * Skip the first `n` BiDataSets.
+   * Skip the first `n` BiDatasets.
    */
   skip?: number
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
    * 
-   * Filter by unique combinations of BiDataSets.
+   * Filter by unique combinations of BiDatasets.
    */
-  distinct?: Prisma.BiDataSetScalarFieldEnum | Prisma.BiDataSetScalarFieldEnum[]
+  distinct?: Prisma.BiDatasetScalarFieldEnum | Prisma.BiDatasetScalarFieldEnum[]
 }
 
 /**
- * BiDataSet create
+ * BiDataset create
  */
-export type BiDataSetCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BiDataSet
+   * Select specific fields to fetch from the BiDataset
    */
-  select?: Prisma.BiDataSetSelect<ExtArgs> | null
+  select?: Prisma.BiDatasetSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the BiDataSet
+   * Omit specific fields from the BiDataset
    */
-  omit?: Prisma.BiDataSetOmit<ExtArgs> | null
+  omit?: Prisma.BiDatasetOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BiDataSetInclude<ExtArgs> | null
+  include?: Prisma.BiDatasetInclude<ExtArgs> | null
   /**
-   * The data needed to create a BiDataSet.
+   * The data needed to create a BiDataset.
    */
-  data: Prisma.XOR<Prisma.BiDataSetCreateInput, Prisma.BiDataSetUncheckedCreateInput>
+  data: Prisma.XOR<Prisma.BiDatasetCreateInput, Prisma.BiDatasetUncheckedCreateInput>
 }
 
 /**
- * BiDataSet createMany
+ * BiDataset createMany
  */
-export type BiDataSetCreateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetCreateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * The data used to create many BiDataSets.
+   * The data used to create many BiDatasets.
    */
-  data: Prisma.BiDataSetCreateManyInput | Prisma.BiDataSetCreateManyInput[]
+  data: Prisma.BiDatasetCreateManyInput | Prisma.BiDatasetCreateManyInput[]
   skipDuplicates?: boolean
 }
 
 /**
- * BiDataSet createManyAndReturn
+ * BiDataset createManyAndReturn
  */
-export type BiDataSetCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BiDataSet
+   * Select specific fields to fetch from the BiDataset
    */
-  select?: Prisma.BiDataSetSelectCreateManyAndReturn<ExtArgs> | null
+  select?: Prisma.BiDatasetSelectCreateManyAndReturn<ExtArgs> | null
   /**
-   * Omit specific fields from the BiDataSet
+   * Omit specific fields from the BiDataset
    */
-  omit?: Prisma.BiDataSetOmit<ExtArgs> | null
+  omit?: Prisma.BiDatasetOmit<ExtArgs> | null
   /**
-   * The data used to create many BiDataSets.
+   * The data used to create many BiDatasets.
    */
-  data: Prisma.BiDataSetCreateManyInput | Prisma.BiDataSetCreateManyInput[]
+  data: Prisma.BiDatasetCreateManyInput | Prisma.BiDatasetCreateManyInput[]
   skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BiDataSetIncludeCreateManyAndReturn<ExtArgs> | null
+  include?: Prisma.BiDatasetIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
- * BiDataSet update
+ * BiDataset update
  */
-export type BiDataSetUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BiDataSet
+   * Select specific fields to fetch from the BiDataset
    */
-  select?: Prisma.BiDataSetSelect<ExtArgs> | null
+  select?: Prisma.BiDatasetSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the BiDataSet
+   * Omit specific fields from the BiDataset
    */
-  omit?: Prisma.BiDataSetOmit<ExtArgs> | null
+  omit?: Prisma.BiDatasetOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BiDataSetInclude<ExtArgs> | null
+  include?: Prisma.BiDatasetInclude<ExtArgs> | null
   /**
-   * The data needed to update a BiDataSet.
+   * The data needed to update a BiDataset.
    */
-  data: Prisma.XOR<Prisma.BiDataSetUpdateInput, Prisma.BiDataSetUncheckedUpdateInput>
+  data: Prisma.XOR<Prisma.BiDatasetUpdateInput, Prisma.BiDatasetUncheckedUpdateInput>
   /**
-   * Choose, which BiDataSet to update.
+   * Choose, which BiDataset to update.
    */
-  where: Prisma.BiDataSetWhereUniqueInput
+  where: Prisma.BiDatasetWhereUniqueInput
 }
 
 /**
- * BiDataSet updateMany
+ * BiDataset updateMany
  */
-export type BiDataSetUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * The data used to update BiDataSets.
+   * The data used to update BiDatasets.
    */
-  data: Prisma.XOR<Prisma.BiDataSetUpdateManyMutationInput, Prisma.BiDataSetUncheckedUpdateManyInput>
+  data: Prisma.XOR<Prisma.BiDatasetUpdateManyMutationInput, Prisma.BiDatasetUncheckedUpdateManyInput>
   /**
-   * Filter which BiDataSets to update
+   * Filter which BiDatasets to update
    */
-  where?: Prisma.BiDataSetWhereInput
+  where?: Prisma.BiDatasetWhereInput
   /**
-   * Limit how many BiDataSets to update.
+   * Limit how many BiDatasets to update.
    */
   limit?: number
 }
 
 /**
- * BiDataSet updateManyAndReturn
+ * BiDataset updateManyAndReturn
  */
-export type BiDataSetUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BiDataSet
+   * Select specific fields to fetch from the BiDataset
    */
-  select?: Prisma.BiDataSetSelectUpdateManyAndReturn<ExtArgs> | null
+  select?: Prisma.BiDatasetSelectUpdateManyAndReturn<ExtArgs> | null
   /**
-   * Omit specific fields from the BiDataSet
+   * Omit specific fields from the BiDataset
    */
-  omit?: Prisma.BiDataSetOmit<ExtArgs> | null
+  omit?: Prisma.BiDatasetOmit<ExtArgs> | null
   /**
-   * The data used to update BiDataSets.
+   * The data used to update BiDatasets.
    */
-  data: Prisma.XOR<Prisma.BiDataSetUpdateManyMutationInput, Prisma.BiDataSetUncheckedUpdateManyInput>
+  data: Prisma.XOR<Prisma.BiDatasetUpdateManyMutationInput, Prisma.BiDatasetUncheckedUpdateManyInput>
   /**
-   * Filter which BiDataSets to update
+   * Filter which BiDatasets to update
    */
-  where?: Prisma.BiDataSetWhereInput
+  where?: Prisma.BiDatasetWhereInput
   /**
-   * Limit how many BiDataSets to update.
+   * Limit how many BiDatasets to update.
    */
   limit?: number
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BiDataSetIncludeUpdateManyAndReturn<ExtArgs> | null
+  include?: Prisma.BiDatasetIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
- * BiDataSet upsert
+ * BiDataset upsert
  */
-export type BiDataSetUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BiDataSet
+   * Select specific fields to fetch from the BiDataset
    */
-  select?: Prisma.BiDataSetSelect<ExtArgs> | null
+  select?: Prisma.BiDatasetSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the BiDataSet
+   * Omit specific fields from the BiDataset
    */
-  omit?: Prisma.BiDataSetOmit<ExtArgs> | null
+  omit?: Prisma.BiDatasetOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BiDataSetInclude<ExtArgs> | null
+  include?: Prisma.BiDatasetInclude<ExtArgs> | null
   /**
-   * The filter to search for the BiDataSet to update in case it exists.
+   * The filter to search for the BiDataset to update in case it exists.
    */
-  where: Prisma.BiDataSetWhereUniqueInput
+  where: Prisma.BiDatasetWhereUniqueInput
   /**
-   * In case the BiDataSet found by the `where` argument doesn't exist, create a new BiDataSet with this data.
+   * In case the BiDataset found by the `where` argument doesn't exist, create a new BiDataset with this data.
    */
-  create: Prisma.XOR<Prisma.BiDataSetCreateInput, Prisma.BiDataSetUncheckedCreateInput>
+  create: Prisma.XOR<Prisma.BiDatasetCreateInput, Prisma.BiDatasetUncheckedCreateInput>
   /**
-   * In case the BiDataSet was found with the provided `where` argument, update it with this data.
+   * In case the BiDataset was found with the provided `where` argument, update it with this data.
    */
-  update: Prisma.XOR<Prisma.BiDataSetUpdateInput, Prisma.BiDataSetUncheckedUpdateInput>
+  update: Prisma.XOR<Prisma.BiDatasetUpdateInput, Prisma.BiDatasetUncheckedUpdateInput>
 }
 
 /**
- * BiDataSet delete
+ * BiDataset delete
  */
-export type BiDataSetDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BiDataSet
+   * Select specific fields to fetch from the BiDataset
    */
-  select?: Prisma.BiDataSetSelect<ExtArgs> | null
+  select?: Prisma.BiDatasetSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the BiDataSet
+   * Omit specific fields from the BiDataset
    */
-  omit?: Prisma.BiDataSetOmit<ExtArgs> | null
+  omit?: Prisma.BiDatasetOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BiDataSetInclude<ExtArgs> | null
+  include?: Prisma.BiDatasetInclude<ExtArgs> | null
   /**
-   * Filter which BiDataSet to delete.
+   * Filter which BiDataset to delete.
    */
-  where: Prisma.BiDataSetWhereUniqueInput
+  where: Prisma.BiDatasetWhereUniqueInput
 }
 
 /**
- * BiDataSet deleteMany
+ * BiDataset deleteMany
  */
-export type BiDataSetDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Filter which BiDataSets to delete
+   * Filter which BiDatasets to delete
    */
-  where?: Prisma.BiDataSetWhereInput
+  where?: Prisma.BiDatasetWhereInput
   /**
-   * Limit how many BiDataSets to delete.
+   * Limit how many BiDatasets to delete.
    */
   limit?: number
 }
 
 /**
- * BiDataSet.panels
+ * BiDataset.source
  */
-export type BiDataSet$panelsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDataset$sourceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BiSource
+   */
+  select?: Prisma.BiSourceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BiSource
+   */
+  omit?: Prisma.BiSourceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BiSourceInclude<ExtArgs> | null
+  where?: Prisma.BiSourceWhereInput
+}
+
+/**
+ * BiDataset.panels
+ */
+export type BiDataset$panelsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the BiPanel
    */
@@ -1626,9 +1838,9 @@ export type BiDataSet$panelsArgs<ExtArgs extends runtime.Types.Extensions.Intern
 }
 
 /**
- * BiDataSet.user
+ * BiDataset.user
  */
-export type BiDataSet$userArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDataset$userArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the User
    */
@@ -1645,19 +1857,19 @@ export type BiDataSet$userArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * BiDataSet without action
+ * BiDataset without action
  */
-export type BiDataSetDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type BiDatasetDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BiDataSet
+   * Select specific fields to fetch from the BiDataset
    */
-  select?: Prisma.BiDataSetSelect<ExtArgs> | null
+  select?: Prisma.BiDatasetSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the BiDataSet
+   * Omit specific fields from the BiDataset
    */
-  omit?: Prisma.BiDataSetOmit<ExtArgs> | null
+  omit?: Prisma.BiDatasetOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BiDataSetInclude<ExtArgs> | null
+  include?: Prisma.BiDatasetInclude<ExtArgs> | null
 }
