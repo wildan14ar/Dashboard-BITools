@@ -1,8 +1,8 @@
 import json
 import logging
-from typing import Optional
-from sqlalchemy import create_engine, Engine, text
-from sqlalchemy.pool import NullPool
+
+from sqlalchemy import Engine, create_engine, text
+from sqlalchemy.pool import QueuePool
 
 logger = logging.getLogger(__name__)
 
@@ -57,8 +57,11 @@ class EnginePool:
 
         engine = create_engine(
             url,
-            poolclass=NullPool,
-            connect_args={"connect_timeout": 10} if db_type != "sqlite" else {},
+            poolclass=QueuePool,
+            pool_size=2,
+            max_overflow=2,
+            pool_recycle=300,
+            connect_args={"connect_timeout": 5} if db_type != "sqlite" else {},
             echo=False,
         )
         self._engines[source_id] = engine
@@ -70,7 +73,7 @@ class EnginePool:
             logger.info(f"Disposing engine for [{source_id}]")
             engine.dispose()
 
-    def test(self, db_type: str, config_json: str) -> tuple[bool, Optional[str]]:
+    def test(self, db_type: str, config_json: str) -> tuple[bool, str | None]:
         try:
             config = (
                 json.loads(config_json) if isinstance(config_json, str) else config_json
@@ -78,7 +81,9 @@ class EnginePool:
             url = _build_url(db_type, config)
             engine = create_engine(
                 url,
-                poolclass=NullPool,
+                poolclass=QueuePool,
+                pool_size=1,
+                max_overflow=0,
                 connect_args={"connect_timeout": 5} if db_type != "sqlite" else {},
             )
             with engine.connect() as conn:

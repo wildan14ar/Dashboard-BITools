@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
 
   const source = await prisma.biSource.create({
-    data: { name: parsed.data.name, type: parsed.data.type, config: (parsed.data.config ?? {}) as object },
+    data: { name: parsed.data.name, type: parsed.data.type, config: parsed.data.config as object },
   })
   return NextResponse.json(source, { status: 201 })
 }

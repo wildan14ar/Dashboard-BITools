@@ -3,7 +3,7 @@ import { z } from "zod"
 export const dashboardSchema = z.object({
   name: z.string().min(1, "Required"),
   description: z.string().optional(),
-  folderId: z.string().optional(),
+  tags: z.string().array().optional(),
   isPublic: z.boolean().optional(),
 })
 

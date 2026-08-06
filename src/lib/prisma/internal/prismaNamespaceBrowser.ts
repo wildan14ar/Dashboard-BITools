@@ -55,7 +55,6 @@ export const ModelName = {
   Role: 'Role',
   UserRole: 'UserRole',
   RolePermission: 'RolePermission',
-  BiFolder: 'BiFolder',
   BiDashboard: 'BiDashboard',
   BiDashboardMember: 'BiDashboardMember',
   BiDataset: 'BiDataset',
@@ -130,22 +129,12 @@ export const RolePermissionScalarFieldEnum = {
 export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
 
 
-export const BiFolderScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  parentId: 'parentId',
-  createdAt: 'createdAt'
-} as const
-
-export type BiFolderScalarFieldEnum = (typeof BiFolderScalarFieldEnum)[keyof typeof BiFolderScalarFieldEnum]
-
-
 export const BiDashboardScalarFieldEnum = {
   id: 'id',
   name: 'name',
   description: 'description',
+  tags: 'tags',
   isPublic: 'isPublic',
-  folderId: 'folderId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId'

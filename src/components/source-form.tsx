@@ -1,0 +1,126 @@
+"use client"
+
+import { useState } from "react"
+import { useForm, type FieldError } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { FlaskConical } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { sourceSchema, type SourceInput } from "@/validation/source"
+import { useTestSource, useTestSourceAdhoc } from "@/hooks/use-sources"
+
+const DB_TYPES = [
+  { value: "postgresql", label: "PostgreSQL" },
+  { value: "mysql", label: "MySQL" },
+  { value: "sqlite", label: "SQLite" },
+  { value: "clickhouse", label: "ClickHouse" },
+  { value: "bigquery", label: "BigQuery" },
+  { value: "mongodb", label: "MongoDB" },
+]
+
+type Props = {
+  defaultValues?: Partial<SourceInput>
+  onSubmit: (data: SourceInput) => Promise<void>
+  onCancel: () => void
+  submitLabel?: string
+  sourceId?: string
+}
+
+export function SourceForm({ defaultValues, onSubmit, onCancel, submitLabel = "Save", sourceId }: Props) {
+  const [testResult, setTestResult] = useState("")
+  const testExisting = useTestSource()
+  const testAdhoc = useTestSourceAdhoc()
+
+  const { register, handleSubmit, formState: { errors, isSubmitting }, getValues } = useForm<SourceInput>({
+    resolver: zodResolver(sourceSchema),
+    defaultValues: {
+      type: "postgresql",
+      config: { host: "", port: "", user: "", password: "", database: "" },
+      ...defaultValues,
+    } as SourceInput,
+  })
+
+  function handleTest() {
+    setTestResult("")
+    if (sourceId) {
+      testExisting.mutate(sourceId, {
+        onSuccess: (d) => setTestResult(d.ok ? "Connected" : d.error ?? "Failed"),
+        onError: () => setTestResult("Connection failed"),
+      })
+    } else {
+      testAdhoc.mutate({ type: getValues("type"), config: getValues("config") }, {
+        onSuccess: (d) => setTestResult(d.ok ? "Connected" : d.error ?? "Failed"),
+        onError: () => setTestResult("Connection failed"),
+      })
+    }
+  }
+
+  const testing = testExisting.isPending || testAdhoc.isPending
+  const cfgErr = (t: keyof SourceInput["config"]) => (errors.config?.[t] as FieldError | undefined)?.message
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <label className="block space-y-1.5">
+        <span className="text-sm font-medium">Name</span>
+        <input {...register("name")} placeholder="Production DB" className="input" autoFocus />
+        {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+      </label>
+
+      <label className="block space-y-1.5">
+        <span className="text-sm font-medium">Type</span>
+        <select {...register("type")} className="input">
+          {DB_TYPES.map((t) => (
+            <option key={t.value} value={t.value}>{t.label}</option>
+          ))}
+        </select>
+      </label>
+
+      <fieldset className="rounded-lg border p-4 space-y-3">
+        <legend className="text-sm font-medium px-1">Connection</legend>
+
+        <div className="grid grid-cols-3 gap-3">
+          <label className="block space-y-1">
+            <span className="text-xs font-medium">Host</span>
+            <input {...register("config.host")} placeholder="localhost" className="input" />
+            {cfgErr("host") && <p className="text-xs text-destructive">{cfgErr("host")}</p>}
+          </label>
+          <label className="block space-y-1">
+            <span className="text-xs font-medium">Port</span>
+            <input {...register("config.port")} placeholder="5432" className="input" />
+            {cfgErr("port") && <p className="text-xs text-destructive">{cfgErr("port")}</p>}
+          </label>
+          <label className="block space-y-1">
+            <span className="text-xs font-medium">Database</span>
+            <input {...register("config.database")} placeholder="mydb" className="input" />
+            {cfgErr("database") && <p className="text-xs text-destructive">{cfgErr("database")}</p>}
+          </label>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <label className="block space-y-1">
+            <span className="text-xs font-medium">User</span>
+            <input {...register("config.user")} placeholder="postgres" className="input" />
+            {cfgErr("user") && <p className="text-xs text-destructive">{cfgErr("user")}</p>}
+          </label>
+          <label className="block space-y-1">
+            <span className="text-xs font-medium">Password</span>
+            <input type="password" {...register("config.password")} placeholder="password" className="input" />
+            {cfgErr("password") && <p className="text-xs text-destructive">{cfgErr("password")}</p>}
+          </label>
+        </div>
+      </fieldset>
+
+      <div className="flex items-center gap-2 pt-2">
+        <Button type="submit" disabled={isSubmitting || testExisting.isPending || testAdhoc.isPending}>{submitLabel}</Button>
+        <Button variant="outline" type="button" onClick={onCancel}>Cancel</Button>
+        <Button variant="ghost" type="button" onClick={handleTest} disabled={testing}>
+          <FlaskConical className="size-3.5" /> Test Connection
+        </Button>
+        {testResult && (
+          <span className={testResult === "Connected" ? "text-sm text-green-600" : "text-sm text-red-600"}>
+            {testResult}
+          </span>
+        )}
+      </div>
+    </form>
+  )
+}

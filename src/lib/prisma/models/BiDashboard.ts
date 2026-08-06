@@ -29,7 +29,6 @@ export type BiDashboardMinAggregateOutputType = {
   name: string | null
   description: string | null
   isPublic: boolean | null
-  folderId: string | null
   createdAt: Date | null
   updatedAt: Date | null
   userId: string | null
@@ -40,7 +39,6 @@ export type BiDashboardMaxAggregateOutputType = {
   name: string | null
   description: string | null
   isPublic: boolean | null
-  folderId: string | null
   createdAt: Date | null
   updatedAt: Date | null
   userId: string | null
@@ -50,8 +48,8 @@ export type BiDashboardCountAggregateOutputType = {
   id: number
   name: number
   description: number
+  tags: number
   isPublic: number
-  folderId: number
   createdAt: number
   updatedAt: number
   userId: number
@@ -64,7 +62,6 @@ export type BiDashboardMinAggregateInputType = {
   name?: true
   description?: true
   isPublic?: true
-  folderId?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -75,7 +72,6 @@ export type BiDashboardMaxAggregateInputType = {
   name?: true
   description?: true
   isPublic?: true
-  folderId?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -85,8 +81,8 @@ export type BiDashboardCountAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  tags?: true
   isPublic?: true
-  folderId?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -169,8 +165,8 @@ export type BiDashboardGroupByOutputType = {
   id: string
   name: string
   description: string | null
+  tags: string[]
   isPublic: boolean
-  folderId: string | null
   createdAt: Date
   updatedAt: Date
   userId: string | null
@@ -201,12 +197,11 @@ export type BiDashboardWhereInput = {
   id?: Prisma.StringFilter<"BiDashboard"> | string
   name?: Prisma.StringFilter<"BiDashboard"> | string
   description?: Prisma.StringNullableFilter<"BiDashboard"> | string | null
+  tags?: Prisma.StringNullableListFilter<"BiDashboard">
   isPublic?: Prisma.BoolFilter<"BiDashboard"> | boolean
-  folderId?: Prisma.StringNullableFilter<"BiDashboard"> | string | null
   createdAt?: Prisma.DateTimeFilter<"BiDashboard"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"BiDashboard"> | Date | string
   userId?: Prisma.StringNullableFilter<"BiDashboard"> | string | null
-  folder?: Prisma.XOR<Prisma.BiFolderNullableScalarRelationFilter, Prisma.BiFolderWhereInput> | null
   panels?: Prisma.BiPanelListRelationFilter
   filters?: Prisma.BiFilterListRelationFilter
   members?: Prisma.BiDashboardMemberListRelationFilter
@@ -217,12 +212,11 @@ export type BiDashboardOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  tags?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
-  folderId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
-  folder?: Prisma.BiFolderOrderByWithRelationInput
   panels?: Prisma.BiPanelOrderByRelationAggregateInput
   filters?: Prisma.BiFilterOrderByRelationAggregateInput
   members?: Prisma.BiDashboardMemberOrderByRelationAggregateInput
@@ -236,12 +230,11 @@ export type BiDashboardWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.BiDashboardWhereInput | Prisma.BiDashboardWhereInput[]
   name?: Prisma.StringFilter<"BiDashboard"> | string
   description?: Prisma.StringNullableFilter<"BiDashboard"> | string | null
+  tags?: Prisma.StringNullableListFilter<"BiDashboard">
   isPublic?: Prisma.BoolFilter<"BiDashboard"> | boolean
-  folderId?: Prisma.StringNullableFilter<"BiDashboard"> | string | null
   createdAt?: Prisma.DateTimeFilter<"BiDashboard"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"BiDashboard"> | Date | string
   userId?: Prisma.StringNullableFilter<"BiDashboard"> | string | null
-  folder?: Prisma.XOR<Prisma.BiFolderNullableScalarRelationFilter, Prisma.BiFolderWhereInput> | null
   panels?: Prisma.BiPanelListRelationFilter
   filters?: Prisma.BiFilterListRelationFilter
   members?: Prisma.BiDashboardMemberListRelationFilter
@@ -252,8 +245,8 @@ export type BiDashboardOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  tags?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
-  folderId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -269,8 +262,8 @@ export type BiDashboardScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"BiDashboard"> | string
   name?: Prisma.StringWithAggregatesFilter<"BiDashboard"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"BiDashboard"> | string | null
+  tags?: Prisma.StringNullableListFilter<"BiDashboard">
   isPublic?: Prisma.BoolWithAggregatesFilter<"BiDashboard"> | boolean
-  folderId?: Prisma.StringNullableWithAggregatesFilter<"BiDashboard"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"BiDashboard"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"BiDashboard"> | Date | string
   userId?: Prisma.StringNullableWithAggregatesFilter<"BiDashboard"> | string | null
@@ -280,10 +273,10 @@ export type BiDashboardCreateInput = {
   id?: string
   name: string
   description?: string | null
+  tags?: Prisma.BiDashboardCreatetagsInput | string[]
   isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  folder?: Prisma.BiFolderCreateNestedOneWithoutDashboardsInput
   panels?: Prisma.BiPanelCreateNestedManyWithoutDashboardInput
   filters?: Prisma.BiFilterCreateNestedManyWithoutDashboardInput
   members?: Prisma.BiDashboardMemberCreateNestedManyWithoutDashboardInput
@@ -294,8 +287,8 @@ export type BiDashboardUncheckedCreateInput = {
   id?: string
   name: string
   description?: string | null
+  tags?: Prisma.BiDashboardCreatetagsInput | string[]
   isPublic?: boolean
-  folderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId?: string | null
@@ -308,10 +301,10 @@ export type BiDashboardUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BiDashboardUpdatetagsInput | string[]
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  folder?: Prisma.BiFolderUpdateOneWithoutDashboardsNestedInput
   panels?: Prisma.BiPanelUpdateManyWithoutDashboardNestedInput
   filters?: Prisma.BiFilterUpdateManyWithoutDashboardNestedInput
   members?: Prisma.BiDashboardMemberUpdateManyWithoutDashboardNestedInput
@@ -322,8 +315,8 @@ export type BiDashboardUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BiDashboardUpdatetagsInput | string[]
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  folderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -336,8 +329,8 @@ export type BiDashboardCreateManyInput = {
   id?: string
   name: string
   description?: string | null
+  tags?: Prisma.BiDashboardCreatetagsInput | string[]
   isPublic?: boolean
-  folderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId?: string | null
@@ -347,6 +340,7 @@ export type BiDashboardUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BiDashboardUpdatetagsInput | string[]
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -356,8 +350,8 @@ export type BiDashboardUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BiDashboardUpdatetagsInput | string[]
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  folderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -373,12 +367,20 @@ export type BiDashboardOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
 export type BiDashboardCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  tags?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
-  folderId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -389,7 +391,6 @@ export type BiDashboardMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
-  folderId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -400,7 +401,6 @@ export type BiDashboardMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
-  folderId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -453,46 +453,13 @@ export type BiDashboardUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.BiDashboardScalarWhereInput | Prisma.BiDashboardScalarWhereInput[]
 }
 
-export type BiDashboardCreateNestedManyWithoutFolderInput = {
-  create?: Prisma.XOR<Prisma.BiDashboardCreateWithoutFolderInput, Prisma.BiDashboardUncheckedCreateWithoutFolderInput> | Prisma.BiDashboardCreateWithoutFolderInput[] | Prisma.BiDashboardUncheckedCreateWithoutFolderInput[]
-  connectOrCreate?: Prisma.BiDashboardCreateOrConnectWithoutFolderInput | Prisma.BiDashboardCreateOrConnectWithoutFolderInput[]
-  createMany?: Prisma.BiDashboardCreateManyFolderInputEnvelope
-  connect?: Prisma.BiDashboardWhereUniqueInput | Prisma.BiDashboardWhereUniqueInput[]
+export type BiDashboardCreatetagsInput = {
+  set: string[]
 }
 
-export type BiDashboardUncheckedCreateNestedManyWithoutFolderInput = {
-  create?: Prisma.XOR<Prisma.BiDashboardCreateWithoutFolderInput, Prisma.BiDashboardUncheckedCreateWithoutFolderInput> | Prisma.BiDashboardCreateWithoutFolderInput[] | Prisma.BiDashboardUncheckedCreateWithoutFolderInput[]
-  connectOrCreate?: Prisma.BiDashboardCreateOrConnectWithoutFolderInput | Prisma.BiDashboardCreateOrConnectWithoutFolderInput[]
-  createMany?: Prisma.BiDashboardCreateManyFolderInputEnvelope
-  connect?: Prisma.BiDashboardWhereUniqueInput | Prisma.BiDashboardWhereUniqueInput[]
-}
-
-export type BiDashboardUpdateManyWithoutFolderNestedInput = {
-  create?: Prisma.XOR<Prisma.BiDashboardCreateWithoutFolderInput, Prisma.BiDashboardUncheckedCreateWithoutFolderInput> | Prisma.BiDashboardCreateWithoutFolderInput[] | Prisma.BiDashboardUncheckedCreateWithoutFolderInput[]
-  connectOrCreate?: Prisma.BiDashboardCreateOrConnectWithoutFolderInput | Prisma.BiDashboardCreateOrConnectWithoutFolderInput[]
-  upsert?: Prisma.BiDashboardUpsertWithWhereUniqueWithoutFolderInput | Prisma.BiDashboardUpsertWithWhereUniqueWithoutFolderInput[]
-  createMany?: Prisma.BiDashboardCreateManyFolderInputEnvelope
-  set?: Prisma.BiDashboardWhereUniqueInput | Prisma.BiDashboardWhereUniqueInput[]
-  disconnect?: Prisma.BiDashboardWhereUniqueInput | Prisma.BiDashboardWhereUniqueInput[]
-  delete?: Prisma.BiDashboardWhereUniqueInput | Prisma.BiDashboardWhereUniqueInput[]
-  connect?: Prisma.BiDashboardWhereUniqueInput | Prisma.BiDashboardWhereUniqueInput[]
-  update?: Prisma.BiDashboardUpdateWithWhereUniqueWithoutFolderInput | Prisma.BiDashboardUpdateWithWhereUniqueWithoutFolderInput[]
-  updateMany?: Prisma.BiDashboardUpdateManyWithWhereWithoutFolderInput | Prisma.BiDashboardUpdateManyWithWhereWithoutFolderInput[]
-  deleteMany?: Prisma.BiDashboardScalarWhereInput | Prisma.BiDashboardScalarWhereInput[]
-}
-
-export type BiDashboardUncheckedUpdateManyWithoutFolderNestedInput = {
-  create?: Prisma.XOR<Prisma.BiDashboardCreateWithoutFolderInput, Prisma.BiDashboardUncheckedCreateWithoutFolderInput> | Prisma.BiDashboardCreateWithoutFolderInput[] | Prisma.BiDashboardUncheckedCreateWithoutFolderInput[]
-  connectOrCreate?: Prisma.BiDashboardCreateOrConnectWithoutFolderInput | Prisma.BiDashboardCreateOrConnectWithoutFolderInput[]
-  upsert?: Prisma.BiDashboardUpsertWithWhereUniqueWithoutFolderInput | Prisma.BiDashboardUpsertWithWhereUniqueWithoutFolderInput[]
-  createMany?: Prisma.BiDashboardCreateManyFolderInputEnvelope
-  set?: Prisma.BiDashboardWhereUniqueInput | Prisma.BiDashboardWhereUniqueInput[]
-  disconnect?: Prisma.BiDashboardWhereUniqueInput | Prisma.BiDashboardWhereUniqueInput[]
-  delete?: Prisma.BiDashboardWhereUniqueInput | Prisma.BiDashboardWhereUniqueInput[]
-  connect?: Prisma.BiDashboardWhereUniqueInput | Prisma.BiDashboardWhereUniqueInput[]
-  update?: Prisma.BiDashboardUpdateWithWhereUniqueWithoutFolderInput | Prisma.BiDashboardUpdateWithWhereUniqueWithoutFolderInput[]
-  updateMany?: Prisma.BiDashboardUpdateManyWithWhereWithoutFolderInput | Prisma.BiDashboardUpdateManyWithWhereWithoutFolderInput[]
-  deleteMany?: Prisma.BiDashboardScalarWhereInput | Prisma.BiDashboardScalarWhereInput[]
+export type BiDashboardUpdatetagsInput = {
+  set?: string[]
+  push?: string | string[]
 }
 
 export type BiDashboardCreateNestedOneWithoutMembersInput = {
@@ -541,10 +508,10 @@ export type BiDashboardCreateWithoutUserInput = {
   id?: string
   name: string
   description?: string | null
+  tags?: Prisma.BiDashboardCreatetagsInput | string[]
   isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  folder?: Prisma.BiFolderCreateNestedOneWithoutDashboardsInput
   panels?: Prisma.BiPanelCreateNestedManyWithoutDashboardInput
   filters?: Prisma.BiFilterCreateNestedManyWithoutDashboardInput
   members?: Prisma.BiDashboardMemberCreateNestedManyWithoutDashboardInput
@@ -554,8 +521,8 @@ export type BiDashboardUncheckedCreateWithoutUserInput = {
   id?: string
   name: string
   description?: string | null
+  tags?: Prisma.BiDashboardCreatetagsInput | string[]
   isPublic?: boolean
-  folderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   panels?: Prisma.BiPanelUncheckedCreateNestedManyWithoutDashboardInput
@@ -596,73 +563,21 @@ export type BiDashboardScalarWhereInput = {
   id?: Prisma.StringFilter<"BiDashboard"> | string
   name?: Prisma.StringFilter<"BiDashboard"> | string
   description?: Prisma.StringNullableFilter<"BiDashboard"> | string | null
+  tags?: Prisma.StringNullableListFilter<"BiDashboard">
   isPublic?: Prisma.BoolFilter<"BiDashboard"> | boolean
-  folderId?: Prisma.StringNullableFilter<"BiDashboard"> | string | null
   createdAt?: Prisma.DateTimeFilter<"BiDashboard"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"BiDashboard"> | Date | string
   userId?: Prisma.StringNullableFilter<"BiDashboard"> | string | null
-}
-
-export type BiDashboardCreateWithoutFolderInput = {
-  id?: string
-  name: string
-  description?: string | null
-  isPublic?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  panels?: Prisma.BiPanelCreateNestedManyWithoutDashboardInput
-  filters?: Prisma.BiFilterCreateNestedManyWithoutDashboardInput
-  members?: Prisma.BiDashboardMemberCreateNestedManyWithoutDashboardInput
-  user?: Prisma.UserCreateNestedOneWithoutBiDashboardsInput
-}
-
-export type BiDashboardUncheckedCreateWithoutFolderInput = {
-  id?: string
-  name: string
-  description?: string | null
-  isPublic?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  userId?: string | null
-  panels?: Prisma.BiPanelUncheckedCreateNestedManyWithoutDashboardInput
-  filters?: Prisma.BiFilterUncheckedCreateNestedManyWithoutDashboardInput
-  members?: Prisma.BiDashboardMemberUncheckedCreateNestedManyWithoutDashboardInput
-}
-
-export type BiDashboardCreateOrConnectWithoutFolderInput = {
-  where: Prisma.BiDashboardWhereUniqueInput
-  create: Prisma.XOR<Prisma.BiDashboardCreateWithoutFolderInput, Prisma.BiDashboardUncheckedCreateWithoutFolderInput>
-}
-
-export type BiDashboardCreateManyFolderInputEnvelope = {
-  data: Prisma.BiDashboardCreateManyFolderInput | Prisma.BiDashboardCreateManyFolderInput[]
-  skipDuplicates?: boolean
-}
-
-export type BiDashboardUpsertWithWhereUniqueWithoutFolderInput = {
-  where: Prisma.BiDashboardWhereUniqueInput
-  update: Prisma.XOR<Prisma.BiDashboardUpdateWithoutFolderInput, Prisma.BiDashboardUncheckedUpdateWithoutFolderInput>
-  create: Prisma.XOR<Prisma.BiDashboardCreateWithoutFolderInput, Prisma.BiDashboardUncheckedCreateWithoutFolderInput>
-}
-
-export type BiDashboardUpdateWithWhereUniqueWithoutFolderInput = {
-  where: Prisma.BiDashboardWhereUniqueInput
-  data: Prisma.XOR<Prisma.BiDashboardUpdateWithoutFolderInput, Prisma.BiDashboardUncheckedUpdateWithoutFolderInput>
-}
-
-export type BiDashboardUpdateManyWithWhereWithoutFolderInput = {
-  where: Prisma.BiDashboardScalarWhereInput
-  data: Prisma.XOR<Prisma.BiDashboardUpdateManyMutationInput, Prisma.BiDashboardUncheckedUpdateManyWithoutFolderInput>
 }
 
 export type BiDashboardCreateWithoutMembersInput = {
   id?: string
   name: string
   description?: string | null
+  tags?: Prisma.BiDashboardCreatetagsInput | string[]
   isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  folder?: Prisma.BiFolderCreateNestedOneWithoutDashboardsInput
   panels?: Prisma.BiPanelCreateNestedManyWithoutDashboardInput
   filters?: Prisma.BiFilterCreateNestedManyWithoutDashboardInput
   user?: Prisma.UserCreateNestedOneWithoutBiDashboardsInput
@@ -672,8 +587,8 @@ export type BiDashboardUncheckedCreateWithoutMembersInput = {
   id?: string
   name: string
   description?: string | null
+  tags?: Prisma.BiDashboardCreatetagsInput | string[]
   isPublic?: boolean
-  folderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId?: string | null
@@ -701,10 +616,10 @@ export type BiDashboardUpdateWithoutMembersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BiDashboardUpdatetagsInput | string[]
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  folder?: Prisma.BiFolderUpdateOneWithoutDashboardsNestedInput
   panels?: Prisma.BiPanelUpdateManyWithoutDashboardNestedInput
   filters?: Prisma.BiFilterUpdateManyWithoutDashboardNestedInput
   user?: Prisma.UserUpdateOneWithoutBiDashboardsNestedInput
@@ -714,8 +629,8 @@ export type BiDashboardUncheckedUpdateWithoutMembersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BiDashboardUpdatetagsInput | string[]
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  folderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -727,10 +642,10 @@ export type BiDashboardCreateWithoutPanelsInput = {
   id?: string
   name: string
   description?: string | null
+  tags?: Prisma.BiDashboardCreatetagsInput | string[]
   isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  folder?: Prisma.BiFolderCreateNestedOneWithoutDashboardsInput
   filters?: Prisma.BiFilterCreateNestedManyWithoutDashboardInput
   members?: Prisma.BiDashboardMemberCreateNestedManyWithoutDashboardInput
   user?: Prisma.UserCreateNestedOneWithoutBiDashboardsInput
@@ -740,8 +655,8 @@ export type BiDashboardUncheckedCreateWithoutPanelsInput = {
   id?: string
   name: string
   description?: string | null
+  tags?: Prisma.BiDashboardCreatetagsInput | string[]
   isPublic?: boolean
-  folderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId?: string | null
@@ -769,10 +684,10 @@ export type BiDashboardUpdateWithoutPanelsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BiDashboardUpdatetagsInput | string[]
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  folder?: Prisma.BiFolderUpdateOneWithoutDashboardsNestedInput
   filters?: Prisma.BiFilterUpdateManyWithoutDashboardNestedInput
   members?: Prisma.BiDashboardMemberUpdateManyWithoutDashboardNestedInput
   user?: Prisma.UserUpdateOneWithoutBiDashboardsNestedInput
@@ -782,8 +697,8 @@ export type BiDashboardUncheckedUpdateWithoutPanelsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BiDashboardUpdatetagsInput | string[]
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  folderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -795,10 +710,10 @@ export type BiDashboardCreateWithoutFiltersInput = {
   id?: string
   name: string
   description?: string | null
+  tags?: Prisma.BiDashboardCreatetagsInput | string[]
   isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  folder?: Prisma.BiFolderCreateNestedOneWithoutDashboardsInput
   panels?: Prisma.BiPanelCreateNestedManyWithoutDashboardInput
   members?: Prisma.BiDashboardMemberCreateNestedManyWithoutDashboardInput
   user?: Prisma.UserCreateNestedOneWithoutBiDashboardsInput
@@ -808,8 +723,8 @@ export type BiDashboardUncheckedCreateWithoutFiltersInput = {
   id?: string
   name: string
   description?: string | null
+  tags?: Prisma.BiDashboardCreatetagsInput | string[]
   isPublic?: boolean
-  folderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId?: string | null
@@ -837,10 +752,10 @@ export type BiDashboardUpdateWithoutFiltersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BiDashboardUpdatetagsInput | string[]
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  folder?: Prisma.BiFolderUpdateOneWithoutDashboardsNestedInput
   panels?: Prisma.BiPanelUpdateManyWithoutDashboardNestedInput
   members?: Prisma.BiDashboardMemberUpdateManyWithoutDashboardNestedInput
   user?: Prisma.UserUpdateOneWithoutBiDashboardsNestedInput
@@ -850,8 +765,8 @@ export type BiDashboardUncheckedUpdateWithoutFiltersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BiDashboardUpdatetagsInput | string[]
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  folderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -863,8 +778,8 @@ export type BiDashboardCreateManyUserInput = {
   id?: string
   name: string
   description?: string | null
+  tags?: Prisma.BiDashboardCreatetagsInput | string[]
   isPublic?: boolean
-  folderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -873,10 +788,10 @@ export type BiDashboardUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BiDashboardUpdatetagsInput | string[]
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  folder?: Prisma.BiFolderUpdateOneWithoutDashboardsNestedInput
   panels?: Prisma.BiPanelUpdateManyWithoutDashboardNestedInput
   filters?: Prisma.BiFilterUpdateManyWithoutDashboardNestedInput
   members?: Prisma.BiDashboardMemberUpdateManyWithoutDashboardNestedInput
@@ -886,8 +801,8 @@ export type BiDashboardUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BiDashboardUpdatetagsInput | string[]
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  folderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   panels?: Prisma.BiPanelUncheckedUpdateManyWithoutDashboardNestedInput
@@ -899,56 +814,10 @@ export type BiDashboardUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  folderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type BiDashboardCreateManyFolderInput = {
-  id?: string
-  name: string
-  description?: string | null
-  isPublic?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  userId?: string | null
-}
-
-export type BiDashboardUpdateWithoutFolderInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.BiDashboardUpdatetagsInput | string[]
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  panels?: Prisma.BiPanelUpdateManyWithoutDashboardNestedInput
-  filters?: Prisma.BiFilterUpdateManyWithoutDashboardNestedInput
-  members?: Prisma.BiDashboardMemberUpdateManyWithoutDashboardNestedInput
-  user?: Prisma.UserUpdateOneWithoutBiDashboardsNestedInput
-}
-
-export type BiDashboardUncheckedUpdateWithoutFolderInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  panels?: Prisma.BiPanelUncheckedUpdateManyWithoutDashboardNestedInput
-  filters?: Prisma.BiFilterUncheckedUpdateManyWithoutDashboardNestedInput
-  members?: Prisma.BiDashboardMemberUncheckedUpdateManyWithoutDashboardNestedInput
-}
-
-export type BiDashboardUncheckedUpdateManyWithoutFolderInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1004,12 +873,11 @@ export type BiDashboardSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   id?: boolean
   name?: boolean
   description?: boolean
+  tags?: boolean
   isPublic?: boolean
-  folderId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
-  folder?: boolean | Prisma.BiDashboard$folderArgs<ExtArgs>
   panels?: boolean | Prisma.BiDashboard$panelsArgs<ExtArgs>
   filters?: boolean | Prisma.BiDashboard$filtersArgs<ExtArgs>
   members?: boolean | Prisma.BiDashboard$membersArgs<ExtArgs>
@@ -1021,12 +889,11 @@ export type BiDashboardSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   id?: boolean
   name?: boolean
   description?: boolean
+  tags?: boolean
   isPublic?: boolean
-  folderId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
-  folder?: boolean | Prisma.BiDashboard$folderArgs<ExtArgs>
   user?: boolean | Prisma.BiDashboard$userArgs<ExtArgs>
 }, ExtArgs["result"]["biDashboard"]>
 
@@ -1034,12 +901,11 @@ export type BiDashboardSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   id?: boolean
   name?: boolean
   description?: boolean
+  tags?: boolean
   isPublic?: boolean
-  folderId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
-  folder?: boolean | Prisma.BiDashboard$folderArgs<ExtArgs>
   user?: boolean | Prisma.BiDashboard$userArgs<ExtArgs>
 }, ExtArgs["result"]["biDashboard"]>
 
@@ -1047,16 +913,15 @@ export type BiDashboardSelectScalar = {
   id?: boolean
   name?: boolean
   description?: boolean
+  tags?: boolean
   isPublic?: boolean
-  folderId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
 }
 
-export type BiDashboardOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "isPublic" | "folderId" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["biDashboard"]>
+export type BiDashboardOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "tags" | "isPublic" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["biDashboard"]>
 export type BiDashboardInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  folder?: boolean | Prisma.BiDashboard$folderArgs<ExtArgs>
   panels?: boolean | Prisma.BiDashboard$panelsArgs<ExtArgs>
   filters?: boolean | Prisma.BiDashboard$filtersArgs<ExtArgs>
   members?: boolean | Prisma.BiDashboard$membersArgs<ExtArgs>
@@ -1064,18 +929,15 @@ export type BiDashboardInclude<ExtArgs extends runtime.Types.Extensions.Internal
   _count?: boolean | Prisma.BiDashboardCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BiDashboardIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  folder?: boolean | Prisma.BiDashboard$folderArgs<ExtArgs>
   user?: boolean | Prisma.BiDashboard$userArgs<ExtArgs>
 }
 export type BiDashboardIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  folder?: boolean | Prisma.BiDashboard$folderArgs<ExtArgs>
   user?: boolean | Prisma.BiDashboard$userArgs<ExtArgs>
 }
 
 export type $BiDashboardPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "BiDashboard"
   objects: {
-    folder: Prisma.$BiFolderPayload<ExtArgs> | null
     panels: Prisma.$BiPanelPayload<ExtArgs>[]
     filters: Prisma.$BiFilterPayload<ExtArgs>[]
     members: Prisma.$BiDashboardMemberPayload<ExtArgs>[]
@@ -1085,8 +947,8 @@ export type $BiDashboardPayload<ExtArgs extends runtime.Types.Extensions.Interna
     id: string
     name: string
     description: string | null
+    tags: string[]
     isPublic: boolean
-    folderId: string | null
     createdAt: Date
     updatedAt: Date
     userId: string | null
@@ -1484,7 +1346,6 @@ readonly fields: BiDashboardFieldRefs;
  */
 export interface Prisma__BiDashboardClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  folder<T extends Prisma.BiDashboard$folderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BiDashboard$folderArgs<ExtArgs>>): Prisma.Prisma__BiFolderClient<runtime.Types.Result.GetResult<Prisma.$BiFolderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   panels<T extends Prisma.BiDashboard$panelsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BiDashboard$panelsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiPanelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   filters<T extends Prisma.BiDashboard$filtersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BiDashboard$filtersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiFilterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   members<T extends Prisma.BiDashboard$membersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BiDashboard$membersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BiDashboardMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1521,8 +1382,8 @@ export interface BiDashboardFieldRefs {
   readonly id: Prisma.FieldRef<"BiDashboard", 'String'>
   readonly name: Prisma.FieldRef<"BiDashboard", 'String'>
   readonly description: Prisma.FieldRef<"BiDashboard", 'String'>
+  readonly tags: Prisma.FieldRef<"BiDashboard", 'String[]'>
   readonly isPublic: Prisma.FieldRef<"BiDashboard", 'Boolean'>
-  readonly folderId: Prisma.FieldRef<"BiDashboard", 'String'>
   readonly createdAt: Prisma.FieldRef<"BiDashboard", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"BiDashboard", 'DateTime'>
   readonly userId: Prisma.FieldRef<"BiDashboard", 'String'>
@@ -1924,25 +1785,6 @@ export type BiDashboardDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many BiDashboards to delete.
    */
   limit?: number
-}
-
-/**
- * BiDashboard.folder
- */
-export type BiDashboard$folderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the BiFolder
-   */
-  select?: Prisma.BiFolderSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the BiFolder
-   */
-  omit?: Prisma.BiFolderOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.BiFolderInclude<ExtArgs> | null
-  where?: Prisma.BiFolderWhereInput
 }
 
 /**

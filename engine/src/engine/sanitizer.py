@@ -1,5 +1,6 @@
-import sqlparse
 import re
+
+import sqlparse
 
 ALLOWED_KEYWORDS = {"SELECT", "WITH", "EXPLAIN", "SHOW", "DESCRIBE", "DESC", "ANALYZE"}
 BLOCKED_KEYWORDS = {
@@ -44,7 +45,7 @@ def is_safe(sql: str) -> bool:
 
 
 def apply_params(sql: str, params: dict[str, str]) -> str:
-    for key, val in (params or {}).items():
+    for val in (params or {}).values():
         safe = val.replace("'", "''").replace("\\", "\\\\")
         sql = TEMPLATE_RE.sub(safe, sql, count=1)
     return sql

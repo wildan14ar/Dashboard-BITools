@@ -1,7 +1,7 @@
 import hashlib
 import json
 import logging
-from typing import Optional
+
 import redis
 
 from src.config import REDIS_URL
@@ -10,10 +10,10 @@ logger = logging.getLogger(__name__)
 
 _ttl_default = int(__import__("os").getenv("QUERY_CACHE_TTL_SEC", "300"))
 
-_redis: Optional[redis.Redis] = None
+_redis: redis.Redis | None = None
 
 
-def _get_redis() -> Optional[redis.Redis]:
+def _get_redis() -> redis.Redis | None:
     global _redis
     if _redis is None:
         try:
@@ -21,7 +21,7 @@ def _get_redis() -> Optional[redis.Redis]:
             _redis.ping()
             logger.info(f"Redis connected: {REDIS_URL}")
         except Exception:
-            logger.warning(f"Redis unavailable, cache disabled")
+            logger.warning("Redis unavailable, cache disabled")
             _redis = False  # type: ignore
             return None
     return _redis if _redis is not False else None  # type: ignore
@@ -32,7 +32,7 @@ def cache_key(source_id: str, sql: str) -> str:
     return hashlib.md5(raw.encode()).hexdigest()
 
 
-def get(key: str) -> Optional[dict]:
+def get(key: str) -> dict | None:
     r = _get_redis()
     if r is None:
         return None

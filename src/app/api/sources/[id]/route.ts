@@ -24,7 +24,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const source = await prisma.biSource.update({
     where: { id },
-    data: { name: parsed.data.name, type: parsed.data.type, config: (parsed.data.config ?? {}) as object },
+    data: { name: parsed.data.name, type: parsed.data.type, config: parsed.data.config as object },
   })
   return NextResponse.json(source)
 }

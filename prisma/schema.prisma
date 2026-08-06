@@ -70,25 +70,12 @@ enum BiRole {
   EDITOR
 }
 
-model BiFolder {
-  id         String        @id @default(cuid())
-  name       String
-  parentId   String?       @map("parent_id")
-  parent     BiFolder?     @relation("FolderTree", fields: [parentId], references: [id], onDelete: Cascade)
-  children   BiFolder[]    @relation("FolderTree")
-  dashboards BiDashboard[]
-  createdAt  DateTime      @default(now()) @map("created_at")
-
-  @@map("bi_folders")
-}
-
 model BiDashboard {
   id          String              @id @default(cuid())
   name        String
   description String?
+  tags        String[]            @map("tags")
   isPublic    Boolean             @default(false) @map("is_public")
-  folderId    String?             @map("folder_id")
-  folder      BiFolder?           @relation(fields: [folderId], references: [id], onDelete: SetNull)
   panels      BiPanel[]
   filters     BiFilter[]
   members     BiDashboardMember[]

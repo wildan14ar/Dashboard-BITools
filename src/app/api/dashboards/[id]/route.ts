@@ -27,7 +27,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const dashboard = await prisma.biDashboard.update({
     where: { id },
-    data: { name: parsed.data.name, description: parsed.data.description, isPublic: parsed.data.isPublic, folderId: parsed.data.folderId ?? null },
+    data: { name: parsed.data.name, description: parsed.data.description, tags: parsed.data.tags ?? [], isPublic: parsed.data.isPublic },
   })
   return NextResponse.json(dashboard)
 }

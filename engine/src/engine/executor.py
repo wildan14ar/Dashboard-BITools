@@ -1,19 +1,24 @@
-import json
-import time
 import logging
-from typing import Optional
+import time
+
 from sqlalchemy import text
 
-from src.engine.factory import engine_pool
-from src.engine.sanitizer import is_safe, apply_params
-from src.engine.introspector import get_schema
+from src.config import MAX_ROWS_HARD, TIMEOUT_SEC_HARD
 from src.engine.cache import (
-    get as cache_get,
-    set as cache_set,
-    delete as cache_delete,
     cache_key,
 )
-from src.config import MAX_ROWS_HARD, TIMEOUT_SEC_HARD
+from src.engine.cache import (
+    delete as cache_delete,
+)
+from src.engine.cache import (
+    get as cache_get,
+)
+from src.engine.cache import (
+    set as cache_set,
+)
+from src.engine.factory import engine_pool
+from src.engine.introspector import get_schema
+from src.engine.sanitizer import apply_params, is_safe
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +30,10 @@ def execute_query(
     config_json: str = "{}",
     max_rows: int = 1000,
     timeout_sec: int = 30,
-    params: Optional[dict[str, str]] = None,
+    params: dict[str, str] | None = None,
     use_cache: bool = True,
+    limit: int | None = None,
+    offset: int = 0,
 ) -> dict:
     if not is_safe(sql):
         raise PermissionError("Query blocked by sanitizer")
@@ -35,12 +42,18 @@ def execute_query(
     max_rows = min(max_rows, MAX_ROWS_HARD)
     timeout_sec = min(timeout_sec, TIMEOUT_SEC_HARD)
 
+    # ponytail: appends LIMIT/OFFSET to the raw SQL; breaks if the dataset SQL
+    # already ends with LIMIT. Use windowed subquery if that ever bites.
+    if limit is not None and limit > 0:
+        sql = f"{sql.rstrip().rstrip(';').strip()} LIMIT {min(int(limit), max_rows)} OFFSET {int(offset or 0)}"
+
     key = cache_key(source_id, sql) if use_cache and not params else None
 
     if key:
         cached = cache_get(key)
         if cached is not None:
             logger.info(f"Cache hit: {source_id}")
+            cached["cached"] = True
             return cached
 
     engine = engine_pool.get(source_id, db_type, config_json)

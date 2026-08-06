@@ -7,12 +7,7 @@ import ReactECharts from "echarts-for-react"
 import GridLayout from "react-grid-layout"
 import { Loader2 } from "lucide-react"
 import "react-grid-layout/css/styles.css"
-
-type Panel = {
-  id: string; title: string; chartType: string; config: Record<string, unknown> | null
-  x: number; y: number; w: number; h: number; dataSetId: string | null
-}
-type Dashboard = { id: string; name: string; isPublic: boolean; panels: Panel[] }
+import { useDashboard, type Panel } from "@/hooks/use-dashboards"
 
 const CHART_COLORS = ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4"]
 
@@ -35,39 +30,28 @@ function buildChartOption(panel: Panel, data: { columns: string[]; rows: { value
 
 export default function PublicDashboardPage() {
   const { id } = useParams<{ id: string }>()
-  const [dashboard, setDashboard] = useState<Dashboard | null>(null)
+  const { data: dashboard, isLoading } = useDashboard(id)
   const [panelData, setPanelData] = useState<Record<string, { columns: string[]; rows: { values: string[] }[] } | null>>({})
-  const [loading, setLoading] = useState(true)
 
-  useEffect(() => { loadData(id) }, [])
-
-  async function loadData(dashboardId: string) {
-    const { data } = await axios.get(`/api/dashboards/${dashboardId}`)
-    if (!data.isPublic) { setLoading(false); return }
-    setDashboard(data)
-    setLoading(false)
-    for (const panel of data.panels) {
+  useEffect(() => {
+    if (!dashboard?.panels) return
+    for (const panel of dashboard.panels) {
       if (panel.dataSetId) {
-        try {
-          const runRes = await axios.post(`/api/datasets/${panel.dataSetId}/run`)
-          setPanelData((p) => ({ ...p, [panel.id]: runRes.data }))
-        } catch { /* pass */ }
+        axios.post(`/api/datasets/${panel.dataSetId}/run`).then((r) => setPanelData((p) => ({ ...p, [panel.id]: r.data }))).catch(() => {})
       }
     }
-  }
+  }, [dashboard])
 
-  if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="size-6 animate-spin" /></div>
-  if (!dashboard || !dashboard.isPublic) return <div className="flex h-screen items-center justify-center text-muted-foreground">Dashboard not found or not public</div>
+  if (isLoading) return <div className="flex h-screen items-center justify-center"><Loader2 className="size-6 animate-spin" /></div>
+  if (!dashboard?.isPublic) return <div className="flex h-screen items-center justify-center text-muted-foreground">Dashboard not found or not public</div>
 
-  const layout = dashboard.panels.map((p) => ({ i: p.id, x: p.x, y: p.y, w: p.w, h: p.h, static: true }))
+  const layout = dashboard.panels!.map((p) => ({ i: p.id, x: p.x, y: p.y, w: p.w, h: p.h, static: true }))
 
   return (
     <div className="h-screen bg-muted/10 p-4">
-      <div className="mb-3">
-        <h1 className="text-lg font-semibold">{dashboard.name}</h1>
-      </div>
+      <div className="mb-3"><h1 className="text-lg font-semibold">{dashboard.name}</h1></div>
       <GridLayout className="layout" layout={layout} gridConfig={{ cols: 12, rowHeight: 60 }} width={window.innerWidth - 32} dragConfig={{ enabled: false }} resizeConfig={{ enabled: false }}>
-        {dashboard.panels.map((panel) => {
+        {dashboard.panels!.map((panel) => {
           const data = panelData[panel.id]
           const option = buildChartOption(panel, data)
           return (

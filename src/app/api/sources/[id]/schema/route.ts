@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { getSchema } from "@/lib/query-engine"
+import { getSchema } from "@/lib/engine"
+
+function cleanError(err: unknown): string {
+  if (err && typeof err === "object" && "details" in err) return String(err.details)
+  if (err instanceof Error) return err.message
+  return String(err)
+}
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth()
@@ -19,6 +25,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     })
     return NextResponse.json(result)
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    return NextResponse.json({ error: cleanError(err) }, { status: 500 })
   }
 }

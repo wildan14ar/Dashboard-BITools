@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { execute } from "@/lib/query-engine"
+import { execute } from "@/lib/engine"
+
+function cleanError(err: unknown): string {
+  if (err && typeof err === "object" && "details" in err) return String(err.details)
+  if (err instanceof Error) return err.message
+  return String(err)
+}
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth()
@@ -13,6 +19,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const body = await req.json().catch(() => ({}))
   const paramsOverrides = body.params ?? {}
+  const cache = body.cache !== false
+  const page = Math.max(1, Number(body.page) || 1)
+  const pageSize = Math.max(0, Number(body.pageSize) || 0)
 
   try {
     const result = await execute({
@@ -21,11 +30,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       configJson: JSON.stringify(dataset.source.config ?? {}),
       sql: dataset.sql,
       params: paramsOverrides,
+      useCache: cache,
+      limit: pageSize > 0 ? pageSize : undefined,
+      offset: pageSize > 0 ? (page - 1) * pageSize : 0,
     })
 
     await prisma.biDataset.update({ where: { id }, data: { lastRunAt: new Date() } })
     return NextResponse.json(result)
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    return NextResponse.json({ error: cleanError(err) }, { status: 500 })
   }
 }

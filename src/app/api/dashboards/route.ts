@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     data: {
       name: parsed.data.name,
       description: parsed.data.description,
-      folderId: parsed.data.folderId ?? null,
+      tags: parsed.data.tags ?? [],
       isPublic: parsed.data.isPublic ?? false,
       userId: session.user.id,
     },

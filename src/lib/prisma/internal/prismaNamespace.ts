@@ -401,7 +401,6 @@ export const ModelName = {
   Role: 'Role',
   UserRole: 'UserRole',
   RolePermission: 'RolePermission',
-  BiFolder: 'BiFolder',
   BiDashboard: 'BiDashboard',
   BiDashboardMember: 'BiDashboardMember',
   BiDataset: 'BiDataset',
@@ -423,7 +422,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "role" | "userRole" | "rolePermission" | "biFolder" | "biDashboard" | "biDashboardMember" | "biDataset" | "biSource" | "biPanel" | "biFilter"
+    modelProps: "user" | "role" | "userRole" | "rolePermission" | "biDashboard" | "biDashboardMember" | "biDataset" | "biSource" | "biPanel" | "biFilter"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -720,80 +719,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.RolePermissionCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.RolePermissionCountAggregateOutputType> | number
-        }
-      }
-    }
-    BiFolder: {
-      payload: Prisma.$BiFolderPayload<ExtArgs>
-      fields: Prisma.BiFolderFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.BiFolderFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.BiFolderFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>
-        }
-        findFirst: {
-          args: Prisma.BiFolderFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.BiFolderFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>
-        }
-        findMany: {
-          args: Prisma.BiFolderFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>[]
-        }
-        create: {
-          args: Prisma.BiFolderCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>
-        }
-        createMany: {
-          args: Prisma.BiFolderCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.BiFolderCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>[]
-        }
-        delete: {
-          args: Prisma.BiFolderDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>
-        }
-        update: {
-          args: Prisma.BiFolderUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>
-        }
-        deleteMany: {
-          args: Prisma.BiFolderDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.BiFolderUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.BiFolderUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>[]
-        }
-        upsert: {
-          args: Prisma.BiFolderUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BiFolderPayload>
-        }
-        aggregate: {
-          args: Prisma.BiFolderAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateBiFolder>
-        }
-        groupBy: {
-          args: Prisma.BiFolderGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.BiFolderGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.BiFolderCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.BiFolderCountAggregateOutputType> | number
         }
       }
     }
@@ -1330,22 +1255,12 @@ export const RolePermissionScalarFieldEnum = {
 export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
 
 
-export const BiFolderScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  parentId: 'parentId',
-  createdAt: 'createdAt'
-} as const
-
-export type BiFolderScalarFieldEnum = (typeof BiFolderScalarFieldEnum)[keyof typeof BiFolderScalarFieldEnum]
-
-
 export const BiDashboardScalarFieldEnum = {
   id: 'id',
   name: 'name',
   description: 'description',
+  tags: 'tags',
   isPublic: 'isPublic',
-  folderId: 'folderId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId'
@@ -1715,7 +1630,6 @@ export type GlobalOmitConfig = {
   role?: Prisma.RoleOmit
   userRole?: Prisma.UserRoleOmit
   rolePermission?: Prisma.RolePermissionOmit
-  biFolder?: Prisma.BiFolderOmit
   biDashboard?: Prisma.BiDashboardOmit
   biDashboardMember?: Prisma.BiDashboardMemberOmit
   biDataset?: Prisma.BiDatasetOmit
