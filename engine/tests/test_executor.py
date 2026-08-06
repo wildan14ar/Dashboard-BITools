@@ -53,6 +53,9 @@ def test_pagination(cfg):
     assert [r[0] for r in p2["rows"]] == [str(i) for i in range(10, 20)]
     assert len(all_rows["rows"]) == 50
     assert all_rows["row_count"] == 50
+    assert p1["total"] == 50
+    assert p2["total"] == 50
+    assert all_rows["total"] == 50
 
 
 def test_cache_flag(cfg, monkeypatch):

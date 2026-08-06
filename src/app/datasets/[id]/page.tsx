@@ -14,7 +14,7 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
   const [id, setId] = useState("")
   const [sql, setSql] = useState("")
   const [name, setName] = useState("")
-  const [result, setResult] = useState<{ columns: string[]; rows: { values: string[] }[]; rowCount: number; executionTimeMs: number; cached?: boolean } | null>(null)
+  const [result, setResult] = useState<{ columns: string[]; rows: { values: string[] }[]; rowCount: number; executionTimeMs: number; cached?: boolean; total?: number } | null>(null)
   const [error, setError] = useState("")
   const [useCache, setUseCache] = useState(true)
   const [page, setPage] = useState(1)
@@ -47,6 +47,8 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
 
   if (!dataset) return <div className="p-6 text-muted-foreground">Loading...</div>
 
+  const totalPages = pageSize > 0 && result?.total != null ? Math.max(1, Math.ceil(result.total / pageSize)) : undefined
+
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3 border-b px-6 py-3">
@@ -70,8 +72,8 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
           {pageSize > 0 && (
             <div className="flex items-center gap-1.5">
               <Button variant="outline" size="sm" onClick={() => runAt(page - 1)} disabled={page <= 1}>Prev</Button>
-              <span className="text-xs text-muted-foreground">Page {page}</span>
-              <Button variant="outline" size="sm" onClick={() => runAt(page + 1)}>Next</Button>
+              <span className="text-xs text-muted-foreground">{totalPages ? `Page ${page} / ${totalPages}` : `Page ${page}`}</span>
+              <Button variant="outline" size="sm" onClick={() => runAt(page + 1)} disabled={totalPages != null && page >= totalPages}>Next</Button>
             </div>
           )}
           <Button onClick={handleRun} disabled={runDataset.isPending}>
@@ -103,7 +105,7 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
               <span className="flex items-center gap-3 text-xs text-muted-foreground">
                 {result.cached && <span className="font-medium text-emerald-500">cached</span>}
                 <span className="flex items-center gap-1"><Clock className="size-3" />{result.executionTimeMs}ms</span>
-                <span>{result.rowCount} rows</span>
+                <span>{result.rowCount}{result.total != null ? ` / ${result.total}` : ""} rows</span>
               </span>
             )}
           </div>

@@ -42,10 +42,12 @@ def execute_query(
     max_rows = min(max_rows, MAX_ROWS_HARD)
     timeout_sec = min(timeout_sec, TIMEOUT_SEC_HARD)
 
-    # ponytail: appends LIMIT/OFFSET to the raw SQL; breaks if the dataset SQL
-    # already ends with LIMIT. Use windowed subquery if that ever bites.
+    base_sql = sql.rstrip().rstrip(";").strip()
     if limit is not None and limit > 0:
-        sql = f"{sql.rstrip().rstrip(';').strip()} LIMIT {min(int(limit), max_rows)} OFFSET {int(offset or 0)}"
+        # ponytail: appends LIMIT/OFFSET; breaks if the dataset SQL already
+        # ends with LIMIT, and the COUNT subquery can't wrap EXPLAIN/SHOW.
+        # Use a windowed subquery if that ever bites.
+        sql = f"{base_sql} LIMIT {min(int(limit), max_rows)} OFFSET {int(offset or 0)}"
 
     key = cache_key(source_id, sql) if use_cache and not params else None
 
@@ -60,6 +62,11 @@ def execute_query(
     start = time.monotonic()
 
     with engine.connect() as conn:
+        total = None
+        if limit is not None and limit > 0:
+            total = conn.execute(
+                text(f"SELECT COUNT(*) FROM ({base_sql}) AS _fyc_count")
+            ).scalar()
         result = conn.execute(
             text(sql).execution_options(max_row_count=max_rows, timeout=timeout_sec)
         )
@@ -70,6 +77,7 @@ def execute_query(
     output = {
         "columns": columns,
         "row_count": len(rows),
+        "total": int(total) if total is not None else len(rows),
         "execution_time_ms": round(elapsed, 2),
         "rows": rows,
         "cached": False,
