@@ -81,6 +81,17 @@ export function useCreatePanel(dashboardId: string) {
   })
 }
 
+export function useUpdatePanel(dashboardId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ panelId, ...input }: Record<string, unknown> & { panelId: string }) => {
+      const { data } = await axios.put(`/api/dashboards/${dashboardId}/panels/${panelId}`, input)
+      return data
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["dashboards", dashboardId] }),
+  })
+}
+
 export function useDeletePanel(dashboardId: string) {
   const qc = useQueryClient()
   return useMutation({

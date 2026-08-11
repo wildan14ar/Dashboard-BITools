@@ -28,6 +28,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   session: { strategy: "jwt" },
+  pages: {
+    signIn: "/login",
+  },
   callbacks: {
     jwt({ token, user }) {
       if (user) token.isSuperAdmin = user.isSuperAdmin as boolean

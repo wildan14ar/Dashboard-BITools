@@ -3,7 +3,6 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
-import { LogoutButton } from "@/components/logout-button"
 import { createUserSchema, updateUserSchema, type CreateUserInput, type UpdateUserInput } from "@/validation/user"
 import { useUsers, useCreateUser, useUpdateUser, useDeleteUser, type User } from "@/hooks/use-users"
 import { useState } from "react"
@@ -35,7 +34,6 @@ export default function UsersPage() {
         <h1 className="text-2xl font-bold">Users</h1>
         <div className="flex items-center gap-3">
           <Button variant="outline" onClick={() => setShowCreate(!showCreate)}>New User</Button>
-          <LogoutButton />
         </div>
       </div>
 
