@@ -69,3 +69,35 @@ export function useDeleteDashboard() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["dashboards"] }),
   })
 }
+
+export function useCreatePanel(dashboardId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: Record<string, unknown>) => {
+      const { data } = await axios.post(`/api/dashboards/${dashboardId}/panels`, input)
+      return data
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["dashboards", dashboardId] }),
+  })
+}
+
+export function useDeletePanel(dashboardId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (panelId: string) => {
+      await axios.delete(`/api/dashboards/${dashboardId}/panels/${panelId}`)
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["dashboards", dashboardId] }),
+  })
+}
+
+export function useReorderPanels(dashboardId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (panels: { id: string; x: number; y: number; w: number; h: number }[]) => {
+      const { data } = await axios.put(`/api/dashboards/${dashboardId}/panels/reorder`, panels)
+      return data
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["dashboards", dashboardId] }),
+  })
+}

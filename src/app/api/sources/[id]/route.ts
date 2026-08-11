@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { invalidateCache } from "@/lib/engine"
 import { sourceSchema } from "@/validation/source"
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -26,6 +27,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     where: { id },
     data: { name: parsed.data.name, type: parsed.data.type, config: parsed.data.config as object },
   })
+  invalidateCache(id).catch(() => {}) // cache stale setelah config berubah
   return NextResponse.json(source)
 }
 
@@ -35,5 +37,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
   const { id } = await params
   await prisma.biSource.delete({ where: { id } })
+  invalidateCache(id).catch(() => {}) // cache stale setelah source dihapus
   return NextResponse.json({ ok: true })
 }

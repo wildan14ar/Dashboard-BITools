@@ -16,8 +16,12 @@ const proto = grpc.loadPackageDefinition(packageDefinition) as unknown as ProtoG
 
 const ENGINE_HOST = process.env.QUERY_ENGINE_HOST ?? "localhost:50051"
 
+let _client: InstanceType<typeof proto.engine.QueryEngine> | null = null
+
 function getClient() {
-  return new proto.query_engine.QueryEngine(ENGINE_HOST, grpc.credentials.createInsecure())
+  if (_client) return _client
+  _client = new proto.engine.QueryEngine(ENGINE_HOST, grpc.credentials.createInsecure())
+  return _client
 }
 
 function promisify<T>(fn: (callback: grpc.requestCallback<T>) => grpc.ClientUnaryCall) {
@@ -57,7 +61,7 @@ export async function execute(src: SourceRef & {
       },
       cb
     )
-  ).finally(() => client.close())
+  )
 }
 
 export function executeStream(src: SourceRef & {
@@ -86,7 +90,7 @@ export function executeStream(src: SourceRef & {
 
 export async function getSchema(src: SourceRef) {
   const client = getClient()
-  return promisify((cb) => client.GetSchema({ sourceId: src.sourceId, dbType: src.dbType, configJson: src.configJson }, cb)).finally(() => client.close())
+  return promisify((cb) => client.GetSchema({ sourceId: src.sourceId, dbType: src.dbType, configJson: src.configJson }, cb))
 }
 
 export async function testConnection(params: {
@@ -100,10 +104,10 @@ export async function testConnection(params: {
       { sourceId: params.sourceId, dbType: params.dbType, configJson: params.configJson },
       cb
     )
-  ).finally(() => client.close())
+  )
 }
 
-export async function invalidateCache(datasetId: string) {
+export async function invalidateCache(sourceId: string) {
   const client = getClient()
-  return promisify((cb) => client.InvalidateCache({ datasetId }, cb)).finally(() => client.close())
+  return promisify((cb) => client.InvalidateCache({ sourceId }, cb))
 }

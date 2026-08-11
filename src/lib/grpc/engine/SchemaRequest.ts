@@ -8,7 +8,7 @@ export interface SchemaRequest {
 }
 
 export interface SchemaRequest__Output {
-  'sourceId': (string);
-  'dbType': (string);
-  'configJson': (string);
+  'sourceId'?: (string);
+  'dbType'?: (string);
+  'configJson'?: (string);
 }

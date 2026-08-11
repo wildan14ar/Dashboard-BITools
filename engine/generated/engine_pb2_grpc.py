@@ -35,27 +35,27 @@ class QueryEngineStub:
             channel: A grpc.Channel.
         """
         self.TestConnection = channel.unary_unary(
-                '/query_engine.QueryEngine/TestConnection',
+                '/engine.QueryEngine/TestConnection',
                 request_serializer=engine__pb2.TestRequest.SerializeToString,
                 response_deserializer=engine__pb2.TestResponse.FromString,
                 _registered_method=True)
         self.GetSchema = channel.unary_unary(
-                '/query_engine.QueryEngine/GetSchema',
+                '/engine.QueryEngine/GetSchema',
                 request_serializer=engine__pb2.SchemaRequest.SerializeToString,
                 response_deserializer=engine__pb2.SchemaResponse.FromString,
                 _registered_method=True)
         self.Execute = channel.unary_unary(
-                '/query_engine.QueryEngine/Execute',
+                '/engine.QueryEngine/Execute',
                 request_serializer=engine__pb2.QueryRequest.SerializeToString,
                 response_deserializer=engine__pb2.QueryResponse.FromString,
                 _registered_method=True)
         self.ExecuteStream = channel.unary_stream(
-                '/query_engine.QueryEngine/ExecuteStream',
+                '/engine.QueryEngine/ExecuteStream',
                 request_serializer=engine__pb2.QueryRequest.SerializeToString,
                 response_deserializer=engine__pb2.RowBatch.FromString,
                 _registered_method=True)
         self.InvalidateCache = channel.unary_unary(
-                '/query_engine.QueryEngine/InvalidateCache',
+                '/engine.QueryEngine/InvalidateCache',
                 request_serializer=engine__pb2.CacheRequest.SerializeToString,
                 response_deserializer=engine__pb2.CacheResponse.FromString,
                 _registered_method=True)
@@ -124,9 +124,9 @@ def add_QueryEngineServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'query_engine.QueryEngine', rpc_method_handlers)
+            'engine.QueryEngine', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('query_engine.QueryEngine', rpc_method_handlers)
+    server.add_registered_method_handlers('engine.QueryEngine', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -147,7 +147,7 @@ class QueryEngine:
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/query_engine.QueryEngine/TestConnection',
+            '/engine.QueryEngine/TestConnection',
             engine__pb2.TestRequest.SerializeToString,
             engine__pb2.TestResponse.FromString,
             options,
@@ -174,7 +174,7 @@ class QueryEngine:
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/query_engine.QueryEngine/GetSchema',
+            '/engine.QueryEngine/GetSchema',
             engine__pb2.SchemaRequest.SerializeToString,
             engine__pb2.SchemaResponse.FromString,
             options,
@@ -201,7 +201,7 @@ class QueryEngine:
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/query_engine.QueryEngine/Execute',
+            '/engine.QueryEngine/Execute',
             engine__pb2.QueryRequest.SerializeToString,
             engine__pb2.QueryResponse.FromString,
             options,
@@ -228,7 +228,7 @@ class QueryEngine:
         return grpc.experimental.unary_stream(
             request,
             target,
-            '/query_engine.QueryEngine/ExecuteStream',
+            '/engine.QueryEngine/ExecuteStream',
             engine__pb2.QueryRequest.SerializeToString,
             engine__pb2.RowBatch.FromString,
             options,
@@ -255,7 +255,7 @@ class QueryEngine:
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/query_engine.QueryEngine/InvalidateCache',
+            '/engine.QueryEngine/InvalidateCache',
             engine__pb2.CacheRequest.SerializeToString,
             engine__pb2.CacheResponse.FromString,
             options,

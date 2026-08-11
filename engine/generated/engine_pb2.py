@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x65ngine.proto\x12\x0cquery_engine\"F\n\x0bTestRequest\x12\x11\n\tsource_id\x18\x01 \x01(\t\x12\x0f\n\x07\x64\x62_type\x18\x02 \x01(\t\x12\x13\n\x0b\x63onfig_json\x18\x03 \x01(\t\")\n\x0cTestResponse\x12\n\n\x02ok\x18\x01 \x01(\x08\x12\r\n\x05\x65rror\x18\x02 \x01(\t\"H\n\rSchemaRequest\x12\x11\n\tsource_id\x18\x01 \x01(\t\x12\x0f\n\x07\x64\x62_type\x18\x02 \x01(\t\x12\x13\n\x0b\x63onfig_json\x18\x03 \x01(\t\"9\n\x0eSchemaResponse\x12\'\n\x06tables\x18\x01 \x03(\x0b\x32\x17.query_engine.TableInfo\"T\n\tTableInfo\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x06schema\x18\x02 \x01(\t\x12)\n\x07\x63olumns\x18\x03 \x03(\x0b\x32\x18.query_engine.ColumnInfo\"\x81\x01\n\nColumnInfo\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04type\x18\x02 \x01(\t\x12\x10\n\x08nullable\x18\x03 \x01(\x08\x12\x16\n\x0eis_primary_key\x18\x04 \x01(\x08\x12-\n\x0b\x66oreign_key\x18\x05 \x01(\x0b\x32\x18.query_engine.ForeignKey\"+\n\nForeignKey\x12\r\n\x05table\x18\x01 \x01(\t\x12\x0e\n\x06\x63olumn\x18\x02 \x01(\t\"\x94\x02\n\x0cQueryRequest\x12\x11\n\tsource_id\x18\x01 \x01(\t\x12\x0b\n\x03sql\x18\x02 \x01(\t\x12\x10\n\x08max_rows\x18\x03 \x01(\x05\x12\x13\n\x0btimeout_sec\x18\x04 \x01(\x05\x12\x36\n\x06params\x18\x05 \x03(\x0b\x32&.query_engine.QueryRequest.ParamsEntry\x12\x0f\n\x07\x64\x62_type\x18\x06 \x01(\t\x12\x13\n\x0b\x63onfig_json\x18\x07 \x01(\t\x12\x11\n\tuse_cache\x18\x08 \x01(\x08\x12\r\n\x05limit\x18\t \x01(\x05\x12\x0e\n\x06offset\x18\n \x01(\x05\x1a-\n\x0bParamsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x7f\n\rQueryResponse\x12\x0f\n\x07\x63olumns\x18\x01 \x03(\t\x12\x1f\n\x04rows\x18\x02 \x03(\x0b\x32\x11.query_engine.Row\x12\x11\n\trow_count\x18\x03 \x01(\x05\x12\x19\n\x11\x65xecution_time_ms\x18\x04 \x01(\x01\x12\x0e\n\x06\x63\x61\x63hed\x18\x05 \x01(\x08\"\x15\n\x03Row\x12\x0e\n\x06values\x18\x01 \x03(\t\"M\n\x08RowBatch\x12\x0f\n\x07\x63olumns\x18\x01 \x03(\t\x12\x1f\n\x04rows\x18\x02 \x03(\x0b\x32\x11.query_engine.Row\x12\x0f\n\x07is_last\x18\x03 \x01(\x08\"\"\n\x0c\x43\x61\x63heRequest\x12\x12\n\ndataset_id\x18\x01 \x01(\t\"\x1b\n\rCacheResponse\x12\n\n\x02ok\x18\x01 \x01(\x08\x32\xf5\x02\n\x0bQueryEngine\x12G\n\x0eTestConnection\x12\x19.query_engine.TestRequest\x1a\x1a.query_engine.TestResponse\x12\x46\n\tGetSchema\x12\x1b.query_engine.SchemaRequest\x1a\x1c.query_engine.SchemaResponse\x12\x42\n\x07\x45xecute\x12\x1a.query_engine.QueryRequest\x1a\x1b.query_engine.QueryResponse\x12\x45\n\rExecuteStream\x12\x1a.query_engine.QueryRequest\x1a\x16.query_engine.RowBatch0\x01\x12J\n\x0fInvalidateCache\x12\x1a.query_engine.CacheRequest\x1a\x1b.query_engine.CacheResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x65ngine.proto\x12\x06\x65ngine\"F\n\x0bTestRequest\x12\x11\n\tsource_id\x18\x01 \x01(\t\x12\x0f\n\x07\x64\x62_type\x18\x02 \x01(\t\x12\x13\n\x0b\x63onfig_json\x18\x03 \x01(\t\")\n\x0cTestResponse\x12\n\n\x02ok\x18\x01 \x01(\x08\x12\r\n\x05\x65rror\x18\x02 \x01(\t\"H\n\rSchemaRequest\x12\x11\n\tsource_id\x18\x01 \x01(\t\x12\x0f\n\x07\x64\x62_type\x18\x02 \x01(\t\x12\x13\n\x0b\x63onfig_json\x18\x03 \x01(\t\"3\n\x0eSchemaResponse\x12!\n\x06tables\x18\x01 \x03(\x0b\x32\x11.engine.TableInfo\"N\n\tTableInfo\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x06schema\x18\x02 \x01(\t\x12#\n\x07\x63olumns\x18\x03 \x03(\x0b\x32\x12.engine.ColumnInfo\"{\n\nColumnInfo\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04type\x18\x02 \x01(\t\x12\x10\n\x08nullable\x18\x03 \x01(\x08\x12\x16\n\x0eis_primary_key\x18\x04 \x01(\x08\x12\'\n\x0b\x66oreign_key\x18\x05 \x01(\x0b\x32\x12.engine.ForeignKey\"+\n\nForeignKey\x12\r\n\x05table\x18\x01 \x01(\t\x12\x0e\n\x06\x63olumn\x18\x02 \x01(\t\"\x8e\x02\n\x0cQueryRequest\x12\x11\n\tsource_id\x18\x01 \x01(\t\x12\x0b\n\x03sql\x18\x02 \x01(\t\x12\x10\n\x08max_rows\x18\x03 \x01(\x05\x12\x13\n\x0btimeout_sec\x18\x04 \x01(\x05\x12\x30\n\x06params\x18\x05 \x03(\x0b\x32 .engine.QueryRequest.ParamsEntry\x12\x0f\n\x07\x64\x62_type\x18\x06 \x01(\t\x12\x13\n\x0b\x63onfig_json\x18\x07 \x01(\t\x12\x11\n\tuse_cache\x18\x08 \x01(\x08\x12\r\n\x05limit\x18\t \x01(\x05\x12\x0e\n\x06offset\x18\n \x01(\x05\x1a-\n\x0bParamsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"y\n\rQueryResponse\x12\x0f\n\x07\x63olumns\x18\x01 \x03(\t\x12\x19\n\x04rows\x18\x02 \x03(\x0b\x32\x0b.engine.Row\x12\x11\n\trow_count\x18\x03 \x01(\x05\x12\x19\n\x11\x65xecution_time_ms\x18\x04 \x01(\x01\x12\x0e\n\x06\x63\x61\x63hed\x18\x05 \x01(\x08\"\x15\n\x03Row\x12\x0e\n\x06values\x18\x01 \x03(\t\"G\n\x08RowBatch\x12\x0f\n\x07\x63olumns\x18\x01 \x03(\t\x12\x19\n\x04rows\x18\x02 \x03(\x0b\x32\x0b.engine.Row\x12\x0f\n\x07is_last\x18\x03 \x01(\x08\"!\n\x0c\x43\x61\x63heRequest\x12\x11\n\tsource_id\x18\x01 \x01(\t\"\x1b\n\rCacheResponse\x12\n\n\x02ok\x18\x01 \x01(\x08\x32\xb9\x02\n\x0bQueryEngine\x12;\n\x0eTestConnection\x12\x13.engine.TestRequest\x1a\x14.engine.TestResponse\x12:\n\tGetSchema\x12\x15.engine.SchemaRequest\x1a\x16.engine.SchemaResponse\x12\x36\n\x07\x45xecute\x12\x14.engine.QueryRequest\x1a\x15.engine.QueryResponse\x12\x39\n\rExecuteStream\x12\x14.engine.QueryRequest\x1a\x10.engine.RowBatch0\x01\x12>\n\x0fInvalidateCache\x12\x14.engine.CacheRequest\x1a\x15.engine.CacheResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,34 +33,34 @@ if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_QUERYREQUEST_PARAMSENTRY']._loaded_options = None
   _globals['_QUERYREQUEST_PARAMSENTRY']._serialized_options = b'8\001'
-  _globals['_TESTREQUEST']._serialized_start=30
-  _globals['_TESTREQUEST']._serialized_end=100
-  _globals['_TESTRESPONSE']._serialized_start=102
-  _globals['_TESTRESPONSE']._serialized_end=143
-  _globals['_SCHEMAREQUEST']._serialized_start=145
-  _globals['_SCHEMAREQUEST']._serialized_end=217
-  _globals['_SCHEMARESPONSE']._serialized_start=219
-  _globals['_SCHEMARESPONSE']._serialized_end=276
-  _globals['_TABLEINFO']._serialized_start=278
-  _globals['_TABLEINFO']._serialized_end=362
-  _globals['_COLUMNINFO']._serialized_start=365
-  _globals['_COLUMNINFO']._serialized_end=494
-  _globals['_FOREIGNKEY']._serialized_start=496
-  _globals['_FOREIGNKEY']._serialized_end=539
-  _globals['_QUERYREQUEST']._serialized_start=542
-  _globals['_QUERYREQUEST']._serialized_end=818
-  _globals['_QUERYREQUEST_PARAMSENTRY']._serialized_start=773
-  _globals['_QUERYREQUEST_PARAMSENTRY']._serialized_end=818
-  _globals['_QUERYRESPONSE']._serialized_start=820
-  _globals['_QUERYRESPONSE']._serialized_end=947
-  _globals['_ROW']._serialized_start=949
-  _globals['_ROW']._serialized_end=970
-  _globals['_ROWBATCH']._serialized_start=972
-  _globals['_ROWBATCH']._serialized_end=1049
-  _globals['_CACHEREQUEST']._serialized_start=1051
-  _globals['_CACHEREQUEST']._serialized_end=1085
-  _globals['_CACHERESPONSE']._serialized_start=1087
-  _globals['_CACHERESPONSE']._serialized_end=1114
-  _globals['_QUERYENGINE']._serialized_start=1117
-  _globals['_QUERYENGINE']._serialized_end=1490
+  _globals['_TESTREQUEST']._serialized_start=24
+  _globals['_TESTREQUEST']._serialized_end=94
+  _globals['_TESTRESPONSE']._serialized_start=96
+  _globals['_TESTRESPONSE']._serialized_end=137
+  _globals['_SCHEMAREQUEST']._serialized_start=139
+  _globals['_SCHEMAREQUEST']._serialized_end=211
+  _globals['_SCHEMARESPONSE']._serialized_start=213
+  _globals['_SCHEMARESPONSE']._serialized_end=264
+  _globals['_TABLEINFO']._serialized_start=266
+  _globals['_TABLEINFO']._serialized_end=344
+  _globals['_COLUMNINFO']._serialized_start=346
+  _globals['_COLUMNINFO']._serialized_end=469
+  _globals['_FOREIGNKEY']._serialized_start=471
+  _globals['_FOREIGNKEY']._serialized_end=514
+  _globals['_QUERYREQUEST']._serialized_start=517
+  _globals['_QUERYREQUEST']._serialized_end=787
+  _globals['_QUERYREQUEST_PARAMSENTRY']._serialized_start=742
+  _globals['_QUERYREQUEST_PARAMSENTRY']._serialized_end=787
+  _globals['_QUERYRESPONSE']._serialized_start=789
+  _globals['_QUERYRESPONSE']._serialized_end=910
+  _globals['_ROW']._serialized_start=912
+  _globals['_ROW']._serialized_end=933
+  _globals['_ROWBATCH']._serialized_start=935
+  _globals['_ROWBATCH']._serialized_end=1006
+  _globals['_CACHEREQUEST']._serialized_start=1008
+  _globals['_CACHEREQUEST']._serialized_end=1041
+  _globals['_CACHERESPONSE']._serialized_start=1043
+  _globals['_CACHERESPONSE']._serialized_end=1070
+  _globals['_QUERYENGINE']._serialized_start=1073
+  _globals['_QUERYENGINE']._serialized_end=1386
 # @@protoc_insertion_point(module_scope)

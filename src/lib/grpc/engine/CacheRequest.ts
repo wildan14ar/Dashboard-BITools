@@ -2,9 +2,9 @@
 
 
 export interface CacheRequest {
-  'datasetId'?: (string);
+  'sourceId'?: (string);
 }
 
 export interface CacheRequest__Output {
-  'datasetId': (string);
+  'sourceId'?: (string);
 }

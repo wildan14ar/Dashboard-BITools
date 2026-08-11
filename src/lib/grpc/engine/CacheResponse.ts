@@ -6,5 +6,5 @@ export interface CacheResponse {
 }
 
 export interface CacheResponse__Output {
-  'ok': (boolean);
+  'ok'?: (boolean);
 }

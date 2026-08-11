@@ -6,5 +6,5 @@ export interface Row {
 }
 
 export interface Row__Output {
-  'values': (string)[];
+  'values'?: (string)[];
 }

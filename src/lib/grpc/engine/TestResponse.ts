@@ -7,6 +7,6 @@ export interface TestResponse {
 }
 
 export interface TestResponse__Output {
-  'ok': (boolean);
-  'error': (string);
+  'ok'?: (boolean);
+  'error'?: (string);
 }

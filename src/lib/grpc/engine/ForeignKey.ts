@@ -7,6 +7,6 @@ export interface ForeignKey {
 }
 
 export interface ForeignKey__Output {
-  'table': (string);
-  'column': (string);
+  'table'?: (string);
+  'column'?: (string);
 }

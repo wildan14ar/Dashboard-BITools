@@ -82,3 +82,17 @@ def test_cache_flag(cfg, monkeypatch):
     )
     assert nocache["cached"] is False
     assert "pagination_test" not in cache  # use_cache=False must not write cache
+
+
+def test_stale_serve_when_lease_held(cfg, monkeypatch):
+    stale = {"columns": ["n"], "rows": [["1"]], "row_count": 1, "total": 1}
+    monkeypatch.setattr(exec_mod, "cache_get", lambda key: None)
+    monkeypatch.setattr(exec_mod, "cache_get_stale", lambda key: copy.deepcopy(stale))
+    monkeypatch.setattr(exec_mod, "cache_try_lock", lambda key, lease_sec=60: False)
+
+    result = execute_query(
+        "pagination_test", SQL, db_type="sqlite", config_json=cfg, use_cache=True
+    )
+    assert result["cached"] is True
+    assert result["rows"] == [["1"]]
+    assert result["row_count"] == 1

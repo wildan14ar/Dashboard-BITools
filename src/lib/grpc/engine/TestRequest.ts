@@ -8,7 +8,7 @@ export interface TestRequest {
 }
 
 export interface TestRequest__Output {
-  'sourceId': (string);
-  'dbType': (string);
-  'configJson': (string);
+  'sourceId'?: (string);
+  'dbType'?: (string);
+  'configJson'?: (string);
 }

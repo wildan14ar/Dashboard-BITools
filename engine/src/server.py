@@ -12,6 +12,7 @@ import grpc
 
 from src.config import GRPC_PORT
 from src.engine.executor import execute_query, get_schema_info, test_connection
+from src.engine.executor import invalidate_cache
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
@@ -125,7 +126,15 @@ class QueryEngineServicer(rpc.QueryEngineServicer):
             return pb.SchemaResponse()
 
     def InvalidateCache(self, request: pb.CacheRequest, context):
-        return pb.CacheResponse(ok=True)
+        try:
+            return pb.CacheResponse(
+                ok=invalidate_cache(request.source_id).get("ok", False)
+            )
+        except Exception as e:
+            logger.exception("InvalidateCache failed")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(str(e))
+            return pb.CacheResponse(ok=False)
 
 
 def serve():

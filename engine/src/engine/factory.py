@@ -1,6 +1,7 @@
 import json
 import logging
 
+from pymongo import MongoClient
 from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.pool import QueuePool
 
@@ -78,6 +79,14 @@ class EnginePool:
             config = (
                 json.loads(config_json) if isinstance(config_json, str) else config_json
             )
+            if db_type == "mongodb":
+                client = MongoClient(
+                    config.get("connection_string", "mongodb://localhost:27017"),
+                    serverSelectionTimeoutMS=5000,
+                )
+                client.admin.command("ping")
+                client.close()
+                return True, None
             url = _build_url(db_type, config)
             engine = create_engine(
                 url,
@@ -95,3 +104,30 @@ class EnginePool:
 
 
 engine_pool = EnginePool()
+
+
+class MongoPool:
+    def __init__(self):
+        self._clients: dict[str, MongoClient] = {}
+
+    def get(self, source_id: str, config_json: str) -> MongoClient:
+        if source_id in self._clients:
+            return self._clients[source_id]
+
+        config = (
+            json.loads(config_json) if isinstance(config_json, str) else config_json
+        )
+        uri = config.get("connection_string", "mongodb://localhost:27017")
+        logger.info(f"Creating mongo client for [{source_id}]")
+        client = MongoClient(uri, serverSelectionTimeoutMS=5000)
+        self._clients[source_id] = client
+        return client
+
+    def dispose(self, source_id: str):
+        client = self._clients.pop(source_id, None)
+        if client:
+            logger.info(f"Disposing mongo client for [{source_id}]")
+            client.close()
+
+
+mongo_pool = MongoPool()

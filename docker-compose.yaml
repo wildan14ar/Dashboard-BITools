@@ -53,7 +53,7 @@ services:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://${POSTGRES_USER:-fycuser}:${POSTGRES_PASSWORD:-fycpassword}@postgres:5432/${POSTGRES_DB:-fycdb}
       - AUTH_SECRET=${DASHBOARD_AUTH_SECRET:-your_secret_key}
-      - QUERY_ENGINE_HOST=query-engine:50051
+      - QUERY_ENGINE_HOST=engine:50051
     depends_on:
       - engine
     restart: unless-stopped

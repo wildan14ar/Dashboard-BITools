@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { testConnection } from "@/lib/engine"
-import { sourceConfigSchema } from "@/validation/source"
+import { CONFIG_SCHEMAS, sourceTypeSchema } from "@/validation/source"
 import { z } from "zod"
 
 function cleanError(err: unknown): string {
@@ -10,10 +10,19 @@ function cleanError(err: unknown): string {
   return String(err)
 }
 
-const testSchema = z.object({
-  type: z.enum(["postgresql", "mysql", "sqlite", "clickhouse", "bigquery", "mongodb"]),
-  config: sourceConfigSchema,
-})
+const testSchema = z
+  .object({
+    type: sourceTypeSchema,
+    config: z.record(z.string(), z.unknown()),
+  })
+  .superRefine((val, ctx) => {
+    const result = CONFIG_SCHEMAS[val.type].safeParse(val.config)
+    if (!result.success) {
+      for (const issue of result.error.issues) {
+        ctx.addIssue({ ...issue, path: ["config", ...issue.path] })
+      }
+    }
+  })
 
 export async function POST(req: Request) {
   const session = await auth()
