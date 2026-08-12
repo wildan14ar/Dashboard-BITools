@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { AxisDrop } from "./axis-drop"
 import { ChartPreview } from "./chart-preview"
-import { Field, FieldLabel, Segmented, OptionButton, ColorField, RangeField } from "./controls"
+import { Field, Segmented, OptionButton, ColorField, RangeField } from "./controls"
 import { Heading } from "@/components/charts/heading"
 import type { PanelEditor } from "@/hooks/use-panel-editor"
 
@@ -38,14 +38,15 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
     panelPadding, setPanelPadding,
     titlePosition, setTitlePosition,
     titleAlign, titleBold, titleItalic, titleStrikethrough, titleColor, titleSize,
-    pieMode, donutThickness, lineFill, barOrientation, xColumn, yColumn, yAgg, tableColumns, tableScroll,
+    pieMode, donutThickness, lineFill, barOrientation, xColumn, yColumn, yAgg,
+    tableColumns, tableScroll, tableMode, pivotRowCol, pivotColCol, pivotValueCol, pivotAgg,
     previewData,
   } = editor
 
   const chartConfig = chartType === "kpi"
     ? { column: yColumn, agg: yAgg }
     : chartType === "table"
-      ? { columns: tableColumns, tableScroll }
+      ? { columns: tableColumns, tableScroll, tableMode, pivotRowCol, pivotColCol, pivotValueCol, pivotAgg }
       : chartType === "pie"
         ? { xColumn, yColumn, yAgg, pieMode, donutThickness }
         : { xColumn, yColumn, yAgg, lineFill, barOrientation }
@@ -336,8 +337,19 @@ const SCROLL_OPTIONS = [
   { value: "horizontal" as const, label: "Horizontal" },
 ]
 
+const TABLE_MODE_OPTIONS = [
+  { value: "plain" as const, label: "Plain" },
+  { value: "pivot" as const, label: "Pivot" },
+]
+
 function TableConfig({ editor }: { editor: PanelEditor }) {
-  const { columns, tableColumns, setTableColumns, tableScroll, setTableScroll, datasetId, selectDataset } = editor
+  const {
+    columns, tableColumns, setTableColumns, tableScroll, setTableScroll,
+    tableMode, setTableMode,
+    pivotRowCol, setPivotRowCol, pivotColCol, setPivotColCol,
+    pivotValueCol, setPivotValueCol, pivotAgg, setPivotAgg,
+    datasetId, selectDataset,
+  } = editor
   const [over, setOver] = useState(false)
   const [draggingIdx, setDraggingIdx] = useState<number | null>(null)
 
@@ -369,6 +381,35 @@ function TableConfig({ editor }: { editor: PanelEditor }) {
 
 return (
     <>
+      <Field label="Table Mode">
+        <Segmented value={tableMode} onChange={setTableMode} columns={2} options={TABLE_MODE_OPTIONS} />
+      </Field>
+
+      {tableMode === "pivot" ? (
+        <>
+          <AxisDrop
+            label="Rows"
+            column={columns[pivotRowCol]}
+            onChange={(idx) => setPivotRowCol(idx)}
+            onDropField={(f) => { selectDataset(f.datasetId); setPivotRowCol(f.columnIndex) }}
+          />
+          <AxisDrop
+            label="Columns"
+            column={columns[pivotColCol]}
+            onChange={(idx) => setPivotColCol(idx)}
+            onDropField={(f) => { selectDataset(f.datasetId); setPivotColCol(f.columnIndex) }}
+          />
+          <AxisDrop
+            label="Value"
+            column={columns[pivotValueCol]}
+            agg={pivotAgg}
+            onAggChange={setPivotAgg}
+            onChange={(idx) => setPivotValueCol(idx)}
+            onDropField={(f) => { selectDataset(f.datasetId); setPivotValueCol(f.columnIndex) }}
+          />
+        </>
+      ) : (
+        <>
       <Field label="Columns">
         <div
           onDragOver={(e) => { e.preventDefault(); setOver(true) }}
@@ -426,6 +467,8 @@ return (
       <Field label="Scroll">
         <Segmented value={tableScroll} onChange={setTableScroll} columns={2} options={SCROLL_OPTIONS} />
       </Field>
+        </>
+      )}
     </>
   )
 }

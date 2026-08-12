@@ -48,6 +48,11 @@ export function usePanelEditor(id: string) {
   const [columns, setColumns] = useState<string[]>([])
   const [tableColumns, setTableColumns] = useState<number[]>([])
   const [tableScroll, setTableScroll] = useState<"vertical" | "horizontal">("vertical")
+  const [tableMode, setTableMode] = useState<"plain" | "pivot">("pivot")
+  const [pivotRowCol, setPivotRowCol] = useState(0)
+  const [pivotColCol, setPivotColCol] = useState(1)
+  const [pivotValueCol, setPivotValueCol] = useState(2)
+  const [pivotAgg, setPivotAgg] = useState("sum")
   const [previewData, setPreviewData] = useState<PreviewData | null>(null)
   const [columnsLoading, setColumnsLoading] = useState(false)
   const [expandedDatasets, setExpandedDatasets] = useState<Set<string>>(new Set())
@@ -115,7 +120,7 @@ export function usePanelEditor(id: string) {
     const config = chartType === "text"
       ? { content: panelText, level: panelTextLevel, color: panelTextColor, align: panelTextAlign, valign: panelTextVAlign, padding: panelPadding, ...titleConfig }
       : chartType === "kpi" ? { column: yColumn, agg: yAgg, padding: panelPadding, ...titleConfig }
-      : chartType === "table" ? { columns: tableColumns, tableScroll, padding: panelPadding, ...titleConfig }
+      : chartType === "table" ? { columns: tableColumns, tableScroll, tableMode, pivotRowCol, pivotColCol, pivotValueCol, pivotAgg, padding: panelPadding, ...titleConfig }
       : chartType === "pie" ? { xColumn, yColumn, yAgg, pieMode, donutThickness, padding: panelPadding, ...titleConfig }
       : { xColumn, yColumn, yAgg, lineFill, barOrientation, padding: panelPadding, ...titleConfig }
     const title = panelTitle || selectedDataset?.name || "Panel"
@@ -186,6 +191,11 @@ export function usePanelEditor(id: string) {
         const cols = (cfg.columns as number[]) ?? []
         setTableColumns(cols.length ? cols : columns.map((_: string, i: number) => i))
         setTableScroll((cfg.tableScroll as "vertical" | "horizontal") || "vertical")
+        setTableMode((cfg.tableMode as "plain" | "pivot") || "plain")
+        setPivotRowCol(Number(cfg.pivotRowCol) || 0)
+        setPivotColCol(Number(cfg.pivotColCol) || 1)
+        setPivotValueCol(Number(cfg.pivotValueCol) || 2)
+        setPivotAgg((cfg.pivotAgg as string) || "sum")
       }
       if (panel.chartType === "line" || panel.chartType === "area") {
         setLineFill(Boolean(cfg.lineFill))
@@ -225,6 +235,11 @@ export function usePanelEditor(id: string) {
     setTitleColor("")
     setTitleSize(12)
     setTableScroll("vertical")
+    setTableMode("pivot")
+    setPivotRowCol(0)
+    setPivotColCol(1)
+    setPivotValueCol(2)
+    setPivotAgg("sum")
     setColumns([])
   }
 
@@ -313,6 +328,16 @@ export function usePanelEditor(id: string) {
     setTableColumns,
     tableScroll,
     setTableScroll,
+    tableMode,
+    setTableMode,
+    pivotRowCol,
+    setPivotRowCol,
+    pivotColCol,
+    setPivotColCol,
+    pivotValueCol,
+    setPivotValueCol,
+    pivotAgg,
+    setPivotAgg,
     previewData,
     columnsLoading,
     expandedDatasets,
