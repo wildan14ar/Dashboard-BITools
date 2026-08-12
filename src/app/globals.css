@@ -154,6 +154,14 @@
   }
 }
 
+@utility scroll-hidden {
+  overflow: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @utility scroll-hidden-y {
   overflow-y: auto;
   scrollbar-width: none;

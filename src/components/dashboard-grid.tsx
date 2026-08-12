@@ -8,7 +8,7 @@ import ReactECharts from "echarts-for-react"
 import { Loader2, MoreVertical, Pencil, Trash2, GripVertical } from "lucide-react"
 import "react-grid-layout/css/styles.css"
 import type { Dashboard, Panel } from "@/hooks/use-dashboards"
-import { buildChartOption, type RunData } from "@/lib/chart"
+import { aggregate, buildChartOption, type RunData } from "@/lib/chart"
 import { cn } from "@/lib/utils"
 
 type Props = {
@@ -73,8 +73,11 @@ export default function DashboardGrid({ dashboard, editable = false, layout, onL
           resizeConfig={editable ? { enabled: true } : { enabled: false }}
           onLayoutChange={onLayoutChange}
         >
-          {dashboard.panels.map((panel) => (
-            <div key={panel.id} className="group relative flex h-full flex-col overflow-hidden rounded-lg border bg-background shadow-sm">
+          {dashboard.panels.map((panel) => {
+            const cfg = (panel.config as Record<string, unknown>) ?? {}
+            const pad = Number(cfg.padding) || 8
+            return (
+            <div key={panel.id} className="group relative flex h-full flex-col overflow-hidden rounded border bg-background shadow-sm">
               {editable && (
                 <PanelMenu
                   panel={panel}
@@ -82,7 +85,7 @@ export default function DashboardGrid({ dashboard, editable = false, layout, onL
                   onDelete={onDeletePanel}
                 />
               )}
-              <div className="flex-1 overflow-hidden p-2">
+              <div className="flex-1 overflow-hidden" style={{ padding: pad }}>
                 {panel.chartType === "text" ? (
                   <TextPanel panel={panel} />
                 ) : panel.dataSetId ? <PanelBody panel={panel} data={panelData[panel.id]} /> : (
@@ -90,7 +93,8 @@ export default function DashboardGrid({ dashboard, editable = false, layout, onL
                 )}
               </div>
             </div>
-          ))}
+            )
+          })}
         </GridLayout>
       )}
     </div>
@@ -151,7 +155,7 @@ function PanelMenu({ panel, onEdit, onDelete }: {
 }
 
 function TextPanel({ panel }: { panel: Panel }) {
-  const config = (panel.config ?? {}) as { content?: string; level?: string; color?: string; align?: string }
+  const config = (panel.config ?? {}) as { content?: string; level?: string; color?: string; align?: string; valign?: string }
   const content = config.content ?? ""
   const level = config.level ?? "p"
   const Tag = level === "p" ? "p" : (level as keyof React.JSX.IntrinsicElements)
@@ -163,14 +167,25 @@ function TextPanel({ panel }: { panel: Panel }) {
     h5: "text-base font-medium",
     h6: "text-sm font-medium",
   }
+  const vAlignClass = {
+    top: "justify-start",
+    center: "justify-center",
+    bottom: "justify-end",
+  }[config.valign ?? "top"] ?? "justify-start"
   return (
-    <div className="h-full overflow-auto p-1" style={{ color: config.color || undefined, textAlign: (config.align as "left" | "center" | "right") || undefined }}>
+    <div
+      className={`flex h-full w-full flex-col scroll-hidden p-1 ${vAlignClass}`}
+      style={{
+        color: config.color || undefined,
+        textAlign: (config.align as "left" | "center" | "right") || undefined,
+      }}
+    >
       <Tag className={`${level === "p" ? "text-sm" : sizeMap[level] ?? "text-sm"} whitespace-pre-wrap`}>{content}</Tag>
     </div>
   )
 }
 
-function PanelBody({ panel, data }: { panel: Panel; data: RunData | null | undefined }) {
+export function PanelBody({ panel, data, preview = false }: { panel: Panel; data: RunData | null | undefined; preview?: boolean }) {
   if (data === undefined) {
     return (
       <div className="flex h-full items-center justify-center text-muted-foreground">
@@ -182,6 +197,13 @@ function PanelBody({ panel, data }: { panel: Panel; data: RunData | null | undef
     return <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No data</div>
   }
   if (panel.chartType === "pivot") {
+    if (preview) {
+      return (
+        <div className="flex h-full items-center justify-center">
+          <span className="p-2 text-[10px] text-muted-foreground text-center">Pivot preview</span>
+        </div>
+      )
+    }
     const rows = data.rows.slice(0, 200)
     const cols = data.columns
     if (cols.length < 2) {
@@ -199,7 +221,7 @@ function PanelBody({ panel, data }: { panel: Panel; data: RunData | null | undef
     }
     const sortedX = [...xVals].sort()
     return (
-      <div className="h-full overflow-auto">
+      <div className="h-full scroll-hidden">
         <table className="w-full text-xs border-separate border-spacing-0">
           <thead>
             <tr className="border-b text-left">
@@ -223,40 +245,55 @@ function PanelBody({ panel, data }: { panel: Panel; data: RunData | null | undef
   if (panel.chartType === "kpi") {
     const rows = data.rows
     if (rows.length === 0) return <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No data</div>
-    const val = parseFloat(rows[0].values[0]) || 0
-    const label = data.columns[1] ?? data.columns[0] ?? "KPI"
-    const prev = rows.length > 1 ? parseFloat(rows[1]?.values[0]) || 0 : null
-    const delta = prev !== null ? ((val - prev) / (prev || 1)) * 100 : null
-    return (
+    const cfg = (panel.config as Record<string, unknown>) ?? {}
+    const column = Number(cfg.column) || 0
+    const agg = (cfg.agg as string) || "sum"
+    const vals = rows.map((r) => r.values[column]).filter((v) => v !== null && v !== undefined && v !== "")
+    const val = aggregate(vals, agg)
+    const label = data.columns[column] ?? data.columns[0] ?? "KPI"
+    return preview ? (
+      <div className="flex h-full flex-col items-center justify-center">
+        <span className="text-xl font-bold">{val.toLocaleString()}</span>
+      </div>
+    ) : (
       <div className="flex h-full flex-col items-center justify-center">
         <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</span>
         <span className="text-3xl font-bold mt-1">{val.toLocaleString()}</span>
-        {delta !== null && (
-          <span className={`text-xs mt-1 font-medium ${delta >= 0 ? "text-emerald-500" : "text-destructive"}`}>
-            {delta >= 0 ? "↑" : "↓"} {Math.abs(delta).toFixed(1)}%
-          </span>
-        )}
       </div>
     )
   }
 
   if (panel.chartType === "table" || !panel.chartType) {
-    const rows = data.rows.slice(0, 100)
-    return (
-      <div className="h-full overflow-auto">
+    const rows = data.rows.slice(0, preview ? 4 : 100)
+    const cfg = (panel.config as Record<string, unknown>) ?? {}
+    const sel = (cfg.columns as number[]) ?? []
+    const idxs = sel.length ? sel : data.columns.map((_: string, i: number) => i)
+    return preview ? (
+      <div className="overflow-auto max-h-32">
+        <table className="w-full text-[9px]">
+          <thead><tr className="border-b">{idxs.map((i) => <th key={i} className="px-1.5 py-0.5 text-left">{data.columns[i]}</th>)}</tr></thead>
+          <tbody>
+            {rows.map((r, i) => (
+              <tr key={i} className="border-b last:border-0">{idxs.map((j) => <td key={j} className="px-1.5 py-0.5">{r.values[j]}</td>)}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ) : (
+      <div className="h-full scroll-hidden">
         <table className="w-full text-xs">
           <thead>
             <tr className="border-b text-left">
-              {data.columns.map((c) => (
-                <th key={c} className="px-2 py-1 font-medium">{c}</th>
+              {idxs.map((i) => (
+                <th key={i} className="px-2 py-1 font-medium">{data.columns[i]}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {rows.map((r, i) => (
               <tr key={i} className="border-b last:border-0">
-                {r.values.map((v, j) => (
-                  <td key={j} className="px-2 py-1">{v}</td>
+                {idxs.map((j) => (
+                  <td key={j} className="px-2 py-1">{r.values[j]}</td>
                 ))}
               </tr>
             ))}
@@ -267,5 +304,9 @@ function PanelBody({ panel, data }: { panel: Panel; data: RunData | null | undef
   }
   const option = buildChartOption(panel, data)
   if (!option) return <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No data</div>
-  return <ReactECharts option={option} notMerge style={{ height: "100%", width: "100%" }} />
+  return preview ? (
+    <ReactECharts option={option} notMerge style={{ height: 120, width: "100%" }} />
+  ) : (
+    <ReactECharts option={option} notMerge style={{ height: "100%", width: "100%" }} />
+  )
 }
