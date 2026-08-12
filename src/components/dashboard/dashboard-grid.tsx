@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react"
 import GridLayout, { useContainerWidth, type Layout } from "react-grid-layout"
-import { GripVertical, Loader2, MoreVertical, Pencil, Trash2 } from "lucide-react"
+import { GripVertical, ImageDown, Loader2, MoreVertical, Pencil, Trash2 } from "lucide-react"
+import { toPng } from "html-to-image"
 import "./react-grid.css"
 import type { Dashboard, Panel } from "@/hooks/use-dashboards"
 import { type RunData } from "@/lib/chart"
@@ -25,9 +26,41 @@ type Props = {
   className?: string
 }
 
+async function downloadPanelImage(panel: Panel, node: HTMLElement) {
+  const safe = (panel.title || "panel").replace(/[^\w\- ]+/g, "").trim() || "panel"
+  const download = (dataUrl: string) => {
+    const a = document.createElement("a")
+    a.href = dataUrl
+    a.download = `${safe}.png`
+    a.click()
+  }
+
+  for (const opts of [{ pixelRatio: 2 }, { pixelRatio: 2, skipFonts: true }]) {
+    try {
+      const dataUrl = await toPng(node, opts)
+      return download(dataUrl)
+    } catch {
+      // try next strategy
+    }
+  }
+
+  const canvas = node.querySelector("canvas")
+  if (canvas) {
+    try {
+      return download(canvas.toDataURL("image/png"))
+    } catch {
+      // fall through
+    }
+  }
+
+  console.error("Failed to export panel image")
+  alert("Gagal mengekspor gambar panel")
+}
+
 export default function DashboardGrid({ dashboard, editable = false, layout, onLayoutChange, onEditPanel, onDeletePanel, className }: Props) {
   const { width, containerRef, mounted } = useContainerWidth()
   const panelData = usePanelData(dashboard.panels)
+  const panelRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
   if (!dashboard.panels?.length) {
     return (
@@ -60,12 +93,23 @@ export default function DashboardGrid({ dashboard, editable = false, layout, onL
             const titleEl = renderPanelTitle(panel.title, cfg)
 
             return (
-              <div key={panel.id} className="group relative flex h-full flex-col overflow-hidden rounded border bg-background shadow-sm">
+              <div
+                key={panel.id}
+                ref={(el) => {
+                  if (el) panelRefs.current.set(panel.id, el)
+                  else panelRefs.current.delete(panel.id)
+                }}
+                className="group relative flex h-full flex-col overflow-hidden rounded border bg-background shadow-sm"
+              >
                 {editable && (
                   <PanelMenu
                     panel={panel}
                     onEdit={onEditPanel}
                     onDelete={onDeletePanel}
+                    onDownload={(p) => {
+                      const node = panelRefs.current.get(p.id)
+                      if (node) downloadPanelImage(p, node)
+                    }}
                   />
                 )}
                 {titlePosition === "top" && titleEl}
@@ -88,10 +132,11 @@ export default function DashboardGrid({ dashboard, editable = false, layout, onL
   )
 }
 
-function PanelMenu({ panel, onEdit, onDelete }: {
+function PanelMenu({ panel, onEdit, onDelete, onDownload }: {
   panel: Panel
   onEdit?: (panel: Panel) => void
   onDelete?: (panelId: string) => void
+  onDownload?: (panel: Panel) => void
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -125,6 +170,14 @@ function PanelMenu({ panel, onEdit, onDelete }: {
               className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs hover:bg-muted"
             >
               <Pencil className="size-3.5" /> Edit
+            </button>
+          )}
+          {onDownload && (
+            <button
+              onClick={() => { setOpen(false); onDownload(panel) }}
+              className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs hover:bg-muted"
+            >
+              <ImageDown className="size-3.5" /> Download Image
             </button>
           )}
           {onDelete && (

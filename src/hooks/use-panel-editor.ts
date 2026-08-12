@@ -46,7 +46,7 @@ export function usePanelEditor(id: string) {
   const [titleColor, setTitleColor] = useState("")
   const [titleSize, setTitleSize] = useState(12)
   const [columns, setColumns] = useState<string[]>([])
-  const [tableColumns, setTableColumns] = useState<Set<number>>(new Set())
+  const [tableColumns, setTableColumns] = useState<number[]>([])
   const [tableScroll, setTableScroll] = useState<"vertical" | "horizontal">("vertical")
   const [previewData, setPreviewData] = useState<PreviewData | null>(null)
   const [columnsLoading, setColumnsLoading] = useState(false)
@@ -54,8 +54,8 @@ export function usePanelEditor(id: string) {
   const [datasetColumns, setDatasetColumns] = useState<Record<string, string[]>>({})
 
   useEffect(() => {
-    if (chartType === "table" && columns.length > 0 && tableColumns.size === 0) {
-      setTableColumns(new Set(columns.map((_: string, i: number) => i)))
+    if (chartType === "table" && columns.length > 0 && tableColumns.length === 0) {
+      setTableColumns(columns.map((_: string, i: number) => i))
     }
   }, [chartType, columns, tableColumns])
 
@@ -69,7 +69,7 @@ export function usePanelEditor(id: string) {
         if (!cancelled && data?.columns) {
           setColumns(data.columns)
           setPreviewData(data)
-          if (chartType === "table") setTableColumns(new Set(data.columns.map((_: string, i: number) => i)))
+          if (chartType === "table") setTableColumns(data.columns.map((_: string, i: number) => i))
         }
       })
       .finally(() => { if (!cancelled) setColumnsLoading(false) })
@@ -115,7 +115,7 @@ export function usePanelEditor(id: string) {
     const config = chartType === "text"
       ? { content: panelText, level: panelTextLevel, color: panelTextColor, align: panelTextAlign, valign: panelTextVAlign, padding: panelPadding, ...titleConfig }
       : chartType === "kpi" ? { column: yColumn, agg: yAgg, padding: panelPadding, ...titleConfig }
-      : chartType === "table" ? { columns: [...tableColumns].sort((a, b) => a - b), tableScroll, padding: panelPadding, ...titleConfig }
+      : chartType === "table" ? { columns: tableColumns, tableScroll, padding: panelPadding, ...titleConfig }
       : chartType === "pie" ? { xColumn, yColumn, yAgg, pieMode, donutThickness, padding: panelPadding, ...titleConfig }
       : { xColumn, yColumn, yAgg, lineFill, barOrientation, padding: panelPadding, ...titleConfig }
     const title = panelTitle || selectedDataset?.name || "Panel"
@@ -184,7 +184,7 @@ export function usePanelEditor(id: string) {
       }
       if (panel.chartType === "table") {
         const cols = (cfg.columns as number[]) ?? []
-        setTableColumns(new Set(cols.length ? cols : columns.map((_: string, i: number) => i)))
+        setTableColumns(cols.length ? cols : columns.map((_: string, i: number) => i))
         setTableScroll((cfg.tableScroll as "vertical" | "horizontal") || "vertical")
       }
       if (panel.chartType === "line" || panel.chartType === "area") {

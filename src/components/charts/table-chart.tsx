@@ -30,7 +30,7 @@ export function TableChart({ panel, data, preview = false }: Props) {
         overflowY: "auto",
       }}
     >
-      <table className={cn("border-collapse", horizontal && "min-w-full whitespace-nowrap")}>
+      <table className={cn("border-collapse", horizontal ? "min-w-full whitespace-nowrap" : "w-full")}>
         <thead>
           <tr>
             {idxs.map((i) => (

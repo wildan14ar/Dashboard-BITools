@@ -1,6 +1,7 @@
 "use client"
 
-import { Plus, Save, Table2, BarChart3, PieChart, Target, Type, LineChart } from "lucide-react"
+import { useState } from "react"
+import { Plus, Save, Table2, BarChart3, PieChart, Target, Type, LineChart, GripVertical, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { AxisDrop } from "./axis-drop"
@@ -44,7 +45,7 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
   const chartConfig = chartType === "kpi"
     ? { column: yColumn, agg: yAgg }
     : chartType === "table"
-      ? { columns: [...tableColumns].sort((a, b) => a - b), tableScroll }
+      ? { columns: tableColumns, tableScroll }
       : chartType === "pie"
         ? { xColumn, yColumn, yAgg, pieMode, donutThickness }
         : { xColumn, yColumn, yAgg, lineFill, barOrientation }
@@ -180,23 +181,10 @@ function TitlePositionEditor({ editor }: { editor: PanelEditor }) {
 }
 
 function NonTextConfig({ editor }: { editor: PanelEditor }) {
-  const { chartType, datasetId, datasets, selectDataset } = editor
+  const { chartType } = editor
 
   return (
     <>
-      <Field label="Dataset">
-        <select
-          value={datasetId}
-          onChange={(e) => selectDataset(e.target.value)}
-          className="h-8 w-full rounded-md border bg-background px-2 text-xs outline-none focus:border-ring"
-        >
-          <option value="">Select a dataset</option>
-          {datasets.map((ds) => (
-            <option key={ds.id} value={ds.id}>{ds.name}</option>
-          ))}
-        </select>
-      </Field>
-
       {chartType === "kpi" ? (
         <KpiConfig editor={editor} />
       ) : chartType === "table" ? (
@@ -349,50 +337,92 @@ const SCROLL_OPTIONS = [
 ]
 
 function TableConfig({ editor }: { editor: PanelEditor }) {
-  const { columns, columnsLoading, tableColumns, setTableColumns, tableScroll, setTableScroll } = editor
+  const { columns, tableColumns, setTableColumns, tableScroll, setTableScroll, datasetId, selectDataset } = editor
+  const [over, setOver] = useState(false)
+  const [draggingIdx, setDraggingIdx] = useState<number | null>(null)
 
-  return (
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setOver(false)
+    const dsId = e.dataTransfer.getData("dataset-id")
+    const colIdx = Number(e.dataTransfer.getData("column-index"))
+    if (dsId && dsId !== datasetId) {
+      selectDataset(dsId)
+    } else if (!Number.isNaN(colIdx) && !tableColumns.includes(colIdx)) {
+      setTableColumns((prev) => [...prev, colIdx])
+    }
+  }
+
+  const removeColumn = (idx: number) => {
+    setTableColumns((prev) => prev.filter((_, i) => i !== idx))
+  }
+
+  const moveColumn = (from: number, to: number) => {
+    setTableColumns((prev) => {
+      if (from === to || from < 0 || to < 0 || from >= prev.length || to >= prev.length) return prev
+      const next = [...prev]
+      const [item] = next.splice(from, 1)
+      next.splice(to, 0, item)
+      return next
+    })
+  }
+
+return (
     <>
-      <div className="flex flex-col gap-1.5">
-        <div className="flex items-center justify-between">
-          <FieldLabel>Columns</FieldLabel>
-          <button
-            onClick={() => {
-              if (tableColumns.size === columns.length) setTableColumns(() => new Set())
-              else setTableColumns(() => new Set(columns.map((_: string, i: number) => i)))
-            }}
-            className="text-[10px] text-muted-foreground underline"
-          >
-            {tableColumns.size === columns.length ? "clear" : "select all"}
-          </button>
+      <Field label="Columns">
+        <div
+          onDragOver={(e) => { e.preventDefault(); setOver(true) }}
+          onDragLeave={() => setOver(false)}
+          onDrop={handleDrop}
+          className={cn(
+            "flex h-8 items-center rounded-md border border-dashed px-2 text-[10px] transition-colors",
+            over ? "border-primary bg-primary/5 text-primary" : "border-border text-muted-foreground/50"
+          )}
+        >
+          Drop column field to add
         </div>
-        {columnsLoading ? (
-          <span className="text-sm text-muted-foreground">Loading…</span>
-        ) : columns.length > 0 ? (
-          <div className="max-h-40 overflow-auto rounded-md border divide-y">
-            {columns.map((col, i) => (
-              <label key={col} className="flex items-center gap-2 px-2 py-1.5 text-xs hover:bg-muted/50 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={tableColumns.has(i)}
-                  onChange={() => {
-                    setTableColumns((prev) => {
-                      const next = new Set(prev)
-                      if (next.has(i)) next.delete(i)
-                      else next.add(i)
-                      return next
-                    })
-                  }}
-                  className="size-3.5 accent-primary"
-                />
-                <span className="truncate font-mono">{col}</span>
-              </label>
-            ))}
-          </div>
+        {tableColumns.length === 0 ? (
+          <p className="text-[10px] text-muted-foreground">No columns selected — drop a field above</p>
         ) : (
-          <p className="text-[10px] text-muted-foreground">No columns</p>
+          <div className="flex flex-col gap-1">
+            {tableColumns.map((colIdx, i) => {
+              const col = columns[colIdx] ?? `#${colIdx}`
+              return (
+                <div
+                  key={colIdx}
+                  draggable
+                  onDragStart={(e) => {
+                    setDraggingIdx(i)
+                    e.dataTransfer.setData("text/plain", String(i))
+                    e.dataTransfer.effectAllowed = "move"
+                  }}
+                  onDragEnd={() => setDraggingIdx(null)}
+                  onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move" }}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    const from = Number(e.dataTransfer.getData("text/plain"))
+                    if (!Number.isNaN(from)) moveColumn(from, i)
+                  }}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-md border bg-muted/40 px-2 py-1.5 text-xs cursor-grab active:cursor-grabbing",
+                    draggingIdx === i ? "opacity-50" : ""
+                  )}
+                >
+                  <GripVertical className="size-3 shrink-0 opacity-40" />
+                  <span className="truncate flex-1 font-mono">{col}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeColumn(i)}
+                    className="shrink-0 rounded p-0.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <X className="size-3" />
+                  </button>
+                </div>
+              )
+            })}
+          </div>
         )}
-      </div>
+      </Field>
       <Field label="Scroll">
         <Segmented value={tableScroll} onChange={setTableScroll} columns={2} options={SCROLL_OPTIONS} />
       </Field>
