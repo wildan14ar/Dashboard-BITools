@@ -37,6 +37,7 @@ export function usePanelEditor(id: string) {
   const [pieMode, setPieMode] = useState("donut")
   const [donutThickness, setDonutThickness] = useState(45)
   const [lineFill, setLineFill] = useState(false)
+  const [barOrientation, setBarOrientation] = useState<"vertical" | "horizontal">("vertical")
   const [titlePosition, setTitlePosition] = useState<"none" | "top" | "bottom">("top")
   const [titleAlign, setTitleAlign] = useState<"left" | "center" | "right">("left")
   const [titleBold, setTitleBold] = useState(false)
@@ -46,6 +47,7 @@ export function usePanelEditor(id: string) {
   const [titleSize, setTitleSize] = useState(12)
   const [columns, setColumns] = useState<string[]>([])
   const [tableColumns, setTableColumns] = useState<Set<number>>(new Set())
+  const [tableScroll, setTableScroll] = useState<"vertical" | "horizontal">("vertical")
   const [previewData, setPreviewData] = useState<PreviewData | null>(null)
   const [columnsLoading, setColumnsLoading] = useState(false)
   const [expandedDatasets, setExpandedDatasets] = useState<Set<string>>(new Set())
@@ -106,13 +108,16 @@ export function usePanelEditor(id: string) {
 
   const handleAdd = () => {
     if (!datasetId && chartType !== "text") return
-    const titleConfig = { titlePosition, titleAlign, titleBold, titleItalic, titleStrikethrough, titleColor, titleSize }
+    const titleConfig = {
+      titlePosition: chartType === "text" ? "none" : titlePosition,
+      titleAlign, titleBold, titleItalic, titleStrikethrough, titleColor, titleSize,
+    }
     const config = chartType === "text"
       ? { content: panelText, level: panelTextLevel, color: panelTextColor, align: panelTextAlign, valign: panelTextVAlign, padding: panelPadding, ...titleConfig }
       : chartType === "kpi" ? { column: yColumn, agg: yAgg, padding: panelPadding, ...titleConfig }
-      : chartType === "table" ? { columns: [...tableColumns].sort((a, b) => a - b), padding: panelPadding, ...titleConfig }
+      : chartType === "table" ? { columns: [...tableColumns].sort((a, b) => a - b), tableScroll, padding: panelPadding, ...titleConfig }
       : chartType === "pie" ? { xColumn, yColumn, yAgg, pieMode, donutThickness, padding: panelPadding, ...titleConfig }
-      : { xColumn, yColumn, yAgg, lineFill, padding: panelPadding, ...titleConfig }
+      : { xColumn, yColumn, yAgg, lineFill, barOrientation, padding: panelPadding, ...titleConfig }
     const title = panelTitle || selectedDataset?.name || "Panel"
 
     if (editingPanelId) {
@@ -150,6 +155,7 @@ export function usePanelEditor(id: string) {
     setPieMode("donut")
     setDonutThickness(45)
     setLineFill(false)
+    setBarOrientation("vertical")
   }
 
   function handleEditPanel(panel: { id: string; title: string; chartType: string; dataSetId: string | null; config: Record<string, unknown> | null }) {
@@ -179,9 +185,13 @@ export function usePanelEditor(id: string) {
       if (panel.chartType === "table") {
         const cols = (cfg.columns as number[]) ?? []
         setTableColumns(new Set(cols.length ? cols : columns.map((_: string, i: number) => i)))
+        setTableScroll((cfg.tableScroll as "vertical" | "horizontal") || "vertical")
       }
       if (panel.chartType === "line" || panel.chartType === "area") {
         setLineFill(Boolean(cfg.lineFill))
+      }
+      if (panel.chartType === "bar") {
+        setBarOrientation((cfg.barOrientation as "vertical" | "horizontal") || "vertical")
       }
     }
     setTitlePosition((cfg.titlePosition as "none" | "top" | "bottom") || "top")
@@ -206,6 +216,7 @@ export function usePanelEditor(id: string) {
     setPieMode("donut")
     setDonutThickness(45)
     setLineFill(false)
+    setBarOrientation("vertical")
     setTitlePosition("top")
     setTitleAlign("left")
     setTitleBold(false)
@@ -213,6 +224,7 @@ export function usePanelEditor(id: string) {
     setTitleStrikethrough(false)
     setTitleColor("")
     setTitleSize(12)
+    setTableScroll("vertical")
     setColumns([])
   }
 
@@ -280,6 +292,8 @@ export function usePanelEditor(id: string) {
     setDonutThickness,
     lineFill,
     setLineFill,
+    barOrientation,
+    setBarOrientation,
     titlePosition,
     setTitlePosition,
     titleAlign,
@@ -297,6 +311,8 @@ export function usePanelEditor(id: string) {
     columns,
     tableColumns,
     setTableColumns,
+    tableScroll,
+    setTableScroll,
     previewData,
     columnsLoading,
     expandedDatasets,

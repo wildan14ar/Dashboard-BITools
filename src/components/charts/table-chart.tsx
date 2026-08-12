@@ -16,14 +16,21 @@ export function TableChart({ panel, data, preview = false }: Props) {
   const cfg = (panel.config as Record<string, unknown>) ?? {}
   const sel = (cfg.columns as number[]) ?? []
   const idxs = sel.length ? sel : data.columns.map((_: string, i: number) => i)
+  const horizontal = (cfg.tableScroll as string) === "horizontal"
   const cellCls = cn(
     preview ? "px-1.5 py-0.5 text-[9px]" : "px-2 py-1 text-xs",
     "border border-border/70"
   )
 
   return (
-    <div className={cn("scroll-hidden", preview ? "max-h-32 overflow-auto" : "h-full")}>
-      <table className="w-full border-collapse">
+    <div
+      className={cn("scroll-hidden", preview ? "max-h-32" : "h-full")}
+      style={{
+        overflowX: horizontal ? "auto" : "hidden",
+        overflowY: "auto",
+      }}
+    >
+      <table className={cn("border-collapse", horizontal && "min-w-full whitespace-nowrap")}>
         <thead>
           <tr>
             {idxs.map((i) => (

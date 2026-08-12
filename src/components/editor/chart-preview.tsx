@@ -5,11 +5,12 @@ import { renderPanelTitle, type TitleConfig } from "@/components/dashboard/panel
 import type { Panel } from "@/hooks/use-dashboards"
 import type { PreviewData } from "@/hooks/use-panel-editor"
 
-export function ChartPreview({ chartType, data, title, config }: {
+export function ChartPreview({ chartType, data, title, config, chartConfig }: {
   chartType: string
   data: PreviewData
   title: string
   config: TitleConfig
+  chartConfig?: Record<string, unknown>
 }) {
   const titlePosition = config.titlePosition || "top"
   const padding = config.padding ?? 8
@@ -21,7 +22,7 @@ export function ChartPreview({ chartType, data, title, config }: {
     title,
     chartType,
     dataSetId: "_preview",
-    config: {},
+    config: chartConfig ?? {},
     x: 0, y: 0, w: 1, h: 1,
   }
 

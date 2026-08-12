@@ -50,14 +50,20 @@ export function buildChartOption(panel: Panel, data: RunData | null) {
 
   const isArea = panel.chartType === "area"
   const type: "line" | "bar" = isArea ? "line" : (panel.chartType === "line" ? "line" : "bar")
+  const horizontalBar = type === "bar" && (cfg.barOrientation as string) === "horizontal"
+  const categories = rows.map((r) => r[xIdx] ?? "")
 
   return {
       color: CHART_COLORS,
       title: { show: false },
       tooltip: { trigger: "axis" as const },
-    grid: { left: 30, right: 6, top: 6, bottom: 20 },
-    xAxis: { type: "category" as const, data: rows.map((r) => r[xIdx] ?? ""), axisLabel: { fontSize: 9 } },
-    yAxis: { type: "value" as const, axisLabel: { fontSize: 9 } },
+    grid: horizontalBar ? { left: 60, right: 10, top: 6, bottom: 10 } : { left: 30, right: 6, top: 6, bottom: 20 },
+    xAxis: horizontalBar
+      ? { type: "value" as const, axisLabel: { fontSize: 9 } }
+      : { type: "category" as const, data: categories, axisLabel: { fontSize: 9 } },
+    yAxis: horizontalBar
+      ? { type: "category" as const, data: categories, axisLabel: { fontSize: 9 } }
+      : { type: "value" as const, axisLabel: { fontSize: 9 } },
     series: [{
       type,
       data: rows.map((r) => parseFloat(r[yIdx]) || 0),

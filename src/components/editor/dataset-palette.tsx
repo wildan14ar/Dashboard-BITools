@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import type { PanelEditor } from "@/hooks/use-panel-editor"
 
 export function DatasetPalette({ editor }: { editor: PanelEditor }) {
-  const { datasets, datasetId, expandedDatasets, datasetColumns, selectDataset, toggleDatasetExpand } = editor
+  const { datasets, expandedDatasets, datasetColumns, toggleDatasetExpand } = editor
 
   return (
     <aside className="w-52 border-l bg-muted/20 flex flex-col shrink-0">
@@ -29,12 +29,9 @@ export function DatasetPalette({ editor }: { editor: PanelEditor }) {
                     e.dataTransfer.setData("dataset-name", ds.name)
                     e.dataTransfer.effectAllowed = "copy"
                   }}
-                  onClick={() => selectDataset(ds.id)}
                   className={cn(
-                    "flex items-center gap-1 px-2 py-1.5 text-xs transition-colors cursor-pointer group",
-                    datasetId === ds.id
-                      ? "bg-primary/10 text-primary border-l-2 border-l-primary"
-                      : "text-muted-foreground hover:bg-muted/50 hover:text-foreground border-l-2 border-l-transparent"
+                    "flex items-center gap-1 px-2 py-1.5 text-xs transition-colors cursor-grab active:cursor-grabbing group",
+                    "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                   )}
                 >
                   <Layers className="size-3 shrink-0" />
@@ -43,7 +40,6 @@ export function DatasetPalette({ editor }: { editor: PanelEditor }) {
                     onClick={(e) => { e.stopPropagation(); toggleDatasetExpand(ds.id) }}
                     className="flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] hover:bg-muted shrink-0"
                   >
-                    {dsCols.length > 0 && <span className="tabular-nums">{dsCols.length}</span>}
                     {isExpanded ? <ChevronDown className="size-2.5" /> : <ChevronRight className="size-2.5" />}
                   </button>
                 </div>

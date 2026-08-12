@@ -1,6 +1,6 @@
 "use client"
 
-import { Plus, Save, Table2, BarChart3, PieChart, Layers, Target, Type, LineChart } from "lucide-react"
+import { Plus, Save, Table2, BarChart3, PieChart, Target, Type, LineChart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { AxisDrop } from "./axis-drop"
@@ -37,8 +37,17 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
     panelPadding, setPanelPadding,
     titlePosition, setTitlePosition,
     titleAlign, titleBold, titleItalic, titleStrikethrough, titleColor, titleSize,
+    pieMode, donutThickness, lineFill, barOrientation, xColumn, yColumn, yAgg, tableColumns, tableScroll,
     previewData,
   } = editor
+
+  const chartConfig = chartType === "kpi"
+    ? { column: yColumn, agg: yAgg }
+    : chartType === "table"
+      ? { columns: [...tableColumns].sort((a, b) => a - b), tableScroll }
+      : chartType === "pie"
+        ? { xColumn, yColumn, yAgg, pieMode, donutThickness }
+        : { xColumn, yColumn, yAgg, lineFill, barOrientation }
 
   return (
     <aside className="w-64 border-l bg-muted/20 flex flex-col shrink-0 overflow-auto">
@@ -54,6 +63,7 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
             chartType={chartType}
             data={previewData}
             title={panelTitle}
+            chartConfig={chartConfig}
             config={{
               titlePosition,
               titleAlign,
@@ -170,16 +180,22 @@ function TitlePositionEditor({ editor }: { editor: PanelEditor }) {
 }
 
 function NonTextConfig({ editor }: { editor: PanelEditor }) {
-  const { chartType, datasetId, selectedDataset } = editor
+  const { chartType, datasetId, datasets, selectDataset } = editor
 
   return (
     <>
-      {datasetId && (
-        <div className="flex items-center gap-2">
-          <Layers className="size-3.5 text-muted-foreground" />
-          <span className="text-xs font-medium truncate">{selectedDataset?.name ?? "Dataset"}</span>
-        </div>
-      )}
+      <Field label="Dataset">
+        <select
+          value={datasetId}
+          onChange={(e) => selectDataset(e.target.value)}
+          className="h-8 w-full rounded-md border bg-background px-2 text-xs outline-none focus:border-ring"
+        >
+          <option value="">Select a dataset</option>
+          {datasets.map((ds) => (
+            <option key={ds.id} value={ds.id}>{ds.name}</option>
+          ))}
+        </select>
+      </Field>
 
       {chartType === "kpi" ? (
         <KpiConfig editor={editor} />
@@ -189,6 +205,7 @@ function NonTextConfig({ editor }: { editor: PanelEditor }) {
         <ChartConfig editor={editor} />
       )}
 
+      {chartType === "bar" && <BarConfig editor={editor} />}
       {chartType === "line" && <LineConfig editor={editor} />}
       {chartType === "pie" && <PieConfig editor={editor} />}
 
@@ -233,6 +250,20 @@ function LineConfig({ editor }: { editor: PanelEditor }) {
 const LINE_OPTIONS = [
   { value: "line" as const, label: "Line" },
   { value: "area" as const, label: "Area" },
+]
+
+function BarConfig({ editor }: { editor: PanelEditor }) {
+  const { barOrientation, setBarOrientation } = editor
+  return (
+    <Field label="Style">
+      <Segmented value={barOrientation} onChange={setBarOrientation} columns={2} options={BAR_ORIENTATION_OPTIONS} />
+    </Field>
+  )
+}
+
+const BAR_ORIENTATION_OPTIONS = [
+  { value: "vertical" as const, label: "Vertical" },
+  { value: "horizontal" as const, label: "Horizontal" },
 ]
 
 function PieConfig({ editor }: { editor: PanelEditor }) {
@@ -312,50 +343,60 @@ function TextConfig({ editor }: { editor: PanelEditor }) {
   )
 }
 
+const SCROLL_OPTIONS = [
+  { value: "vertical" as const, label: "Vertical" },
+  { value: "horizontal" as const, label: "Horizontal" },
+]
+
 function TableConfig({ editor }: { editor: PanelEditor }) {
-  const { columns, columnsLoading, tableColumns, setTableColumns } = editor
+  const { columns, columnsLoading, tableColumns, setTableColumns, tableScroll, setTableScroll } = editor
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-center justify-between">
-        <FieldLabel>Columns</FieldLabel>
-        <button
-          onClick={() => {
-            if (tableColumns.size === columns.length) setTableColumns(() => new Set())
-            else setTableColumns(() => new Set(columns.map((_: string, i: number) => i)))
-          }}
-          className="text-[10px] text-muted-foreground underline"
-        >
-          {tableColumns.size === columns.length ? "clear" : "select all"}
-        </button>
-      </div>
-      {columnsLoading ? (
-        <span className="text-sm text-muted-foreground">Loading…</span>
-      ) : columns.length > 0 ? (
-        <div className="max-h-40 overflow-auto rounded-md border divide-y">
-          {columns.map((col, i) => (
-            <label key={col} className="flex items-center gap-2 px-2 py-1.5 text-xs hover:bg-muted/50 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={tableColumns.has(i)}
-                onChange={() => {
-                  setTableColumns((prev) => {
-                    const next = new Set(prev)
-                    if (next.has(i)) next.delete(i)
-                    else next.add(i)
-                    return next
-                  })
-                }}
-                className="size-3.5 accent-primary"
-              />
-              <span className="truncate font-mono">{col}</span>
-            </label>
-          ))}
+    <>
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between">
+          <FieldLabel>Columns</FieldLabel>
+          <button
+            onClick={() => {
+              if (tableColumns.size === columns.length) setTableColumns(() => new Set())
+              else setTableColumns(() => new Set(columns.map((_: string, i: number) => i)))
+            }}
+            className="text-[10px] text-muted-foreground underline"
+          >
+            {tableColumns.size === columns.length ? "clear" : "select all"}
+          </button>
         </div>
-      ) : (
-        <p className="text-[10px] text-muted-foreground">No columns</p>
-      )}
-    </div>
+        {columnsLoading ? (
+          <span className="text-sm text-muted-foreground">Loading…</span>
+        ) : columns.length > 0 ? (
+          <div className="max-h-40 overflow-auto rounded-md border divide-y">
+            {columns.map((col, i) => (
+              <label key={col} className="flex items-center gap-2 px-2 py-1.5 text-xs hover:bg-muted/50 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={tableColumns.has(i)}
+                  onChange={() => {
+                    setTableColumns((prev) => {
+                      const next = new Set(prev)
+                      if (next.has(i)) next.delete(i)
+                      else next.add(i)
+                      return next
+                    })
+                  }}
+                  className="size-3.5 accent-primary"
+                />
+                <span className="truncate font-mono">{col}</span>
+              </label>
+            ))}
+          </div>
+        ) : (
+          <p className="text-[10px] text-muted-foreground">No columns</p>
+        )}
+      </div>
+      <Field label="Scroll">
+        <Segmented value={tableScroll} onChange={setTableScroll} columns={2} options={SCROLL_OPTIONS} />
+      </Field>
+    </>
   )
 }
 

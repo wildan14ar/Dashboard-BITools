@@ -50,20 +50,27 @@ export default function DashboardViewer({ id, variant, requirePublic = false }: 
         dragConfig={{ enabled: false }}
         resizeConfig={{ enabled: false }}
       >
-        {dashboard.panels!.map((panel) => (
-          <div key={panel.id} className={cn("overflow-hidden border bg-card", isEmbed ? "rounded" : "rounded-lg shadow-sm")}>
-            <div className={cn("border-b", isEmbed ? "px-2 py-0.5" : "px-3 py-1.5")}>
-              <h3 className={cn("truncate font-medium", isEmbed ? "text-[10px]" : "text-xs")}>{panel.title}</h3>
-            </div>
-            <div className={cn(isEmbed ? "h-[calc(100%-20px)]" : "h-[calc(100%-32px)]")}>
-              {panel.dataSetId ? (
-                <PanelBody panel={panel} data={panelData[panel.id]} />
-              ) : (
-                <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No dataset</div>
+        {dashboard.panels!.map((panel) => {
+          const cfg = (panel.config as Record<string, unknown>) ?? {}
+          const titlePosition = (cfg.titlePosition as string) || "top"
+          const showTitle = titlePosition !== "none" && !!panel.title
+          return (
+            <div key={panel.id} className={cn("overflow-hidden border bg-card", isEmbed ? "rounded" : "rounded-lg shadow-sm")}>
+              {showTitle && (
+                <div className={cn("border-b", isEmbed ? "px-2 py-0.5" : "px-3 py-1.5")}>
+                  <h3 className={cn("truncate font-medium", isEmbed ? "text-[10px]" : "text-xs")}>{panel.title}</h3>
+                </div>
               )}
+              <div className={cn(showTitle ? (isEmbed ? "h-[calc(100%-20px)]" : "h-[calc(100%-32px)]") : "h-full")}>
+                {panel.dataSetId ? (
+                  <PanelBody panel={panel} data={panelData[panel.id]} />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No dataset</div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </GridLayout>
     </div>
   )
