@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Plus, Trash2, FlaskConical, Eye, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog } from "@/components/ui/dialog"
-import { SourceForm } from "@/components/source-form"
+import { SourceForm } from "@/components/sources/source-form"
 import { useSources, useCreateSource, useUpdateSource, useDeleteSource, useTestSource, type Source } from "@/hooks/use-sources"
 import type { SourceInput } from "@/validation/source"
 

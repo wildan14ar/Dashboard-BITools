@@ -4,8 +4,8 @@ import { usePathname } from "next/navigation";
 import { JSX, ReactNode, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { PanelLeftClose, PanelLeftOpen, ChevronDown } from "lucide-react";
-import ButtonLogout from "@/components/atoms/ButtonLogout";
-import ButtonTheme from "@/components/atoms/ButtonTheme";
+import ButtonLogout from "@/components/layout/button-logout";
+import ButtonTheme from "@/components/layout/button-theme";
 import Link from "next/link";
 import { useLanguage } from "@/hooks/use-language";
 

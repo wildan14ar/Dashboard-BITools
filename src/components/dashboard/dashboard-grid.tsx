@@ -8,7 +8,7 @@ import { Loader2, MoreVertical, Pencil, Trash2, GripVertical } from "lucide-reac
 import "./react-grid.css"
 import type { Dashboard, Panel } from "@/hooks/use-dashboards"
 import { type RunData } from "@/lib/chart"
-import { renderPanelTitle } from "./PanelTitle"
+import { renderPanelTitle } from "@/components/dashboard/panel-title"
 import {
   TextChart,
   KpiChart,
@@ -16,7 +16,7 @@ import {
   LineChart,
   BarChart,
   PieChart,
-} from "./Charts"
+} from "@/components/charts"
 
 type Props = {
   dashboard: Dashboard

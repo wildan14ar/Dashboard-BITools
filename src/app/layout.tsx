@@ -1,5 +1,5 @@
 import "./globals.css"
-import LayoutWrapper from "@/components/layout-wrapper"
+import LayoutWrapper from "@/components/layout/layout-wrapper"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

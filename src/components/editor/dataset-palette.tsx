@@ -2,7 +2,7 @@
 
 import { Layers, ChevronRight, ChevronDown, GripVertical } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { PanelEditor } from "./use-panel-editor"
+import type { PanelEditor } from "@/hooks/use-panel-editor"
 
 export function DatasetPalette({ editor }: { editor: PanelEditor }) {
   const { datasets, datasetId, expandedDatasets, datasetColumns, selectDataset, toggleDatasetExpand } = editor

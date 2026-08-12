@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { AxisDrop } from "./axis-drop"
 import { ChartPreview } from "./chart-preview"
-import type { PanelEditor } from "./use-panel-editor"
+import type { PanelEditor } from "@/hooks/use-panel-editor"
 
 const CHART_TYPES = [
   { value: "text", label: "Text", icon: Type },

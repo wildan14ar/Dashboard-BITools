@@ -1,8 +1,8 @@
 "use client"
 
-import { PanelBody } from "@/components/dashboard-grid"
+import { PanelBody } from "@/components/dashboard/dashboard-grid"
 import type { Panel } from "@/hooks/use-dashboards"
-import type { PreviewData } from "./use-panel-editor"
+import type { PreviewData } from "@/hooks/use-panel-editor"
 
 export function ChartPreview({ chartType, data, title, config }: {
   chartType: string

@@ -4,8 +4,8 @@ import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { SessionProvider } from "next-auth/react"
 import { Database, BarChart3, Users, Layers } from "lucide-react"
-import Sidebar from "@/components/sidebar"
-import type { MenuItem } from "@/components/sidebar"
+import Sidebar from "@/components/layout/sidebar"
+import type { MenuItem } from "@/components/layout/sidebar"
 
 const menuConfig: MenuItem[] = [
   { key: "dashboards", translations: { en: "Dashboards" }, icon: <BarChart3 size={18} />, href: "/" },

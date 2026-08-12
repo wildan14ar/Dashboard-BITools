@@ -14,7 +14,7 @@ import { Dialog } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 import { useSource, useSourceSchema, type TableItem, type ColumnInfo } from "@/hooks/use-sources"
 import { useCreateDataset } from "@/hooks/use-datasets"
-import { SchemaERD } from "@/components/schema-erd"
+import { SchemaERD } from "@/components/sources/schema-erd"
 
 type QueryResult = { columns: string[]; rows: { values: string[] }[]; rowCount: number; executionTimeMs: number } | null
 type TabKind = "table" | "query" | "erd"

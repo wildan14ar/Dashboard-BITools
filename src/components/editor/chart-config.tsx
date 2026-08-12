@@ -2,8 +2,8 @@
 
 import { Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { PanelEditor } from "@/app/(protected)/[id]/_components/use-panel-editor"
-import { AxisDrop } from "@/app/(protected)/[id]/_components/axis-drop"
+import type { PanelEditor } from "@/hooks/use-panel-editor"
+import { AxisDrop } from "@/components/editor/axis-drop"
 
 export function ChartConfig({ editor }: { editor: PanelEditor }) {
   const {

@@ -4,10 +4,10 @@ import { useParams } from "next/navigation"
 import { Save, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Layout } from "react-grid-layout"
-import DashboardGrid from "@/components/dashboard-grid"
-import { usePanelEditor } from "../_components/use-panel-editor"
-import { ChartConfigSidebar } from "../_components/chart-config-sidebar"
-import { DatasetPalette } from "../_components/dataset-palette"
+import DashboardGrid from "@/components/dashboard/dashboard-grid"
+import { usePanelEditor } from "@/hooks/use-panel-editor"
+import { ChartConfigSidebar } from "@/components/editor/chart-config-sidebar"
+import { DatasetPalette } from "@/components/editor/dataset-palette"
 
 export default function DashboardEditPage() {
   const { id } = useParams<{ id: string }>()
