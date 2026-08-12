@@ -1,21 +1,18 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import axios from "axios"
-import { useContainerWidth } from "react-grid-layout"
-import GridLayout, { type Layout } from "react-grid-layout"
-import { Loader2, MoreVertical, Pencil, Trash2, GripVertical } from "lucide-react"
+import GridLayout, { useContainerWidth, type Layout } from "react-grid-layout"
+import { GripVertical, Loader2, MoreVertical, Pencil, Trash2 } from "lucide-react"
 import "./react-grid.css"
 import type { Dashboard, Panel } from "@/hooks/use-dashboards"
 import { type RunData } from "@/lib/chart"
+import { usePanelData } from "@/hooks/use-panel-data"
 import { renderPanelTitle } from "@/components/dashboard/panel-title"
 import {
-  TextChart,
+  EChart,
   KpiChart,
   TableChart,
-  LineChart,
-  BarChart,
-  PieChart,
+  TextChart,
 } from "@/components/charts"
 
 type Props = {
@@ -30,31 +27,7 @@ type Props = {
 
 export default function DashboardGrid({ dashboard, editable = false, layout, onLayoutChange, onEditPanel, onDeletePanel, className }: Props) {
   const { width, containerRef, mounted } = useContainerWidth()
-  const [panelData, setPanelData] = useState<Record<string, RunData | null>>({})
-
-  useEffect(() => {
-    if (!dashboard.panels?.length) return
-    let cancelled = false
-    const runAll = async () => {
-      const results: Record<string, RunData | null> = {}
-      await Promise.all(
-        dashboard.panels!.map(async (panel) => {
-          if (!panel.dataSetId) return
-          try {
-            const res = await axios.post(`/api/datasets/${panel.dataSetId}/run`, { cache: false })
-            results[panel.id] = res.data ?? null
-          } catch {
-            results[panel.id] = null
-          }
-        })
-      )
-      if (!cancelled) setPanelData(results)
-    }
-    runAll()
-    return () => {
-      cancelled = true
-    }
-  }, [dashboard.panels])
+  const panelData = usePanelData(dashboard.panels)
 
   if (!dashboard.panels?.length) {
     return (
@@ -84,8 +57,7 @@ export default function DashboardGrid({ dashboard, editable = false, layout, onL
             const cfg = (panel.config as Record<string, unknown>) ?? {}
             const pad = Number(cfg.padding) || 8
             const titlePosition = (cfg.titlePosition as string) || "top"
-            const panelTitle = panel.title
-            const titleEl = renderPanelTitle(panelTitle, cfg)
+            const titleEl = renderPanelTitle(panel.title, cfg)
 
             return (
               <div key={panel.id} className="group relative flex h-full flex-col overflow-hidden rounded border bg-background shadow-sm">
@@ -187,14 +159,7 @@ export function PanelBody({ panel, data, preview = false }: { panel: Panel; data
     case "table":
     case "":
       return <TableChart panel={panel} data={data} preview={preview} />
-    case "pie":
-      return <PieChart panel={panel} data={data} preview={preview} />
-    case "bar":
-      return <BarChart panel={panel} data={data} preview={preview} />
-    case "line":
-    case "area":
-      return <LineChart panel={panel} data={data} preview={preview} />
     default:
-      return <LineChart panel={panel} data={data} preview={preview} />
+      return <EChart panel={panel} data={data} preview={preview} />
   }
 }

@@ -3,8 +3,10 @@ import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcrypt"
 import { prisma } from "@/lib/prisma"
 import { loginSchema } from "@/validation/auth"
+import { authConfig } from "@/auth.config"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   providers: [
     Credentials({
       credentials: {
@@ -27,18 +29,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  session: { strategy: "jwt" },
-  pages: {
-    signIn: "/login",
-  },
-  callbacks: {
-    jwt({ token, user }) {
-      if (user) token.isSuperAdmin = user.isSuperAdmin as boolean
-      return token
-    },
-    session({ session, token }) {
-      session.user.isSuperAdmin = token.isSuperAdmin as boolean
-      return session
-    },
-  },
 })

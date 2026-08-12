@@ -1,5 +1,6 @@
 import type { Panel } from "@/hooks/use-dashboards"
 import type { RunData } from "@/lib/chart"
+import { cn } from "@/lib/utils"
 
 type Props = {
   panel: Panel
@@ -15,29 +16,15 @@ export function TableChart({ panel, data, preview = false }: Props) {
   const cfg = (panel.config as Record<string, unknown>) ?? {}
   const sel = (cfg.columns as number[]) ?? []
   const idxs = sel.length ? sel : data.columns.map((_: string, i: number) => i)
-
-  if (preview) {
-    return (
-      <div className="overflow-auto max-h-32">
-        <table className="w-full text-[9px]">
-          <thead><tr className="border-b">{idxs.map((i) => <th key={i} className="px-1.5 py-0.5 text-left">{data.columns[i]}</th>)}</tr></thead>
-          <tbody>
-            {rows.map((r, i) => (
-              <tr key={i} className="border-b last:border-0">{idxs.map((j) => <td key={j} className="px-1.5 py-0.5">{r.values[j]}</td>)}</tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    )
-  }
+  const cellCls = preview ? "px-1.5 py-0.5 text-[9px]" : "px-2 py-1 text-xs"
 
   return (
-    <div className="h-full scroll-hidden">
-      <table className="w-full text-xs">
+    <div className={cn("scroll-hidden", preview ? "max-h-32 overflow-auto" : "h-full")}>
+      <table className="w-full">
         <thead>
           <tr className="border-b text-left">
             {idxs.map((i) => (
-              <th key={i} className="px-2 py-1 font-medium">{data.columns[i]}</th>
+              <th key={i} className={cn("font-medium", cellCls)}>{data.columns[i]}</th>
             ))}
           </tr>
         </thead>
@@ -45,7 +32,7 @@ export function TableChart({ panel, data, preview = false }: Props) {
           {rows.map((r, i) => (
             <tr key={i} className="border-b last:border-0">
               {idxs.map((j) => (
-                <td key={j} className="px-2 py-1">{r.values[j]}</td>
+                <td key={j} className={cellCls}>{r.values[j]}</td>
               ))}
             </tr>
           ))}

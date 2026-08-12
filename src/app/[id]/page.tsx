@@ -22,7 +22,7 @@ export default function DashboardViewPage() {
           {dashboard.description && <p className="mt-1 text-sm text-muted-foreground">{dashboard.description}</p>}
         </div>
         <div className="flex items-center gap-2">
-          <Link href={`/embed/${dashboard.id}`} target="_blank">
+          <Link href={`/bi/embed/${dashboard.id}`} target="_blank">
             <Button variant="outline" size="sm"><ExternalLink className="size-4" /> Embed</Button>
           </Link>
           <Link href={`/${dashboard.id}/edit`}>

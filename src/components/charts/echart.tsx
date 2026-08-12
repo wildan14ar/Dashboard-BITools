@@ -7,10 +7,17 @@ type Props = {
   panel: Panel
   data: RunData | null | undefined
   preview?: boolean
+  chartType?: string
 }
 
-export function BarChart({ panel, data, preview = false }: Props) {
-  const option = data === undefined ? null : buildChartOption({ ...panel, chartType: "bar" }, data ?? null)
+export function EChart({ panel, data, preview = false, chartType }: Props) {
+  const cfg = (panel.config ?? {}) as Record<string, unknown>
+  const rawType = chartType ?? panel.chartType
+  const resolvedType =
+    rawType === "line" || rawType === "area"
+      ? cfg.lineFill ? "area" : "line"
+      : rawType
+  const option = data === undefined ? null : buildChartOption({ ...panel, chartType: resolvedType }, data ?? null)
   if (!option) {
     return <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No data</div>
   }

@@ -1,14 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import axios from "axios"
 import GridLayout from "react-grid-layout"
 import { Loader2 } from "lucide-react"
 import "./react-grid.css"
 import { useDashboard } from "@/hooks/use-dashboards"
+import { usePanelData } from "@/hooks/use-panel-data"
 import { PanelBody } from "@/components/dashboard/dashboard-grid"
 import { cn } from "@/lib/utils"
-import type { RunData } from "@/lib/chart"
 
 type Props = {
   id: string
@@ -18,31 +16,7 @@ type Props = {
 
 export default function DashboardViewer({ id, variant, requirePublic = false }: Props) {
   const { data: dashboard, isLoading } = useDashboard(id)
-  const [panelData, setPanelData] = useState<Record<string, RunData | null>>({})
-
-  useEffect(() => {
-    if (!dashboard?.panels) return
-    let cancelled = false
-    const runAll = async () => {
-      const results: Record<string, RunData | null> = {}
-      await Promise.all(
-        dashboard.panels!.map(async (panel) => {
-          if (!panel.dataSetId) return
-          try {
-            const res = await axios.post(`/api/datasets/${panel.dataSetId}/run`, { cache: false })
-            results[panel.id] = res.data ?? null
-          } catch {
-            results[panel.id] = null
-          }
-        })
-      )
-      if (!cancelled) setPanelData(results)
-    }
-    runAll()
-    return () => {
-      cancelled = true
-    }
-  }, [dashboard])
+  const panelData = usePanelData(dashboard?.panels)
 
   if (isLoading) {
     return (
