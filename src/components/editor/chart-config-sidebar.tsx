@@ -71,14 +71,25 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
           </div>
         )}
 
-        <Field label="Title">
-          <input
-            value={panelTitle}
-            onChange={(e) => setPanelTitle(e.target.value)}
-            className="h-8 rounded-md border bg-background px-2 text-xs outline-none focus:border-ring"
-            placeholder="Panel title"
-          />
-        </Field>
+        {chartType !== "text" && (
+          <>
+            <Field label="Title">
+              <input
+                value={panelTitle}
+                onChange={(e) => setPanelTitle(e.target.value)}
+                className="h-8 rounded-md border bg-background px-2 text-xs outline-none focus:border-ring"
+                placeholder="Panel title"
+              />
+            </Field>
+
+            <Field label="Position">
+              <Segmented value={titlePosition} onChange={setTitlePosition} columns={3} options={POSITIONS} />
+              {titlePosition !== "none" && (
+                <TitlePositionEditor editor={editor} />
+              )}
+            </Field>
+          </>
+        )}
 
         <Field label="Chart Type">
           <div className="grid grid-cols-6 gap-1">
@@ -102,13 +113,6 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
 
         <Field label="Padding">
           <RangeField value={panelPadding} onChange={setPanelPadding} min={0} max={32} step={2} suffix="px" />
-        </Field>
-
-        <Field label="Position">
-          <Segmented value={titlePosition} onChange={setTitlePosition} columns={3} options={POSITIONS} />
-          {titlePosition !== "none" && (
-            <TitlePositionEditor editor={editor} />
-          )}
         </Field>
 
         {chartType === "text" ? (
