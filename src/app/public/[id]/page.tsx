@@ -6,7 +6,7 @@ import axios from "axios"
 import ReactECharts from "echarts-for-react"
 import GridLayout from "react-grid-layout"
 import { Loader2 } from "lucide-react"
-import "react-grid-layout/css/styles.css"
+import "@/components/react-grid.css"
 import { useDashboard, type Panel } from "@/hooks/use-dashboards"
 
 const CHART_COLORS = ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4"]
