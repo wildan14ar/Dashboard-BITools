@@ -71,26 +71,6 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
           </div>
         )}
 
-        {chartType !== "text" && (
-          <>
-            <Field label="Title">
-              <input
-                value={panelTitle}
-                onChange={(e) => setPanelTitle(e.target.value)}
-                className="h-8 rounded-md border bg-background px-2 text-xs outline-none focus:border-ring"
-                placeholder="Panel title"
-              />
-            </Field>
-
-            <Field label="Position">
-              <Segmented value={titlePosition} onChange={setTitlePosition} columns={3} options={POSITIONS} />
-              {titlePosition !== "none" && (
-                <TitlePositionEditor editor={editor} />
-              )}
-            </Field>
-          </>
-        )}
-
         <Field label="Chart Type">
           <div className="grid grid-cols-6 gap-1">
             {CHART_TYPES.map((ct) => (
@@ -111,9 +91,29 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
           </div>
         </Field>
 
-        <Field label="Padding">
-          <RangeField value={panelPadding} onChange={setPanelPadding} min={0} max={32} step={2} suffix="px" />
-        </Field>
+        {chartType !== "text" && (
+          <>
+            <Field label="Title">
+              <input
+                value={panelTitle}
+                onChange={(e) => setPanelTitle(e.target.value)}
+                className="h-8 rounded-md border bg-background px-2 text-xs outline-none focus:border-ring"
+                placeholder="Panel title"
+              />
+            </Field>
+
+            <Field label="Position">
+              <Segmented value={titlePosition} onChange={setTitlePosition} columns={3} options={POSITIONS} />
+              {titlePosition !== "none" && (
+                <TitlePositionEditor editor={editor} />
+              )}
+            </Field>
+
+            <Field label="Padding">
+              <RangeField value={panelPadding} onChange={setPanelPadding} min={0} max={32} step={2} suffix="px" />
+            </Field>
+          </>
+        )}
 
         {chartType === "text" ? (
           <TextConfig editor={editor} />
@@ -198,20 +198,25 @@ function NonTextConfig({ editor }: { editor: PanelEditor }) {
 }
 
 function KpiConfig({ editor }: { editor: PanelEditor }) {
-  const { columns, columnsLoading, yColumn, setYColumn, yAgg, setYAgg } = editor
-  if (columnsLoading) return <span className="text-[10px] text-muted-foreground">Loading…</span>
-  if (!columns.length) return <p className="text-[10px] text-muted-foreground">No columns</p>
-  return <AxisDrop label="Value" column={columns[yColumn]} agg={yAgg} onAggChange={setYAgg} onChange={(idx) => setYColumn(idx)} />
+  const { columns, selectDataset, yColumn, setYColumn, yAgg, setYAgg } = editor
+  return (
+    <AxisDrop
+      label="Value"
+      column={columns[yColumn]}
+      agg={yAgg}
+      onAggChange={setYAgg}
+      onChange={(idx) => setYColumn(idx)}
+      onDropField={(f) => { selectDataset(f.datasetId); setYColumn(f.columnIndex) }}
+    />
+  )
 }
 
 function ChartConfig({ editor }: { editor: PanelEditor }) {
-  const { columns, columnsLoading, xColumn, setXColumn, yColumn, setYColumn, yAgg, setYAgg } = editor
-  if (columnsLoading) return <span className="text-[10px] text-muted-foreground">Loading…</span>
-  if (!columns.length) return <p className="text-[10px] text-muted-foreground">No columns</p>
+  const { columns, selectDataset, xColumn, setXColumn, yColumn, setYColumn, yAgg, setYAgg } = editor
   return (
     <div className="space-y-3">
-      <AxisDrop label="X-Axis" column={columns[xColumn]} onChange={(idx) => setXColumn(idx)} />
-      <AxisDrop label="Y-Axis" column={columns[yColumn]} agg={yAgg} onAggChange={setYAgg} onChange={(idx) => setYColumn(idx)} />
+      <AxisDrop label="X-Axis" column={columns[xColumn]} onChange={(idx) => setXColumn(idx)} onDropField={(f) => { selectDataset(f.datasetId); setXColumn(f.columnIndex) }} />
+      <AxisDrop label="Y-Axis" column={columns[yColumn]} agg={yAgg} onAggChange={setYAgg} onChange={(idx) => setYColumn(idx)} onDropField={(f) => { selectDataset(f.datasetId); setYColumn(f.columnIndex) }} />
     </div>
   )
 }

@@ -58,12 +58,6 @@ export function usePanelEditor(id: string) {
   }, [chartType, columns, tableColumns])
 
   useEffect(() => {
-    if (!datasetId && datasets.length > 0) {
-      setDatasetId(datasets[0].id)
-    }
-  }, [datasets, datasetId])
-
-  useEffect(() => {
     if (!datasetId) { setColumns([]); setPreviewData(null); return }
     let cancelled = false
     setColumnsLoading(true)

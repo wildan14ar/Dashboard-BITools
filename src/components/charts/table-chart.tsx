@@ -16,21 +16,24 @@ export function TableChart({ panel, data, preview = false }: Props) {
   const cfg = (panel.config as Record<string, unknown>) ?? {}
   const sel = (cfg.columns as number[]) ?? []
   const idxs = sel.length ? sel : data.columns.map((_: string, i: number) => i)
-  const cellCls = preview ? "px-1.5 py-0.5 text-[9px]" : "px-2 py-1 text-xs"
+  const cellCls = cn(
+    preview ? "px-1.5 py-0.5 text-[9px]" : "px-2 py-1 text-xs",
+    "border border-border/70"
+  )
 
   return (
     <div className={cn("scroll-hidden", preview ? "max-h-32 overflow-auto" : "h-full")}>
-      <table className="w-full">
+      <table className="w-full border-collapse">
         <thead>
-          <tr className="border-b text-left">
+          <tr>
             {idxs.map((i) => (
-              <th key={i} className={cn("font-medium", cellCls)}>{data.columns[i]}</th>
+              <th key={i} className={cn("font-medium text-left bg-muted/40", cellCls)}>{data.columns[i]}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {rows.map((r, i) => (
-            <tr key={i} className="border-b last:border-0">
+            <tr key={i} className={cn(i % 2 === 1 && "bg-muted/20")}>
               {idxs.map((j) => (
                 <td key={j} className={cellCls}>{r.values[j]}</td>
               ))}

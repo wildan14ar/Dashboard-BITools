@@ -49,12 +49,14 @@ export function DatasetPalette({ editor }: { editor: PanelEditor }) {
                 </div>
 
                 {isExpanded && (
-                  <div className="pl-8 pr-2 pb-1">
+                  <div className="pl-5 pr-2 pb-1">
                     {dsCols.map((col, colIdx) => (
                       <div
                         key={col}
                         draggable
                         onDragStart={(e) => {
+                          e.dataTransfer.setData("dataset-id", ds.id)
+                          e.dataTransfer.setData("dataset-name", ds.name)
                           e.dataTransfer.setData("column-index", String(colIdx))
                           e.dataTransfer.setData("column-name", col)
                           e.dataTransfer.effectAllowed = "move"
