@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { datasetSchema } from "@/validation/dataset"
+import { requireAuth, unauthorized, parseBody } from "@/lib/api"
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const session = await requireAuth()
+  if (!session) return unauthorized()
 
   const { id } = await params
   const dataset = await prisma.biDataset.findUnique({
@@ -17,30 +17,29 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const session = await requireAuth()
+  if (!session) return unauthorized()
 
   const { id } = await params
-  const body = await req.json()
-  const parsed = datasetSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  const { data, error } = await parseBody(req, datasetSchema)
+  if (error) return error
 
   const dataset = await prisma.biDataset.update({
     where: { id },
     data: {
-      name: parsed.data.name,
-      sql: parsed.data.sql,
-      description: parsed.data.description,
-      sourceId: parsed.data.sourceId,
-      isPublic: parsed.data.isPublic,
+      name: data.name,
+      sql: data.sql,
+      description: data.description,
+      sourceId: data.sourceId,
+      isPublic: data.isPublic,
     },
   })
   return NextResponse.json(dataset)
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const session = await requireAuth()
+  if (!session) return unauthorized()
 
   const { id } = await params
   await prisma.biDataset.delete({ where: { id } })

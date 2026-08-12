@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { getSchema } from "@/lib/engine"
-
-function cleanError(err: unknown): string {
-  if (err && typeof err === "object" && "details" in err) return String(err.details)
-  if (err instanceof Error) return err.message
-  return String(err)
-}
+import { requireAdmin, forbidden, cleanError } from "@/lib/api"
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+  const session = await requireAdmin()
+  if (!session) return forbidden()
 
   const { id } = await params
   const source = await prisma.biSource.findUnique({ where: { id } })

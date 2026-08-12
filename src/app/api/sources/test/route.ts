@@ -1,14 +1,8 @@
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
 import { testConnection } from "@/lib/engine"
 import { CONFIG_SCHEMAS, sourceTypeSchema } from "@/validation/source"
+import { requireAdmin, forbidden, cleanError, parseBody } from "@/lib/api"
 import { z } from "zod"
-
-function cleanError(err: unknown): string {
-  if (err && typeof err === "object" && "details" in err) return String(err.details)
-  if (err instanceof Error) return err.message
-  return String(err)
-}
 
 const testSchema = z
   .object({
@@ -25,18 +19,17 @@ const testSchema = z
   })
 
 export async function POST(req: Request) {
-  const session = await auth()
-  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+  const session = await requireAdmin()
+  if (!session) return forbidden()
 
-  const body = await req.json()
-  const parsed = testSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  const { data, error } = await parseBody(req, testSchema)
+  if (error) return error
 
   try {
     const result = await testConnection({
       sourceId: "adhoc",
-      dbType: parsed.data.type,
-      configJson: JSON.stringify(parsed.data.config),
+      dbType: data.type,
+      configJson: JSON.stringify(data.config),
     })
     return NextResponse.json(result)
   } catch (err) {

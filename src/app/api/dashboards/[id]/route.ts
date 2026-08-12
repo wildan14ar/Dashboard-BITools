@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { dashboardSchema } from "@/validation/dashboard"
+import { requireAuth, unauthorized, parseBody } from "@/lib/api"
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const session = await requireAuth()
+  if (!session) return unauthorized()
 
   const { id } = await params
   const dashboard = await prisma.biDashboard.findUnique({
@@ -17,24 +17,23 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const session = await requireAuth()
+  if (!session) return unauthorized()
 
   const { id } = await params
-  const body = await req.json()
-  const parsed = dashboardSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  const { data, error } = await parseBody(req, dashboardSchema)
+  if (error) return error
 
   const dashboard = await prisma.biDashboard.update({
     where: { id },
-    data: { name: parsed.data.name, description: parsed.data.description, tags: parsed.data.tags ?? [], isPublic: parsed.data.isPublic },
+    data: { name: data.name, description: data.description, tags: data.tags ?? [], isPublic: data.isPublic },
   })
   return NextResponse.json(dashboard)
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const session = await requireAuth()
+  if (!session) return unauthorized()
 
   const { id } = await params
   await prisma.biDashboard.delete({ where: { id } })

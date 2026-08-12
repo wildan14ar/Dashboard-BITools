@@ -1,6 +1,6 @@
 "use client"
 
-import { Plus, Save, Table2, BarChart3, LineChart, PieChart, AreaChart, Loader2, Layers, Target, Table, Type } from "lucide-react"
+import { Plus, Save, Table2, BarChart3, PieChart, Loader2, Layers, Target, Table, Type, LineChart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { AxisDrop } from "./axis-drop"
@@ -14,8 +14,6 @@ const CHART_TYPES = [
   { value: "bar", label: "Bar", icon: BarChart3 },
   { value: "line", label: "Line", icon: LineChart },
   { value: "pie", label: "Pie", icon: PieChart },
-  { value: "area", label: "Area", icon: AreaChart },
-  { value: "pivot", label: "Pivot", icon: Table },
 ]
 
 export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
@@ -26,20 +24,21 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
     xColumn, setXColumn,
     yColumn, setYColumn,
     yAgg, setYAgg,
-    panelText, setPanelText,
-    panelTextLevel, setPanelTextLevel,
-    panelTextColor, setPanelTextColor,
-    panelTextAlign, setPanelTextAlign,
-    panelTextVAlign, setPanelTextVAlign,
+    panelText, panelTextLevel, panelTextColor, panelTextAlign,
     panelPadding, setPanelPadding,
     pieMode, setPieMode,
     donutThickness, setDonutThickness,
+    lineFill, setLineFill,
+    titlePosition, setTitlePosition,
+    titleAlign, setTitleAlign,
+    titleBold, setTitleBold,
+    titleItalic, setTitleItalic,
+    titleStrikethrough, setTitleStrikethrough,
+    titleColor, setTitleColor,
+    titleSize, setTitleSize,
     columns, columnsLoading,
     tableColumns, setTableColumns,
     previewData,
-    editingPanelId,
-    createPanel, updatePanel,
-    handleAdd, handleCancelEdit,
   } = editor
 
   return (
@@ -61,13 +60,17 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
           <ChartPreview
             chartType={chartType}
             data={previewData}
-            config={{
-              xColumn, yColumn, yAgg,
-              pieMode, donutThickness,
-              padding: panelPadding,
-              columns: chartType === "table" ? [...tableColumns].sort((a, b) => a - b) : undefined,
-            }}
             title={panelTitle}
+            config={{
+              titlePosition,
+              titleAlign,
+              titleBold,
+              titleItalic,
+              titleStrikethrough,
+              titleColor,
+              titleSize,
+              padding: panelPadding,
+            }}
           />
         ) : (
           <div className="rounded-md border border-dashed h-24 flex items-center justify-center">
@@ -87,13 +90,13 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
 
         <div className="flex flex-col gap-1.5">
           <label className="text-[10px] text-muted-foreground">Chart Type</label>
-          <div className="grid grid-cols-4 gap-1">
+          <div className="grid grid-cols-6 gap-1">
             {CHART_TYPES.map((ct) => (
               <button
                 key={ct.value}
                 onClick={() => setChartType(ct.value)}
                 className={cn(
-                  "flex flex-col items-center gap-0.5 rounded-md border px-1 py-1.5 text-[10px] transition-colors",
+                  "flex flex-col items-center gap-0.5 rounded-md border px-1 py-1.5 text-[9px] transition-colors",
                   chartType === ct.value
                     ? "border-primary bg-primary/10 text-primary"
                     : "border-border hover:bg-muted text-muted-foreground"
@@ -120,6 +123,137 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
             />
             <span className="w-8 text-right text-xs tabular-nums">{panelPadding}px</span>
           </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[10px] text-muted-foreground">Position</label>
+          <div className="grid grid-cols-3 gap-1">
+            <button
+              onClick={() => setTitlePosition("none")}
+              className={cn(
+                "flex h-7 items-center justify-center rounded-md border text-[10px] transition-colors",
+                titlePosition === "none"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground hover:bg-muted"
+              )}
+            >
+              None
+            </button>
+            <button
+              onClick={() => setTitlePosition("top")}
+              className={cn(
+                "flex h-7 items-center justify-center rounded-md border text-[10px] transition-colors",
+                titlePosition === "top"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground hover:bg-muted"
+              )}
+            >
+              Top
+            </button>
+            <button
+              onClick={() => setTitlePosition("bottom")}
+              className={cn(
+                "flex h-7 items-center justify-center rounded-md border text-[10px] transition-colors",
+                titlePosition === "bottom"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground hover:bg-muted"
+              )}
+            >
+              Bottom
+            </button>
+          </div>
+
+          {titlePosition !== "none" && (
+            <>
+              <div className="grid grid-cols-3 gap-1">
+                <button
+                  onClick={() => setTitleAlign("left")}
+                  className={cn(
+                    "flex h-7 items-center justify-center rounded-md border text-[10px] transition-colors",
+                    titleAlign === "left"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:bg-muted"
+                  )}
+                >
+                  Left
+                </button>
+                <button
+                  onClick={() => setTitleAlign("center")}
+                  className={cn(
+                    "flex h-7 items-center justify-center rounded-md border text-[10px] transition-colors",
+                    titleAlign === "center"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:bg-muted"
+                  )}
+                >
+                  Center
+                </button>
+                <button
+                  onClick={() => setTitleAlign("right")}
+                  className={cn(
+                    "flex h-7 items-center justify-center rounded-md border text-[10px] transition-colors",
+                    titleAlign === "right"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:bg-muted"
+                  )}
+                >
+                  Right
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setTitleBold(!titleBold)}
+                  className={cn(
+                    "flex h-7 w-7 items-center justify-center rounded-md border text-[10px] font-bold transition-colors",
+                    titleBold
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:bg-muted"
+                  )}
+                >
+                  B
+                </button>
+                <button
+                  onClick={() => setTitleItalic(!titleItalic)}
+                  className={cn(
+                    "flex h-7 w-7 items-center justify-center rounded-md border text-[10px] italic transition-colors",
+                    titleItalic
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:bg-muted"
+                  )}
+                >
+                  I
+                </button>
+                <button
+                  onClick={() => setTitleStrikethrough(!titleStrikethrough)}
+                  className={cn(
+                    "flex h-7 w-7 items-center justify-center rounded-md border text-[10px] line-through transition-colors",
+                    titleStrikethrough
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:bg-muted"
+                  )}
+                >
+                  S
+                </button>
+                <div className="flex items-center gap-1 flex-1">
+                  <input
+                    type="color"
+                    value={titleColor || "#000000"}
+                    onChange={(e) => setTitleColor(e.target.value)}
+                    className="size-7 cursor-pointer rounded border"
+                  />
+                  <input
+                    type="number"
+                    min={8}
+                    max={32}
+                    value={titleSize}
+                    onChange={(e) => setTitleSize(Number(e.target.value))}
+                    className="h-7 w-12 rounded-md border bg-background px-1 text-[10px] outline-none"
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {chartType === "text" ? (
@@ -152,8 +286,8 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
                 tableColumns={tableColumns}
                 setTableColumns={setTableColumns}
               />
-            ) : chartType !== "pivot" && (
-              <div className="space-y-2">
+            ) : (
+              <div className="space-y-3">
                 {columnsLoading ? (
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Loader2 className="size-3 animate-spin" /> Loading…</div>
                 ) : (
@@ -162,12 +296,42 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
                     <AxisDrop label="Y-Axis" column={columns[yColumn]} agg={yAgg} onAggChange={setYAgg} onChange={(idx) => setYColumn(idx)} />
                   </>
                 )}
+
+                {chartType === "line" && (
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[10px] text-muted-foreground">Style</label>
+                    <div className="grid grid-cols-2 gap-1">
+                      <button
+                        onClick={() => setLineFill(false)}
+                        className={cn(
+                          "flex h-7 items-center justify-center rounded-md border text-[10px] transition-colors",
+                          !lineFill
+                            ? "border-primary bg-primary/10 text-primary font-semibold"
+                            : "border-border text-muted-foreground hover:bg-muted"
+                        )}
+                      >
+                        Line
+                      </button>
+                      <button
+                        onClick={() => setLineFill(true)}
+                        className={cn(
+                          "flex h-7 items-center justify-center rounded-md border text-[10px] transition-colors",
+                          lineFill
+                            ? "border-primary bg-primary/10 text-primary font-semibold"
+                            : "border-border text-muted-foreground hover:bg-muted"
+                        )}
+                      >
+                        Area
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
             {chartType === "pie" && (
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] text-muted-foreground">Pie Style</label>
+                <label className="text-[10px] text-muted-foreground">Style</label>
                 <div className="grid grid-cols-2 gap-1">
                   <button
                     onClick={() => setPieMode("donut")}
@@ -210,19 +374,29 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
               </div>
             )}
 
-            <Button size="sm" className="w-full gap-1.5" onClick={handleAdd} disabled={createPanel.isPending || updatePanel.isPending || !datasetId}>
-              {editingPanelId ? <Save className="size-3.5" /> : <Plus className="size-3.5" />}
-              {editingPanelId ? "Update Panel" : "Add to Dashboard"}
-            </Button>
-            {editingPanelId && (
-              <Button size="sm" variant="outline" className="w-full" onClick={handleCancelEdit}>
-                Cancel Edit
-              </Button>
-            )}
+            <PanelActionButtons editor={editor} requireDataset />
           </>
         )}
       </div>
     </aside>
+  )
+}
+
+function PanelActionButtons({ editor, requireDataset = false }: { editor: PanelEditor; requireDataset?: boolean }) {
+  const { editingPanelId, createPanel, updatePanel, datasetId, handleAdd, handleCancelEdit } = editor
+  const disabled = createPanel.isPending || updatePanel.isPending || (requireDataset && !datasetId)
+  return (
+    <>
+      <Button size="sm" className="w-full gap-1.5" onClick={handleAdd} disabled={disabled}>
+        {editingPanelId ? <Save className="size-3.5" /> : <Plus className="size-3.5" />}
+        {editingPanelId ? "Update Panel" : "Add to Dashboard"}
+      </Button>
+      {editingPanelId && (
+        <Button size="sm" variant="outline" className="w-full" onClick={handleCancelEdit}>
+          Cancel Edit
+        </Button>
+      )}
+    </>
   )
 }
 
@@ -258,9 +432,6 @@ function TextConfig({ editor }: { editor: PanelEditor }) {
     panelTextColor, setPanelTextColor,
     panelTextAlign, setPanelTextAlign,
     panelTextVAlign, setPanelTextVAlign,
-    editingPanelId,
-    createPanel, updatePanel,
-    handleAdd, handleCancelEdit,
   } = editor
 
   return (
@@ -358,15 +529,7 @@ function TextConfig({ editor }: { editor: PanelEditor }) {
         </div>
       </div>
 
-      <Button size="sm" className="w-full gap-1.5" onClick={handleAdd} disabled={createPanel.isPending || updatePanel.isPending}>
-        {editingPanelId ? <Save className="size-3.5" /> : <Plus className="size-3.5" />}
-        {editingPanelId ? "Update Panel" : "Add to Dashboard"}
-      </Button>
-      {editingPanelId && (
-        <Button size="sm" variant="outline" className="w-full" onClick={handleCancelEdit}>
-          Cancel Edit
-        </Button>
-      )}
+      <PanelActionButtons editor={editor} />
     </>
   )
 }

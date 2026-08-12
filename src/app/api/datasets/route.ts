@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { datasetSchema } from "@/validation/dataset"
+import { requireAuth, unauthorized, parseBody } from "@/lib/api"
 
 export async function GET() {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const session = await requireAuth()
+  if (!session) return unauthorized()
 
   const datasets = await prisma.biDataset.findMany({
     include: { source: { select: { name: true } } },
@@ -15,20 +15,19 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const session = await requireAuth()
+  if (!session) return unauthorized()
 
-  const body = await req.json()
-  const parsed = datasetSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  const { data, error } = await parseBody(req, datasetSchema)
+  if (error) return error
 
   const dataset = await prisma.biDataset.create({
     data: {
-      name: parsed.data.name,
-      sql: parsed.data.sql,
-      description: parsed.data.description,
-      sourceId: parsed.data.sourceId,
-      isPublic: parsed.data.isPublic ?? false,
+      name: data.name,
+      sql: data.sql,
+      description: data.description,
+      sourceId: data.sourceId,
+      isPublic: data.isPublic ?? false,
       userId: session.user.id,
     },
   })

@@ -1,26 +1,25 @@
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { sourceSchema } from "@/validation/source"
+import { requireAdmin, forbidden, parseBody } from "@/lib/api"
 
 export async function GET() {
-  const session = await auth()
-  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+  const session = await requireAdmin()
+  if (!session) return forbidden()
 
   const sources = await prisma.biSource.findMany({ orderBy: { createdAt: "desc" } })
   return NextResponse.json(sources)
 }
 
 export async function POST(req: Request) {
-  const session = await auth()
-  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+  const session = await requireAdmin()
+  if (!session) return forbidden()
 
-  const body = await req.json()
-  const parsed = sourceSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  const { data, error } = await parseBody(req, sourceSchema)
+  if (error) return error
 
   const source = await prisma.biSource.create({
-    data: { name: parsed.data.name, type: parsed.data.type, config: parsed.data.config as object },
+    data: { name: data.name, type: data.type, config: data.config as object },
   })
   return NextResponse.json(source, { status: 201 })
 }

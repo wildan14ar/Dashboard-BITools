@@ -36,6 +36,14 @@ export function usePanelEditor(id: string) {
   const [panelPadding, setPanelPadding] = useState(8)
   const [pieMode, setPieMode] = useState("donut")
   const [donutThickness, setDonutThickness] = useState(45)
+  const [lineFill, setLineFill] = useState(false)
+  const [titlePosition, setTitlePosition] = useState<"none" | "top" | "bottom">("top")
+  const [titleAlign, setTitleAlign] = useState<"left" | "center" | "right">("left")
+  const [titleBold, setTitleBold] = useState(false)
+  const [titleItalic, setTitleItalic] = useState(false)
+  const [titleStrikethrough, setTitleStrikethrough] = useState(false)
+  const [titleColor, setTitleColor] = useState("")
+  const [titleSize, setTitleSize] = useState(12)
   const [columns, setColumns] = useState<string[]>([])
   const [tableColumns, setTableColumns] = useState<Set<number>>(new Set())
   const [previewData, setPreviewData] = useState<PreviewData | null>(null)
@@ -104,12 +112,13 @@ export function usePanelEditor(id: string) {
 
   const handleAdd = () => {
     if (!datasetId && chartType !== "text") return
+    const titleConfig = { titlePosition, titleAlign, titleBold, titleItalic, titleStrikethrough, titleColor, titleSize }
     const config = chartType === "text"
-      ? { content: panelText, level: panelTextLevel, color: panelTextColor, align: panelTextAlign, valign: panelTextVAlign, padding: panelPadding }
-      : chartType === "kpi" ? { column: yColumn, agg: yAgg, padding: panelPadding }
-      : chartType === "table" ? { columns: [...tableColumns].sort((a, b) => a - b), padding: panelPadding }
-      : chartType === "pie" ? { xColumn, yColumn, yAgg, pieMode, donutThickness, padding: panelPadding }
-      : chartType !== "pivot" ? { xColumn, yColumn, yAgg, padding: panelPadding } : { padding: panelPadding }
+      ? { content: panelText, level: panelTextLevel, color: panelTextColor, align: panelTextAlign, valign: panelTextVAlign, padding: panelPadding, ...titleConfig }
+      : chartType === "kpi" ? { column: yColumn, agg: yAgg, padding: panelPadding, ...titleConfig }
+      : chartType === "table" ? { columns: [...tableColumns].sort((a, b) => a - b), padding: panelPadding, ...titleConfig }
+      : chartType === "pie" ? { xColumn, yColumn, yAgg, pieMode, donutThickness, padding: panelPadding, ...titleConfig }
+      : { xColumn, yColumn, yAgg, lineFill, padding: panelPadding, ...titleConfig }
     const title = panelTitle || selectedDataset?.name || "Panel"
 
     if (editingPanelId) {
@@ -146,6 +155,7 @@ export function usePanelEditor(id: string) {
     setPanelPadding(8)
     setPieMode("donut")
     setDonutThickness(45)
+    setLineFill(false)
   }
 
   function handleEditPanel(panel: { id: string; title: string; chartType: string; dataSetId: string | null; config: Record<string, unknown> | null }) {
@@ -176,7 +186,17 @@ export function usePanelEditor(id: string) {
         const cols = (cfg.columns as number[]) ?? []
         setTableColumns(new Set(cols.length ? cols : columns.map((_: string, i: number) => i)))
       }
+      if (panel.chartType === "line" || panel.chartType === "area") {
+        setLineFill(Boolean(cfg.lineFill))
+      }
     }
+    setTitlePosition((cfg.titlePosition as "none" | "top" | "bottom") || "top")
+    setTitleAlign((cfg.titleAlign as "left" | "center" | "right") || "left")
+    setTitleBold(Boolean(cfg.titleBold))
+    setTitleItalic(Boolean(cfg.titleItalic))
+    setTitleStrikethrough(Boolean(cfg.titleStrikethrough))
+    setTitleColor((cfg.titleColor as string) || "")
+    setTitleSize(Number(cfg.titleSize) || 12)
   }
 
   function handleCancelEdit() {
@@ -191,6 +211,14 @@ export function usePanelEditor(id: string) {
     setPanelPadding(8)
     setPieMode("donut")
     setDonutThickness(45)
+    setLineFill(false)
+    setTitlePosition("top")
+    setTitleAlign("left")
+    setTitleBold(false)
+    setTitleItalic(false)
+    setTitleStrikethrough(false)
+    setTitleColor("")
+    setTitleSize(12)
     setColumns([])
   }
 
@@ -256,6 +284,22 @@ export function usePanelEditor(id: string) {
     setPieMode,
     donutThickness,
     setDonutThickness,
+    lineFill,
+    setLineFill,
+    titlePosition,
+    setTitlePosition,
+    titleAlign,
+    setTitleAlign,
+    titleBold,
+    setTitleBold,
+    titleItalic,
+    setTitleItalic,
+    titleStrikethrough,
+    setTitleStrikethrough,
+    titleColor,
+    setTitleColor,
+    titleSize,
+    setTitleSize,
     columns,
     tableColumns,
     setTableColumns,

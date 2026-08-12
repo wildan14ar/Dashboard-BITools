@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { requireAuth, unauthorized } from "@/lib/api"
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string; filterId: string }> }) {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const session = await requireAuth()
+  if (!session) return unauthorized()
 
   const { filterId } = await params
   const body = await req.json()
@@ -19,8 +19,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string; filterId: string }> }) {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const session = await requireAuth()
+  if (!session) return unauthorized()
 
   const { filterId } = await params
   await prisma.biFilter.delete({ where: { id: filterId } })

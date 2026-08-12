@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { execute } from "@/lib/engine"
-
-function cleanError(err: unknown): string {
-  if (err && typeof err === "object" && "details" in err) return String(err.details)
-  if (err instanceof Error) return err.message
-  return String(err)
-}
+import { requireAuth, unauthorized, cleanError } from "@/lib/api"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const session = await requireAuth()
+  if (!session) return unauthorized()
 
   const { id } = await params
   const dataset = await prisma.biDataset.findUnique({ where: { id }, include: { source: true } })

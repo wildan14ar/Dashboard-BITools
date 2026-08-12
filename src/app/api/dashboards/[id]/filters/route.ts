@@ -1,19 +1,18 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { filterSchema } from "@/validation/filter"
+import { requireAuth, unauthorized, parseBody } from "@/lib/api"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const session = await requireAuth()
+  if (!session) return unauthorized()
 
   const { id: dashboardId } = await params
-  const body = await req.json()
-  const parsed = filterSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  const { data, error } = await parseBody(req, filterSchema)
+  if (error) return error
 
   const filter = await prisma.biFilter.create({
-    data: { ...parsed.data, dashboardId, config: (parsed.data.config ?? {}) as object },
+    data: { ...data, dashboardId, config: (data.config ?? {}) as object },
   })
   return NextResponse.json(filter, { status: 201 })
 }

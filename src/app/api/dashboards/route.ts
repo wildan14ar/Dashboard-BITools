@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { dashboardSchema } from "@/validation/dashboard"
+import { requireAuth, unauthorized, parseBody } from "@/lib/api"
 
 export async function GET() {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const session = await requireAuth()
+  if (!session) return unauthorized()
 
   const dashboards = await prisma.biDashboard.findMany({
     include: { _count: { select: { panels: true } } },
@@ -15,19 +15,18 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const session = await requireAuth()
+  if (!session) return unauthorized()
 
-  const body = await req.json()
-  const parsed = dashboardSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  const { data, error } = await parseBody(req, dashboardSchema)
+  if (error) return error
 
   const dashboard = await prisma.biDashboard.create({
     data: {
-      name: parsed.data.name,
-      description: parsed.data.description,
-      tags: parsed.data.tags ?? [],
-      isPublic: parsed.data.isPublic ?? false,
+      name: data.name,
+      description: data.description,
+      tags: data.tags ?? [],
+      isPublic: data.isPublic ?? false,
       userId: session.user.id,
     },
   })
