@@ -30,11 +30,11 @@ export function TableChart({ panel, data, preview = false }: Props) {
         overflowY: "auto",
       }}
     >
-      <table className={cn("border-collapse", horizontal ? "min-w-full whitespace-nowrap" : "w-full")}>
+      <table className={cn("border-separate border-spacing-0", horizontal ? "min-w-full whitespace-nowrap" : "w-full")}>
         <thead>
           <tr>
             {idxs.map((i) => (
-              <th key={i} className={cn("font-medium text-left bg-muted/40", cellCls)}>{data.columns[i]}</th>
+              <th key={i} className={cn("sticky top-0 z-10 font-medium text-left bg-muted", cellCls)}>{data.columns[i]}</th>
             ))}
           </tr>
         </thead>
