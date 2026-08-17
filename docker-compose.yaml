@@ -21,6 +21,8 @@ services:
       - REDIS_URL=redis://redis:6379
       - QUERY_CACHE_TTL_SEC=300
       - GRPC_PORT=50051
+      - DB_POOL_SIZE=5
+      - DB_MAX_OVERFLOW=10
     volumes:
       - ./proto:/app/proto:ro
     restart: unless-stopped

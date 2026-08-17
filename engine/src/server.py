@@ -11,8 +11,12 @@ import engine_pb2_grpc as rpc
 import grpc
 
 from src.config import GRPC_PORT
-from src.engine.executor import execute_query, get_schema_info, test_connection
-from src.engine.executor import invalidate_cache
+from src.executor import (
+    execute_query,
+    get_schema_info,
+    invalidate_cache,
+    test_connection,
+)
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"

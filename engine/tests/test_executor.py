@@ -4,9 +4,9 @@ import json
 import pytest
 from sqlalchemy import text
 
-from src.engine import executor as exec_mod
-from src.engine.executor import execute_query
-from src.engine.factory import engine_pool
+from src import executor as exec_mod
+from src import factory
+from src.executor import execute_query
 
 SQL = "SELECT * FROM nums ORDER BY n"
 
@@ -14,8 +14,8 @@ SQL = "SELECT * FROM nums ORDER BY n"
 @pytest.fixture
 def cfg(tmp_path):
     config_json = json.dumps({"path": str(tmp_path / "test.db")})
-    engine = engine_pool.get("pagination_test", "sqlite", config_json)
-    with engine.connect() as conn:
+    engine = factory.get("pagination_test", "sqlite", config_json)
+    with engine.sa_engine.connect() as conn:
         conn.execute(text("DROP TABLE IF EXISTS nums"))
         conn.execute(text("CREATE TABLE nums (n INTEGER)"))
         conn.execute(
@@ -23,7 +23,7 @@ def cfg(tmp_path):
         )
         conn.commit()
     yield config_json
-    engine_pool.dispose("pagination_test")
+    factory.dispose("pagination_test")
 
 
 def test_pagination(cfg):

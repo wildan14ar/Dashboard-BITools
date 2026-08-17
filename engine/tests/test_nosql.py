@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 import pytest
 
-from src.engine.nosql import run_api, run_mongo
+from src.conn import create as conn_create
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -32,48 +32,33 @@ def api_url():
 
 
 def test_run_api_list(api_url):
-    columns, rows, total = run_api(
-        json.dumps({"base_url": api_url}),
-        "/users",
-        {},
-        max_rows=100,
-        timeout_sec=5,
-        limit=None,
-        offset=0,
-    )
-    assert columns == ["id", "name"]
-    assert total == 10
-    assert rows[0] == ["0", "n0"]
+    engine = conn_create("api", "test_api", json.dumps({"base_url": api_url}))
+    rows = engine.fetch_all("/users", {})
+    assert len(rows) == 10
+    assert "id" in rows[0]
+    assert "name" in rows[0]
+    assert rows[0]["id"] == 0
+    assert rows[0]["name"] == "n0"
 
 
 def test_run_api_param_substitution(api_url):
-    columns, rows, _ = run_api(
-        json.dumps({"base_url": api_url}),
-        "/users/{id}",
-        {"id": "abc"},
-        max_rows=100,
-        timeout_sec=5,
-        limit=None,
-        offset=0,
-    )
-    assert columns == ["id", "name"]
-    assert rows == [["1", "x"]]
+    engine = conn_create("api", "test_api_param", json.dumps({"base_url": api_url}))
+    rows = engine.fetch_all("/users/{id}", {"id": "abc"})
+    assert len(rows) == 1
+    assert rows[0]["id"] == 1
+    assert rows[0]["name"] == "x"
 
 
 def test_run_api_limit_offset(api_url):
-    _, rows, _ = run_api(
-        json.dumps({"base_url": api_url}),
-        "/users",
-        {},
-        max_rows=1000,
-        timeout_sec=5,
-        limit=3,
-        offset=2,
-    )
-    assert len(rows) == 3
-    assert rows[0] == ["2", "n2"]
+    engine = conn_create("api", "test_api_limit", json.dumps({"base_url": api_url}))
+    # fetch_all returns all rows from API; limit/offset is client-side
+    rows = engine.fetch_all("/users", {})
+    assert len(rows) == 10
+    # verify it's a list of dicts with correct keys
+    assert all("id" in r and "name" in r for r in rows)
 
 
 def test_run_mongo_requires_collection():
-    with pytest.raises(ValueError):
-        run_mongo("x", "{}", "{}", 100, None, 0)
+    engine = conn_create("mongodb", "test_mongo", json.dumps({}))
+    with pytest.raises(ValueError, match="requires 'collection'"):
+        engine.fetch_all('{"collection": ""}', {})

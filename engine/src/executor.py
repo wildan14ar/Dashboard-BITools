@@ -1,39 +1,44 @@
 import logging
 import time
 
-from sqlalchemy import text
-
-from src.config import MAX_ROWS_HARD, TIMEOUT_SEC_HARD
-from src.engine.cache import (
+from src import conn as conn_mod
+from src.cache import (
     cache_key,
 )
-from src.engine.cache import (
+from src.cache import (
     get as cache_get,
 )
-from src.engine.cache import (
+from src.cache import (
     get_stale as cache_get_stale,
 )
-from src.engine.cache import (
+from src.cache import (
     invalidate_pattern as cache_invalidate_pattern,
 )
-from src.engine.cache import (
+from src.cache import (
     release_lock as cache_release_lock,
 )
-from src.engine.cache import (
+from src.cache import (
     set as cache_set,
 )
-from src.engine.cache import (
+from src.cache import (
     try_lock as cache_try_lock,
 )
-from src.engine.factory import engine_pool
-from src.engine.introspector import get_schema
-from src.engine.nosql import get_schema_info as get_mongo_schema_info
-from src.engine.nosql import run_api, run_mongo
-from src.engine.sanitizer import apply_params, is_safe
+from src.config import MAX_ROWS_HARD, TIMEOUT_SEC_HARD
+from src.introspector import get_schema
+from src.sanitizer import apply_params, is_safe
 
 logger = logging.getLogger(__name__)
 
 NON_SQL_TYPES = {"mongodb", "api"}
+
+
+def _adapt_results(rows: list[dict]) -> tuple[list[str], list[list[str]]]:
+    """Convert list[dict] rows to (columns, rows) format for output."""
+    if not rows:
+        return [], []
+    columns = list(rows[0].keys())
+    str_rows = [[str(cell) for cell in row.values()] for row in rows]
+    return columns, str_rows
 
 
 def execute_query(
@@ -60,16 +65,10 @@ def execute_query(
 
     base_sql = sql.rstrip().rstrip(";").strip()
     if limit is not None and limit > 0 and not non_sql:
-        # ponytail: appends LIMIT/OFFSET; breaks if the dataset SQL already
-        # ends with LIMIT, and the COUNT subquery can't wrap EXPLAIN/SHOW.
-        # Use a windowed subquery if that ever bites.
         sql = f"{base_sql} LIMIT {min(int(limit), max_rows)} OFFSET {int(offset or 0)}"
 
     key = cache_key(source_id, sql) if use_cache and not params else None
 
-    # ponytail: stale-while-revalidate — on miss, acquire a refresh lease so
-    # only one request re-hits the DB; concurrent callers get the stale entry.
-    # No lease on cold start (nothing cached) — first request just runs.
     refresh_lease = False
     if key:
         cached = cache_get(key)
@@ -85,35 +84,32 @@ def execute_query(
         refresh_lease = stale is not None
 
     start = time.monotonic()
+    engine = conn_mod.create(db_type, source_id, config_json)
 
-    if non_sql:
-        if db_type == "mongodb":
-            columns, rows, total = run_mongo(
-                source_id, config_json, sql, max_rows, limit, offset
-            )
+    try:
+        total = None
+        if non_sql:
+            result_rows = engine.fetch_all(sql, params or {})
+            columns, rows = _adapt_results(result_rows)
+            total = len(rows)
         else:
-            columns, rows, total = run_api(
-                config_json, sql, params or {}, max_rows, timeout_sec, limit, offset
-            )
-    else:
-        engine = engine_pool.get(source_id, db_type, config_json)
-        with engine.connect() as conn:
-            total = None
             if limit is not None and limit > 0:
-                total = conn.execute(
-                    text(f"SELECT COUNT(*) FROM ({base_sql}) AS _fyc_count")
-                ).scalar()
-            result = conn.execute(
-                text(sql).execution_options(max_row_count=max_rows, timeout=timeout_sec)
-            )
-            columns = list(result.keys())
-            rows = [list(map(str, row)) for row in result.fetchall()]
+                count_rows = engine.fetch_all(
+                    f"SELECT COUNT(*) AS cnt FROM ({base_sql}) AS _fyc_count"
+                )
+                total = int(count_rows[0]["cnt"]) if count_rows else 0
+            result_rows = engine.fetch_all(sql, params or {})
+            columns, rows = _adapt_results(result_rows)
+            if total is None:
+                total = len(rows)
+    finally:
+        engine.close()
 
     elapsed = (time.monotonic() - start) * 1000
     output = {
         "columns": columns,
         "row_count": len(rows),
-        "total": int(total) if total is not None else len(rows),
+        "total": int(total),
         "execution_time_ms": round(elapsed, 2),
         "rows": rows,
         "cached": False,
@@ -128,16 +124,20 @@ def execute_query(
 
 
 def invalidate_cache(source_id: str) -> dict:
-    # ponytail: cache keys are md5("qcache:{source_id}:{sql}") — never match
-    # the source_id itself. Invalidate by the qcache prefix scan instead.
     cache_invalidate_pattern(f"qcache:{source_id}:*")
     cache_invalidate_pattern(f"schema:{source_id}*")
     return {"ok": True}
 
 
 def test_connection(db_type: str, config_json: str) -> dict:
-    ok, error = engine_pool.test(db_type, config_json)
-    return {"ok": ok, "error": error or ""}
+    engine = conn_mod.create(db_type, "test", config_json)
+    try:
+        ok = engine.ping()
+        return {"ok": ok, "error": "" if ok else "ping failed"}
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+    finally:
+        engine.close()
 
 
 def get_schema_info(source_id: str, db_type: str, config_json: str) -> dict:
@@ -147,12 +147,16 @@ def get_schema_info(source_id: str, db_type: str, config_json: str) -> dict:
         logger.info(f"Schema cache hit: {source_id}")
         return cached
 
-    if db_type == "mongodb":
-        result = get_mongo_schema_info(source_id, config_json)
-    else:
-        engine = engine_pool.get(source_id, db_type, config_json)
-        tables = get_schema(engine)
-        result = {"tables": tables}
+    engine = conn_mod.create(db_type, source_id, config_json)
+    try:
+        if db_type in NON_SQL_TYPES:
+            tables = engine.fetch_all("listCollections")
+            result = {"tables": tables}
+        else:
+            tables = get_schema(engine.sa_engine)
+            result = {"tables": tables}
+    finally:
+        engine.close()
 
     cache_set(schema_cache_key, result)
     return result
