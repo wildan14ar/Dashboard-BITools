@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ExternalLink, Settings2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useDashboard } from "@/hooks/use-dashboards"
+import { DashboardFilterProvider } from "@/hooks/use-dashboard-filters"
 import DashboardGrid from "@/components/dashboard/dashboard-grid"
 
 export default function DashboardViewPage() {

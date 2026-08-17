@@ -45,7 +45,11 @@ def is_safe(sql: str) -> bool:
 
 
 def apply_params(sql: str, params: dict[str, str]) -> str:
-    for val in (params or {}).values():
-        safe = val.replace("'", "''").replace("\\", "\\\\")
-        sql = TEMPLATE_RE.sub(safe, sql, count=1)
-    return sql
+    def repl(match: re.Match) -> str:
+        key = match.group(1)
+        val = (params or {}).get(key)
+        if val is None:
+            return match.group(0)
+        return val.replace("'", "''").replace("\\", "\\\\")
+
+    return TEMPLATE_RE.sub(repl, sql)

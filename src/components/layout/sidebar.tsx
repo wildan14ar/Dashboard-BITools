@@ -109,11 +109,17 @@ export default function Sidebar({
     return (
         <>
             {/* Collapsed sidebar */}
-            {!open && (
-                <div
-                    className={`hidden sm:block h-full ${placement}-4 border-r border-border p-3 bg-background shadow-sm ${isValidPath(pathname, validSidebar) ? "block" : "hidden"
-                        }`}
-                >
+            <AnimatePresence>
+                {!open && (
+                    <motion.div
+                        key="collapsed"
+                        initial={{ x: placement === "left" ? -widthValue : widthValue, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: placement === "left" ? -widthValue : widthValue, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className={`hidden sm:block h-full ${placement}-4 border-r border-border p-3 bg-background shadow-sm ${isValidPath(pathname, validSidebar) ? "block" : "hidden"
+                            }`}
+                    >
                     <div className="flex flex-col items-center gap-4">
                         {/* Toggle button */}
                         <button
@@ -138,14 +144,18 @@ export default function Sidebar({
                             ))}
                         </div>
                     </div>
-                </div>
-            )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Expanded sidebar */}
-            {open && (
+            <AnimatePresence>
+                {open && (
                 <motion.aside
-                    initial={false}
-                    animate={placement === "left" ? { x: offsetX } : { x: -offsetX }}
+                    key="expanded"
+                    initial={{ x: placement === "left" ? -widthValue : widthValue, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: placement === "left" ? -widthValue : widthValue, opacity: 0 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                     className={`fixed md:sticky top-0 ${placement}-0 h-screen w-full ${widthClassName} flex flex-col bg-background border-r border-border shadow-xl z-50 ${isValidPath(pathname, validSidebar) ? "block" : "hidden"
                         }`}
@@ -244,8 +254,8 @@ export default function Sidebar({
                         <ButtonLogout />
                     </div>
                 </motion.aside >
-            )
-            }
+                )}
+            </AnimatePresence>
 
             {/* Overlay for mobile */}
             <AnimatePresence>

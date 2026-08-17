@@ -3,11 +3,28 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
 import type { RunData } from "@/lib/chart"
+import { useDashboardFilters } from "@/hooks/use-dashboard-filters"
 
-type PanelLike = { id: string; dataSetId: string }
+type PanelLike = { id: string; dataSetId: string; config?: Record<string, unknown> | null }
+
+type FilterDef = { column: string; type: "date_range" | "enum"; from?: string; to?: string; value?: string }
+
+export function filtersToParams(filters: FilterDef[] | undefined): Record<string, string> {
+  const params: Record<string, string> = {}
+  for (const f of filters ?? []) {
+    if (f.type === "date_range") {
+      if (f.from) params[`${f.column}_from`] = f.from
+      if (f.to) params[`${f.column}_to`] = f.to
+    } else if (f.value) {
+      params[f.column] = f.value
+    }
+  }
+  return params
+}
 
 export function usePanelData(panels: PanelLike[] | null | undefined) {
   const [panelData, setPanelData] = useState<Record<string, RunData | null>>({})
+  const { values: globalValues } = useDashboardFilters()
 
   useEffect(() => {
     if (!panels?.length) return
@@ -18,7 +35,9 @@ export function usePanelData(panels: PanelLike[] | null | undefined) {
         panels.map(async (panel) => {
           if (!panel.dataSetId) return
           try {
-            const res = await axios.post(`/api/datasets/${panel.dataSetId}/run`, { cache: false })
+            const own = filtersToParams((panel.config?.filters as FilterDef[]) ?? [])
+            const params = { ...globalValues, ...own }
+            const res = await axios.post(`/api/datasets/${panel.dataSetId}/run`, { cache: false, params })
             results[panel.id] = res.data ?? null
           } catch {
             results[panel.id] = null
@@ -31,7 +50,7 @@ export function usePanelData(panels: PanelLike[] | null | undefined) {
     return () => {
       cancelled = true
     }
-  }, [panels])
+  }, [panels, globalValues])
 
   return panelData
 }

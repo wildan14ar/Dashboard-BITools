@@ -8,6 +8,7 @@ import { useDashboard, useCreatePanel, useUpdatePanel, useDeletePanel, useReorde
 import { useDatasets } from "@/hooks/use-datasets"
 
 export type PreviewData = { columns: string[]; rows: { values: string[] }[] }
+export type PanelFilter = { column: string; type: "date_range" | "enum"; from?: string; to?: string; value?: string }
 export type PanelEditor = ReturnType<typeof usePanelEditor>
 
 export function usePanelEditor(id: string) {
@@ -54,6 +55,7 @@ export function usePanelEditor(id: string) {
   const [pivotValueCol, setPivotValueCol] = useState(2)
   const [pivotAgg, setPivotAgg] = useState("sum")
   const [previewData, setPreviewData] = useState<PreviewData | null>(null)
+  const [filters, setFilters] = useState<PanelFilter[]>([])
   const [columnsLoading, setColumnsLoading] = useState(false)
   const [expandedDatasets, setExpandedDatasets] = useState<Set<string>>(new Set())
   const [datasetColumns, setDatasetColumns] = useState<Record<string, string[]>>({})
@@ -112,17 +114,19 @@ export function usePanelEditor(id: string) {
   }
 
   const handleAdd = () => {
-    if (!datasetId && chartType !== "text") return
+    if (!datasetId && chartType !== "text" && chartType !== "filter") return
     const titleConfig = {
       titlePosition: chartType === "text" ? "none" : titlePosition,
       titleAlign, titleBold, titleItalic, titleStrikethrough, titleColor, titleSize,
     }
-    const config = chartType === "text"
+    const config: Record<string, unknown> = chartType === "text"
       ? { content: panelText, level: panelTextLevel, color: panelTextColor, align: panelTextAlign, valign: panelTextVAlign, padding: panelPadding, ...titleConfig }
       : chartType === "kpi" ? { column: yColumn, agg: yAgg, padding: panelPadding, ...titleConfig }
       : chartType === "table" ? { columns: tableColumns, tableScroll, tableMode, pivotRowCol, pivotColCol, pivotValueCol, pivotAgg, padding: panelPadding, ...titleConfig }
       : chartType === "pie" ? { xColumn, yColumn, yAgg, pieMode, donutThickness, padding: panelPadding, ...titleConfig }
+      : chartType === "filter" ? { filters, padding: panelPadding }
       : { xColumn, yColumn, yAgg, lineFill, barOrientation, padding: panelPadding, ...titleConfig }
+    if (filters.length > 0 && chartType !== "filter") config.filters = filters
     const title = panelTitle || selectedDataset?.name || "Panel"
 
     if (editingPanelId) {
@@ -161,6 +165,7 @@ export function usePanelEditor(id: string) {
     setDonutThickness(45)
     setLineFill(false)
     setBarOrientation("vertical")
+    setFilters([])
   }
 
   function handleEditPanel(panel: { id: string; title: string; chartType: string; dataSetId: string | null; config: Record<string, unknown> | null }) {
@@ -171,6 +176,7 @@ export function usePanelEditor(id: string) {
     setPanelPadding(Number(cfg.padding) || 8)
     setPieMode((cfg.pieMode as string) || "donut")
     setDonutThickness(Number(cfg.donutThickness) || 45)
+    setFilters((cfg.filters as PanelFilter[]) ?? [])
     if (panel.chartType === "text") {
       setPanelText((cfg.content as string) ?? "")
       setPanelTextLevel((cfg.level as string) ?? "p")
@@ -240,6 +246,7 @@ export function usePanelEditor(id: string) {
     setPivotColCol(1)
     setPivotValueCol(2)
     setPivotAgg("sum")
+    setFilters([])
     setColumns([])
   }
 
@@ -340,6 +347,8 @@ export function usePanelEditor(id: string) {
     setPivotAgg,
     previewData,
     columnsLoading,
+    filters,
+    setFilters,
     expandedDatasets,
     datasetColumns,
     selectedDataset,

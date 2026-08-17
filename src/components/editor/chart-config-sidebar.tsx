@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Plus, Save, Table2, BarChart3, PieChart, Target, Type, LineChart, GripVertical, X } from "lucide-react"
+import { Plus, Save, Table2, BarChart3, PieChart, Target, Type, LineChart, GripVertical, X, Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { AxisDrop } from "./axis-drop"
@@ -9,6 +9,7 @@ import { ChartPreview } from "./chart-preview"
 import { Field, Segmented, OptionButton, ColorField, RangeField } from "./controls"
 import { Heading } from "@/components/charts/heading"
 import type { PanelEditor } from "@/hooks/use-panel-editor"
+import type { PanelFilter } from "@/hooks/use-panel-editor"
 
 const CHART_TYPES = [
   { value: "text", label: "Text", icon: Type },
@@ -17,6 +18,7 @@ const CHART_TYPES = [
   { value: "bar", label: "Bar", icon: BarChart3 },
   { value: "line", label: "Line", icon: LineChart },
   { value: "pie", label: "Pie", icon: PieChart },
+  { value: "filter", label: "Filter", icon: Filter },
 ]
 
 const LEVELS = ["p", "h1", "h2", "h3", "h4", "h5", "h6"] as const
@@ -40,6 +42,7 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
     titleAlign, titleBold, titleItalic, titleStrikethrough, titleColor, titleSize,
     pieMode, donutThickness, lineFill, barOrientation, xColumn, yColumn, yAgg,
     tableColumns, tableScroll, tableMode, pivotRowCol, pivotColCol, pivotValueCol, pivotAgg,
+    filters,
     previewData,
   } = editor
 
@@ -49,7 +52,9 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
       ? { columns: tableColumns, tableScroll, tableMode, pivotRowCol, pivotColCol, pivotValueCol, pivotAgg }
       : chartType === "pie"
         ? { xColumn, yColumn, yAgg, pieMode, donutThickness }
-        : { xColumn, yColumn, yAgg, lineFill, barOrientation }
+        : chartType === "filter"
+          ? { filters }
+          : { xColumn, yColumn, yAgg, lineFill, barOrientation }
 
   return (
     <aside className="w-64 border-l bg-muted/20 flex flex-col shrink-0 overflow-auto">
@@ -135,9 +140,7 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
       </div>
     </aside>
   )
-}
-
-const POSITIONS = [
+}const POSITIONS = [
   { value: "none" as const, label: "None" },
   { value: "top" as const, label: "Top" },
   { value: "bottom" as const, label: "Bottom" },
@@ -190,6 +193,8 @@ function NonTextConfig({ editor }: { editor: PanelEditor }) {
         <KpiConfig editor={editor} />
       ) : chartType === "table" ? (
         <TableConfig editor={editor} />
+      ) : chartType === "filter" ? (
+        <FilterConfig editor={editor} />
       ) : (
         <ChartConfig editor={editor} />
       )}
@@ -198,7 +203,9 @@ function NonTextConfig({ editor }: { editor: PanelEditor }) {
       {chartType === "line" && <LineConfig editor={editor} />}
       {chartType === "pie" && <PieConfig editor={editor} />}
 
-      <PanelActionButtons editor={editor} requireDataset />
+      {chartType !== "filter" && <FilterConfig editor={editor} />}
+
+      <PanelActionButtons editor={editor} requireDataset={chartType !== "filter"} />
     </>
   )
 }
@@ -473,8 +480,65 @@ return (
   )
 }
 
-function PanelActionButtons({ editor, requireDataset = false }: { editor: PanelEditor; requireDataset?: boolean }) {
-  const { editingPanelId, createPanel, updatePanel, datasetId, handleAdd, handleCancelEdit } = editor
+function FilterConfig({ editor }: { editor: PanelEditor }) {
+  const { columns, filters, setFilters } = editor
+
+  const addFilter = () => setFilters((prev) => [...prev, { column: columns[0] ?? "", type: "date_range" }])
+  const updateFilter = (i: number, patch: Partial<PanelFilter>) => setFilters((prev) => prev.map((f, idx) => (idx === i ? { ...f, ...patch } : f)))
+  const removeFilter = (i: number) => setFilters((prev) => prev.filter((_, idx) => idx !== i))
+
+  return (
+    <Field label="Filters">
+      {filters.length === 0 && (
+        <button type="button" onClick={addFilter} className="flex h-8 w-full items-center justify-center gap-1 rounded-md border border-dashed text-[10px] text-muted-foreground hover:bg-muted">
+          <Filter className="size-3" /> Add filter
+        </button>
+      )}
+      <div className="space-y-2">
+        {filters.map((f, i) => (
+          <div key={i} className="rounded-md border bg-muted/30 p-1.5 space-y-1.5">
+            <div className="flex items-center gap-1">
+              <select
+                value={f.column}
+                onChange={(e) => updateFilter(i, { column: e.target.value })}
+                className="h-7 flex-1 min-w-0 rounded-md border bg-background px-1 text-[10px]"
+              >
+                {columns.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+              <select
+                value={f.type}
+                onChange={(e) => updateFilter(i, { type: e.target.value as PanelFilter["type"] })}
+                className="h-7 w-20 rounded-md border bg-background px-1 text-[10px]"
+              >
+                <option value="date_range">Date</option>
+                <option value="enum">Enum</option>
+              </select>
+              <button type="button" onClick={() => removeFilter(i)} className="shrink-0 rounded p-0.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+                <X className="size-3" />
+              </button>
+            </div>
+            {f.type === "date_range" ? (
+              <div className="flex items-center gap-1">
+                <input type="date" value={f.from ?? ""} onChange={(e) => updateFilter(i, { from: e.target.value })} className="h-7 w-full rounded-md border bg-background px-1 text-[10px]" />
+                <span className="text-[10px] text-muted-foreground">–</span>
+                <input type="date" value={f.to ?? ""} onChange={(e) => updateFilter(i, { to: e.target.value })} className="h-7 w-full rounded-md border bg-background px-1 text-[10px]" />
+              </div>
+            ) : (
+              <input type="text" value={f.value ?? ""} onChange={(e) => updateFilter(i, { value: e.target.value })} placeholder="value" className="h-7 w-full rounded-md border bg-background px-1 text-[10px]" />
+            )}
+          </div>
+        ))}
+        {filters.length > 0 && (
+          <button type="button" onClick={addFilter} className="flex h-7 w-full items-center justify-center gap-1 rounded-md border border-dashed text-[10px] text-muted-foreground hover:bg-muted">
+            <Plus className="size-3" /> Add filter
+          </button>
+        )}
+      </div>
+    </Field>
+  )
+}
+
+function PanelActionButtons({ editor, requireDataset = false }: { editor: PanelEditor; requireDataset?: boolean }) {  const { editingPanelId, createPanel, updatePanel, datasetId, handleAdd, handleCancelEdit } = editor
   const disabled = createPanel.isPending || updatePanel.isPending || (requireDataset && !datasetId)
   return (
     <>

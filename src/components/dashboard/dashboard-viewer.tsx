@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react"
 import "./react-grid.css"
 import { useDashboard } from "@/hooks/use-dashboards"
 import { usePanelData } from "@/hooks/use-panel-data"
+import { DashboardFilterProvider } from "@/hooks/use-dashboard-filters"
 import { PanelBody } from "@/components/dashboard/dashboard-grid"
 import { cn } from "@/lib/utils"
 
@@ -33,10 +34,11 @@ export default function DashboardViewer({ id, variant, requirePublic = false }: 
   const isEmbed = variant === "embed"
 
   return (
-    <div
-      className={cn("h-screen bg-background", !isEmbed && "bg-muted/10 p-4")}
-      style={{ margin: 0, overflow: "hidden" }}
-    >
+    <DashboardFilterProvider>
+      <div
+        className={cn("h-screen bg-background", !isEmbed && "bg-muted/10 p-4")}
+        style={{ margin: 0, overflow: "hidden" }}
+      >
       {!isEmbed && (
         <div className="mb-3">
           <h1 className="text-lg font-semibold">{dashboard.name}</h1>
@@ -62,7 +64,7 @@ export default function DashboardViewer({ id, variant, requirePublic = false }: 
                 </div>
               )}
               <div className={cn(showTitle ? (isEmbed ? "h-[calc(100%-20px)]" : "h-[calc(100%-32px)]") : "h-full")}>
-                {panel.dataSetId ? (
+                {panel.dataSetId || panel.chartType === "filter" ? (
                   <PanelBody panel={panel} data={panelData[panel.id]} />
                 ) : (
                   <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No dataset</div>
@@ -72,6 +74,7 @@ export default function DashboardViewer({ id, variant, requirePublic = false }: 
           )
         })}
       </GridLayout>
-    </div>
+      </div>
+    </DashboardFilterProvider>
   )
 }

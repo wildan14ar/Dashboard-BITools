@@ -14,6 +14,7 @@ import {
   KpiChart,
   TableChart,
   TextChart,
+  FilterChart,
 } from "@/components/charts"
 
 type Props = {
@@ -209,6 +210,8 @@ export function PanelBody({ panel, data, preview = false }: { panel: Panel; data
   switch (panel.chartType) {
     case "kpi":
       return <KpiChart panel={panel} data={data} preview={preview} />
+    case "filter":
+      return <FilterChart panel={panel} data={data} preview={preview} />
     case "table":
     case "":
       return <TableChart panel={panel} data={data} preview={preview} />
