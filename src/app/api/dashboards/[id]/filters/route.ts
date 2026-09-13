@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { RequestHandler } from "@/middlewares/request-handler"
 import { filterSchema } from "@/validation/filter"
-import { requireAuth, unauthorized, parseBody } from "@/lib/api"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireAuth()
-  if (!session) return unauthorized()
+  const session = await auth()
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id: dashboardId } = await params
-  const { data, error } = await parseBody(req, filterSchema)
-  if (error) return error
+  const validated = await RequestHandler.validateRequest(z.object({ body: filterSchema }), req)
+  if (validated instanceof NextResponse) return validated
+  const data = validated.body
 
   const filter = await prisma.biFilter.create({
     data: { ...data, dashboardId, config: (data.config ?? {}) as object },

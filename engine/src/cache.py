@@ -25,9 +25,8 @@ def _get_redis() -> redis.Redis | None:
             logger.info(f"Redis connected: {REDIS_URL}")
         except Exception:
             logger.warning("Redis unavailable, cache disabled")
-            _redis = False  # type: ignore
-            return None
-    return _redis if _redis is not False else None  # type: ignore
+            _redis = None
+    return _redis
 
 
 def cache_key(source_id: str, sql: str) -> str:

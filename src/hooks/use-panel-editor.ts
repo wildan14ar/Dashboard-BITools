@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import axios from "axios"
+import api from "@/lib/axios"
 import type { Layout } from "react-grid-layout"
 import { useDashboard, useCreatePanel, useUpdatePanel, useDeletePanel, useReorderPanels } from "@/hooks/use-dashboards"
 import { useDatasets } from "@/hooks/use-datasets"
@@ -70,9 +70,9 @@ export function usePanelEditor(id: string) {
     if (!datasetId) { setColumns([]); setPreviewData(null); return }
     let cancelled = false
     setColumnsLoading(true)
-    axios
-      .post(`/api/datasets/${datasetId}/run`, { pageSize: 10 })
-      .then(({ data }) => {
+    api
+      .post<PreviewData>(`/datasets/${datasetId}/run`, {})
+      .then((data) => {
         if (!cancelled && data?.columns) {
           setColumns(data.columns)
           setPreviewData(data)
@@ -89,7 +89,7 @@ export function usePanelEditor(id: string) {
       if (next.has(dsId)) { next.delete(dsId); return next }
       next.add(dsId)
       if (!datasetColumns[dsId]) {
-        axios.post(`/api/datasets/${dsId}/run`, { pageSize: 1 }).then(({ data }) => {
+        api.post<{ columns: string[] }>(`/datasets/${dsId}/run`, {}).then((data) => {
           if (data?.columns) setDatasetColumns((p) => ({ ...p, [dsId]: data.columns }))
         })
       }
@@ -102,6 +102,37 @@ export function usePanelEditor(id: string) {
   useEffect(() => {
     if (selectedDataset && !panelTitle) setPanelTitle(selectedDataset.name)
   }, [selectedDataset, panelTitle])
+
+  function resetEditor() {
+    setEditingPanelId(null)
+    setDatasetId("")
+    setPanelTitle("")
+    setPanelText("")
+    setPanelTextLevel("p")
+    setPanelTextColor("")
+    setPanelTextAlign("left")
+    setPanelTextVAlign("top")
+    setColumns([])
+    setPanelPadding(8)
+    setPieMode("donut")
+    setDonutThickness(45)
+    setLineFill(false)
+    setBarOrientation("vertical")
+    setTitlePosition("top")
+    setTitleAlign("left")
+    setTitleBold(false)
+    setTitleItalic(false)
+    setTitleStrikethrough(false)
+    setTitleColor("")
+    setTitleSize(12)
+    setTableScroll("vertical")
+    setTableMode("pivot")
+    setPivotRowCol(0)
+    setPivotColCol(1)
+    setPivotValueCol(2)
+    setPivotAgg("sum")
+    setFilters([])
+  }
 
   const handleSave = () => {
     if (!dashboard) return
@@ -152,20 +183,7 @@ export function usePanelEditor(id: string) {
         config,
       })
     }
-    setDatasetId("")
-    setPanelTitle("")
-    setPanelText("")
-    setPanelTextLevel("p")
-    setPanelTextColor("")
-    setPanelTextAlign("left")
-    setPanelTextVAlign("top")
-    setColumns([])
-    setPanelPadding(8)
-    setPieMode("donut")
-    setDonutThickness(45)
-    setLineFill(false)
-    setBarOrientation("vertical")
-    setFilters([])
+    resetEditor()
   }
 
   function handleEditPanel(panel: { id: string; title: string; chartType: string; dataSetId: string | null; config: Record<string, unknown> | null }) {
@@ -220,34 +238,7 @@ export function usePanelEditor(id: string) {
   }
 
   function handleCancelEdit() {
-    setEditingPanelId(null)
-    setDatasetId("")
-    setPanelTitle("")
-    setPanelText("")
-    setPanelTextLevel("p")
-    setPanelTextColor("")
-    setPanelTextAlign("left")
-    setPanelTextVAlign("top")
-    setPanelPadding(8)
-    setPieMode("donut")
-    setDonutThickness(45)
-    setLineFill(false)
-    setBarOrientation("vertical")
-    setTitlePosition("top")
-    setTitleAlign("left")
-    setTitleBold(false)
-    setTitleItalic(false)
-    setTitleStrikethrough(false)
-    setTitleColor("")
-    setTitleSize(12)
-    setTableScroll("vertical")
-    setTableMode("pivot")
-    setPivotRowCol(0)
-    setPivotColCol(1)
-    setPivotValueCol(2)
-    setPivotAgg("sum")
-    setFilters([])
-    setColumns([])
+    resetEditor()
   }
 
   function selectDataset(dsId: string) {

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import axios from "axios"
+import api from "@/lib/axios"
 import type { DashboardInput } from "@/validation/dashboard"
 
 export type Dashboard = {
@@ -32,7 +32,7 @@ export function useDashboards() {
   return useQuery({
     queryKey: ["dashboards"],
     queryFn: async () => {
-      const { data } = await axios.get<Dashboard[]>("/api/dashboards")
+      const data = await api.get<Dashboard[]>("/dashboards")
       return data
     },
   })
@@ -42,7 +42,7 @@ export function useDashboard(id: string) {
   return useQuery({
     queryKey: ["dashboards", id],
     queryFn: async () => {
-      const { data } = await axios.get<Dashboard>(`/api/dashboards/${id}`)
+      const data = await api.get<Dashboard>(`/dashboards/${id}`)
       return data
     },
     enabled: !!id,
@@ -53,7 +53,7 @@ export function useCreateDashboard() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (input: DashboardInput) => {
-      const { data } = await axios.post("/api/dashboards", input)
+      const data = await api.post<Dashboard>(`/dashboards`, input)
       return data
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["dashboards"] }),
@@ -64,7 +64,7 @@ export function useDeleteDashboard() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`/api/dashboards/${id}`)
+      await api.delete(`/dashboards/${id}`)
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["dashboards"] }),
   })
@@ -74,7 +74,7 @@ export function useCreatePanel(dashboardId: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (input: Record<string, unknown>) => {
-      const { data } = await axios.post(`/api/dashboards/${dashboardId}/panels`, input)
+      const data = await api.post(`/dashboards/${dashboardId}/panels`, input)
       return data
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["dashboards", dashboardId] }),
@@ -85,7 +85,7 @@ export function useUpdatePanel(dashboardId: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ panelId, ...input }: Record<string, unknown> & { panelId: string }) => {
-      const { data } = await axios.put(`/api/dashboards/${dashboardId}/panels/${panelId}`, input)
+      const data = await api.put(`/dashboards/${dashboardId}/panels/${panelId}`, input)
       return data
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["dashboards", dashboardId] }),
@@ -96,7 +96,7 @@ export function useDeletePanel(dashboardId: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (panelId: string) => {
-      await axios.delete(`/api/dashboards/${dashboardId}/panels/${panelId}`)
+      await api.delete(`/dashboards/${dashboardId}/panels/${panelId}`)
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["dashboards", dashboardId] }),
   })
@@ -106,7 +106,7 @@ export function useReorderPanels(dashboardId: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (panels: { id: string; x: number; y: number; w: number; h: number }[]) => {
-      const { data } = await axios.put(`/api/dashboards/${dashboardId}/panels/reorder`, panels)
+      const data = await api.put(`/dashboards/${dashboardId}/panels/reorder`, panels)
       return data
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["dashboards", dashboardId] }),

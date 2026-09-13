@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { RequestHandler } from "@/middlewares/request-handler"
 import { datasetSchema } from "@/validation/dataset"
-import { requireAuth, unauthorized, parseBody } from "@/lib/api"
 
 export async function GET() {
-  const session = await requireAuth()
-  if (!session) return unauthorized()
+  const session = await auth()
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const datasets = await prisma.biDataset.findMany({
     include: { source: { select: { name: true } } },
@@ -15,11 +17,12 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const session = await requireAuth()
-  if (!session) return unauthorized()
+  const session = await auth()
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { data, error } = await parseBody(req, datasetSchema)
-  if (error) return error
+  const validated = await RequestHandler.validateRequest(z.object({ body: datasetSchema }), req)
+  if (validated instanceof NextResponse) return validated
+  const data = validated.body
 
   const dataset = await prisma.biDataset.create({
     data: {

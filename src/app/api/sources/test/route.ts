@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server"
+import { auth } from "@/lib/auth"
 import { testConnection } from "@/lib/engine"
 import { CONFIG_SCHEMAS, sourceTypeSchema } from "@/validation/source"
-import { requireAdmin, forbidden, cleanError, parseBody } from "@/lib/api"
+import { cleanError } from "@/lib/engine"
+import { RequestHandler } from "@/middlewares/request-handler"
 import { z } from "zod"
 
 const testSchema = z
@@ -19,11 +21,12 @@ const testSchema = z
   })
 
 export async function POST(req: Request) {
-  const session = await requireAdmin()
-  if (!session) return forbidden()
+  const session = await auth()
+  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
-  const { data, error } = await parseBody(req, testSchema)
-  if (error) return error
+  const validated = await RequestHandler.validateRequest(z.object({ body: testSchema }), req)
+  if (validated instanceof NextResponse) return validated
+  const data = validated.body
 
   try {
     const result = await testConnection({

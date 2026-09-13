@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import axios from "axios"
+import api from "@/lib/axios"
 import type { RunData } from "@/lib/chart"
 import { useDashboardFilters } from "@/hooks/use-dashboard-filters"
 
@@ -37,8 +37,8 @@ export function usePanelData(panels: PanelLike[] | null | undefined) {
           try {
             const own = filtersToParams((panel.config?.filters as FilterDef[]) ?? [])
             const params = { ...globalValues, ...own }
-            const res = await axios.post(`/api/datasets/${panel.dataSetId}/run`, { cache: false, params })
-            results[panel.id] = res.data ?? null
+            const res = await api.post<RunData | null>(`/datasets/${panel.dataSetId}/run`, { cache: false, params })
+            results[panel.id] = res ?? null
           } catch {
             results[panel.id] = null
           }

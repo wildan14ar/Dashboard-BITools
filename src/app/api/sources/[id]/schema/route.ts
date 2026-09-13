@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { getSchema } from "@/lib/engine"
-import { requireAdmin, forbidden, cleanError } from "@/lib/api"
+import { getSchema, cleanError } from "@/lib/engine"
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireAdmin()
-  if (!session) return forbidden()
+  const session = await auth()
+  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   const { id } = await params
   const source = await prisma.biSource.findUnique({ where: { id } })

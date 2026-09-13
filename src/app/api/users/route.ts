@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import bcrypt from "bcrypt"
+import { z } from "zod"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { RequestHandler } from "@/middlewares/request-handler"
 import { createUserSchema } from "@/validation/user"
-import { requireAdmin, forbidden, parseBody } from "@/lib/api"
 
 export async function GET() {
-  const session = await requireAdmin()
-  if (!session) return forbidden()
+  const session = await auth()
+  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   const users = await prisma.user.findMany({
     select: { id: true, userName: true, fullName: true, email: true, isSuperAdmin: true, createdAt: true },
@@ -16,11 +18,12 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await requireAdmin()
-  if (!session) return forbidden()
+  const session = await auth()
+  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
-  const { data, error } = await parseBody(req, createUserSchema)
-  if (error) return error
+  const validated = await RequestHandler.validateRequest(z.object({ body: createUserSchema }), req)
+  if (validated instanceof NextResponse) return validated
+  const data = validated.body
 
   const { password, ...rest } = data
   const existing = await prisma.user.findUnique({ where: { userName: rest.userName } })

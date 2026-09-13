@@ -36,8 +36,6 @@ class QueryEngineServicer(rpc.QueryEngineServicer):
                 timeout_sec=request.timeout_sec,
                 params=dict(request.params),
                 use_cache=request.use_cache,
-                limit=request.limit,
-                offset=request.offset,
             )
             rows = [pb.Row(values=r) for r in result["rows"]]
             return pb.QueryResponse(
@@ -68,8 +66,6 @@ class QueryEngineServicer(rpc.QueryEngineServicer):
                 timeout_sec=request.timeout_sec or 60,
                 params=dict(request.params),
                 use_cache=request.use_cache,
-                limit=request.limit,
-                offset=request.offset,
             )
             batch_size = 500
             rows = result["rows"]

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { execute } from "@/lib/engine"
-import { requireAuth, unauthorized, cleanError } from "@/lib/api"
+import { execute, cleanError } from "@/lib/engine"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireAuth()
-  if (!session) return unauthorized()
+  const session = await auth()
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
   const dataset = await prisma.biDataset.findUnique({ where: { id }, include: { source: true } })
@@ -14,8 +14,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const body = await req.json().catch(() => ({}))
   const paramsOverrides = body.params ?? {}
   const cache = body.cache !== false
-  const page = Math.max(1, Number(body.page) || 1)
-  const pageSize = Math.max(0, Number(body.pageSize) || 0)
 
   try {
     const result = await execute({
@@ -25,8 +23,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       sql: dataset.sql,
       params: paramsOverrides,
       useCache: cache,
-      limit: pageSize > 0 ? pageSize : undefined,
-      offset: pageSize > 0 ? (page - 1) * pageSize : 0,
     })
 
     await prisma.biDataset.update({ where: { id }, data: { lastRunAt: new Date() } })

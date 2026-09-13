@@ -59,8 +59,6 @@ message QueryRequest {
   string db_type = 6;
   string config_json = 7;
   bool use_cache = 8;
-  int32 limit = 9;
-  int32 offset = 10;
 }
 
 message QueryResponse {

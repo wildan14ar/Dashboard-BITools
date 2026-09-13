@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from "next/server"
 import bcrypt from "bcrypt"
+import { z } from "zod"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { RequestHandler } from "@/middlewares/request-handler"
 import { updateUserSchema } from "@/validation/user"
-import { requireAdmin, forbidden, parseBody } from "@/lib/api"
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireAdmin()
-  if (!session) return forbidden()
+  const session = await auth()
+  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   const { id } = await params
-  const { data, error } = await parseBody(req, updateUserSchema)
-  if (error) return error
+  const validated = await RequestHandler.validateRequest(z.object({ body: updateUserSchema }), req)
+  if (validated instanceof NextResponse) return validated
+  const data = validated.body
 
   const { password, ...rest } = data
   const updateData: Record<string, unknown> = { ...rest }
@@ -25,8 +28,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireAdmin()
-  if (!session) return forbidden()
+  const session = await auth()
+  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
   const { id } = await params
   await prisma.user.delete({ where: { id } })

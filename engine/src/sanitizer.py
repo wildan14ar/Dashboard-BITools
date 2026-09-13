@@ -1,46 +1,44 @@
 import re
 
-import sqlparse
-
 ALLOWED_KEYWORDS = {"SELECT", "WITH", "EXPLAIN", "SHOW", "DESCRIBE", "DESC", "ANALYZE"}
-BLOCKED_KEYWORDS = {
-    "DROP",
-    "DELETE",
-    "INSERT",
-    "UPDATE",
-    "ALTER",
-    "CREATE",
-    "TRUNCATE",
-    "GRANT",
-    "REVOKE",
-    "EXEC",
-    "EXECUTE",
-    "CALL",
-    "SET",
-    "RENAME",
-    "REPLACE",
-    "COMMIT",
-    "ROLLBACK",
-    "BEGIN",
-    "SAVEPOINT",
-    "LOCK",
-    "UNLOCK",
-}
-
-TEMPLATE_RE = re.compile(r"\{\{(\w+)\}\}")
 
 
 def is_safe(sql: str) -> bool:
-    stmts = sqlparse.parse(sql)
-    for stmt in stmts:
-        if stmt.get_type() not in ALLOWED_KEYWORDS:
+    pattern = r"\b(" + "|".join(ALLOWED_KEYWORDS) + r")\b"
+    stmts = re.findall(pattern, sql, flags=re.IGNORECASE)
+    if not stmts:
+        return False
+    lower_sql = sql.lower()
+    for kw in ALLOWED_KEYWORDS:
+        if kw.lower() not in lower_sql:
             return False
-        for token in stmt.flatten():
-            if (
-                token.ttype is sqlparse.tokens.Keyword
-                and token.value.upper() in BLOCKED_KEYWORDS
-            ):
-                return False
+    # Check for blocked keywords
+    blocked = {
+        "drop",
+        "delete",
+        "insert",
+        "update",
+        "alter",
+        "create",
+        "truncate",
+        "grant",
+        "revoke",
+        "exec",
+        "execute",
+        "call",
+        "set",
+        "rename",
+        "replace",
+        "commit",
+        "rollback",
+        "begin",
+        "savepoint",
+        "lock",
+        "unlock",
+    }
+    for token in re.findall(r"\b\w+\b", lower_sql):
+        if token in blocked:
+            return False
     return True
 
 
@@ -52,4 +50,4 @@ def apply_params(sql: str, params: dict[str, str]) -> str:
             return match.group(0)
         return val.replace("'", "''").replace("\\", "\\\\")
 
-    return TEMPLATE_RE.sub(repl, sql)
+    return re.sub(r"\{\{(\w+)\}\}", repl, sql)

@@ -26,36 +26,15 @@ def cfg(tmp_path):
     factory.dispose("pagination_test")
 
 
-def test_pagination(cfg):
-    p1 = execute_query(
-        "pagination_test",
-        SQL,
-        db_type="sqlite",
-        config_json=cfg,
-        limit=10,
-        offset=0,
-        use_cache=False,
-    )
-    p2 = execute_query(
-        "pagination_test",
-        SQL,
-        db_type="sqlite",
-        config_json=cfg,
-        limit=10,
-        offset=10,
-        use_cache=False,
-    )
-    all_rows = execute_query(
+def test_fetch_all_rows(cfg):
+    result = execute_query(
         "pagination_test", SQL, db_type="sqlite", config_json=cfg, use_cache=False
     )
 
-    assert [r[0] for r in p1["rows"]] == [str(i) for i in range(10)]
-    assert [r[0] for r in p2["rows"]] == [str(i) for i in range(10, 20)]
-    assert len(all_rows["rows"]) == 50
-    assert all_rows["row_count"] == 50
-    assert p1["total"] == 50
-    assert p2["total"] == 50
-    assert all_rows["total"] == 50
+    assert [r[0] for r in result["rows"]] == [str(i) for i in range(50)]
+    assert len(result["rows"]) == 50
+    assert result["row_count"] == 50
+    assert result["total"] == 50
 
 
 def test_cache_flag(cfg, monkeypatch):

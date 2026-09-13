@@ -17,8 +17,6 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
   const [result, setResult] = useState<{ columns: string[]; rows: { values: string[] }[]; rowCount: number; executionTimeMs: number; cached?: boolean; total?: number } | null>(null)
   const [error, setError] = useState("")
   const [useCache, setUseCache] = useState(true)
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(0)
 
   const { data: dataset } = useDataset(id)
   const runDataset = useRunDataset(id)
@@ -28,12 +26,11 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
   const displayName = name || dataset?.name || ""
   const displaySql = sql || dataset?.sql || ""
 
-  function runAt(nextPage: number) {
-    setPage(nextPage)
+  function handleRun() {
     setError("")
     setResult(null)
     runDataset.mutate(
-      { cache: useCache, page: nextPage, pageSize },
+      { cache: useCache },
       {
         onSuccess: (data) => setResult(data),
         onError: (err) => setError(String(err)),
@@ -41,13 +38,7 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
     )
   }
 
-  function handleRun() {
-    runAt(page)
-  }
-
   if (!dataset) return <div className="p-6 text-muted-foreground">Loading...</div>
-
-  const totalPages = pageSize > 0 && result?.total != null ? Math.max(1, Math.ceil(result.total / pageSize)) : undefined
 
   return (
     <div className="flex h-full flex-col">
@@ -63,19 +54,6 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
             <input type="checkbox" checked={useCache} onChange={(e) => setUseCache(e.target.checked)} className="size-3.5 accent-primary" />
             Cache
           </label>
-          <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))} className="input h-8 w-24 text-xs">
-            <option value={0}>All rows</option>
-            <option value={100}>100/page</option>
-            <option value={500}>500/page</option>
-            <option value={1000}>1000/page</option>
-          </select>
-          {pageSize > 0 && (
-            <div className="flex items-center gap-1.5">
-              <Button variant="outline" size="sm" onClick={() => runAt(page - 1)} disabled={page <= 1}>Prev</Button>
-              <span className="text-xs text-muted-foreground">{totalPages ? `Page ${page} / ${totalPages}` : `Page ${page}`}</span>
-              <Button variant="outline" size="sm" onClick={() => runAt(page + 1)} disabled={totalPages != null && page >= totalPages}>Next</Button>
-            </div>
-          )}
           <Button onClick={handleRun} disabled={runDataset.isPending}>
             {runDataset.isPending ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
             Run

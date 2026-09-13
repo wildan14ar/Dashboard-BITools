@@ -5,16 +5,16 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { SessionProvider } from "next-auth/react"
 import { Database, BarChart3, Users, Layers } from "lucide-react"
 import Sidebar from "@/components/layout/sidebar"
-import type { MenuItem } from "@/components/layout/sidebar"
 
-const menuConfig: MenuItem[] = [
-  { key: "dashboards", translations: { en: "Dashboards" }, icon: <BarChart3 size={18} />, href: "/" },
-  { key: "sources", translations: { en: "Sources" }, icon: <Database size={18} />, href: "/sources" },
-  { key: "datasets", translations: { en: "Datasets" }, icon: <Layers size={18} />, href: "/datasets" },
-  { key: "users", translations: { en: "Users" }, icon: <Users size={18} />, href: "/users" },
+const items = [
+  { name: "Dashboards", icon: <BarChart3 size={18} />, href: "/" },
+  { name: "Sources", icon: <Database size={18} />, href: "/sources" },
+  { name: "Datasets", icon: <Layers size={18} />, href: "/datasets" },
+  { name: "Users", icon: <Users size={18} />, href: "/users" },
 ]
 
-const validSidebar = ["/", "/sources/**", "/datasets/**", "/users/**", "/new"]
+// Hide chrome on full-screen dashboard pages (/[id], /[id]/edit)
+const showOn = ["/", "/sources/**", "/datasets/**", "/users/**", "/new"]
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient())
@@ -23,12 +23,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     <SessionProvider>
       <QueryClientProvider client={queryClient}>
         <div className="flex h-screen">
-          <Sidebar
-            menuConfig={menuConfig}
-            validSidebar={validSidebar}
-            brandName="BI Dashboard"
-            defaultMenuOpen={true}
-          />
+          <Sidebar items={items} showOn={showOn} brandName="BI Dashboard" />
           <main className="flex-1 overflow-auto">{children}</main>
         </div>
       </QueryClientProvider>

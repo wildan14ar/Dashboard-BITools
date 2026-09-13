@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { RequestHandler } from "@/middlewares/request-handler"
 import { dashboardSchema } from "@/validation/dashboard"
-import { requireAuth, unauthorized, parseBody } from "@/lib/api"
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireAuth()
-  if (!session) return unauthorized()
+  const session = await auth()
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
   const dashboard = await prisma.biDashboard.findUnique({
@@ -17,12 +19,13 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireAuth()
-  if (!session) return unauthorized()
+  const session = await auth()
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
-  const { data, error } = await parseBody(req, dashboardSchema)
-  if (error) return error
+  const validated = await RequestHandler.validateRequest(z.object({ body: dashboardSchema }), req)
+  if (validated instanceof NextResponse) return validated
+  const data = validated.body
 
   const dashboard = await prisma.biDashboard.update({
     where: { id },
@@ -32,8 +35,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireAuth()
-  if (!session) return unauthorized()
+  const session = await auth()
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
   await prisma.biDashboard.delete({ where: { id } })

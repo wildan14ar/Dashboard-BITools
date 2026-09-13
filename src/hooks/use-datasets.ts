@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import axios from "axios"
+import api from "@/lib/axios"
 import type { DatasetInput } from "@/validation/dataset"
 
 export type Dataset = {
@@ -18,7 +18,7 @@ export function useDatasets() {
   return useQuery({
     queryKey: ["datasets"],
     queryFn: async () => {
-      const { data } = await axios.get<Dataset[]>("/api/datasets")
+      const data = await api.get<Dataset[]>("/datasets")
       return data
     },
   })
@@ -28,7 +28,7 @@ export function useDataset(id: string) {
   return useQuery({
     queryKey: ["datasets", id],
     queryFn: async () => {
-      const { data } = await axios.get<Dataset>(`/api/datasets/${id}`)
+      const data = await api.get<Dataset>(`/datasets/${id}`)
       return data
     },
     enabled: !!id,
@@ -39,7 +39,7 @@ export function useCreateDataset() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (input: DatasetInput) => {
-      const { data } = await axios.post("/api/datasets", input)
+      const data = await api.post("/datasets", input)
       return data
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["datasets"] }),
@@ -50,7 +50,7 @@ export function useUpdateDataset() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...input }: DatasetInput & { id: string }) => {
-      const { data } = await axios.put(`/api/datasets/${id}`, input)
+      const data = await api.put(`/datasets/${id}`, input)
       return data
     },
     onSuccess: (_, vars) => {
@@ -64,7 +64,7 @@ export function useDeleteDataset() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`/api/datasets/${id}`)
+      await api.delete(`/datasets/${id}`)
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["datasets"] }),
   })
@@ -73,14 +73,13 @@ export function useDeleteDataset() {
 export type RunOptions = {
   params?: Record<string, string>
   cache?: boolean
-  page?: number
-  pageSize?: number
 }
 
 export function useRunDataset(id: string) {
+  type RunResult = { columns: string[]; rows: { values: string[] }[]; rowCount: number; executionTimeMs: number; cached?: boolean; total?: number }
   return useMutation({
     mutationFn: async (opts?: RunOptions) => {
-      const { data } = await axios.post(`/api/datasets/${id}/run`, opts ?? {})
+      const data = await api.post<RunResult>(`/datasets/${id}/run`, opts ?? {})
       return data
     },
   })

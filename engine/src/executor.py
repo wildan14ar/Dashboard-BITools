@@ -50,8 +50,6 @@ def execute_query(
     timeout_sec: int = 30,
     params: dict[str, str] | None = None,
     use_cache: bool = True,
-    limit: int | None = None,
-    offset: int = 0,
 ) -> dict:
     non_sql = db_type in NON_SQL_TYPES
 
@@ -63,11 +61,8 @@ def execute_query(
     max_rows = min(max_rows, MAX_ROWS_HARD)
     timeout_sec = min(timeout_sec, TIMEOUT_SEC_HARD)
 
-    base_sql = sql.rstrip().rstrip(";").strip()
-    if limit is not None and limit > 0 and not non_sql:
-        sql = f"{base_sql} LIMIT {min(int(limit), max_rows)} OFFSET {int(offset or 0)}"
-
-    key = cache_key(source_id, sql) if use_cache and not params else None
+    sql = sql.rstrip().rstrip(";").strip()
+    key = cache_key(source_id, sql) if use_cache else None
 
     refresh_lease = False
     if key:
@@ -87,21 +82,9 @@ def execute_query(
     engine = conn_mod.create(db_type, source_id, config_json)
 
     try:
-        total = None
-        if non_sql:
-            result_rows = engine.fetch_all(sql, params or {})
-            columns, rows = _adapt_results(result_rows)
-            total = len(rows)
-        else:
-            if limit is not None and limit > 0:
-                count_rows = engine.fetch_all(
-                    f"SELECT COUNT(*) AS cnt FROM ({base_sql}) AS _fyc_count"
-                )
-                total = int(count_rows[0]["cnt"]) if count_rows else 0
-            result_rows = engine.fetch_all(sql, params or {})
-            columns, rows = _adapt_results(result_rows)
-            if total is None:
-                total = len(rows)
+        result_rows = engine.fetch_all(sql, params or {})
+        result_rows = result_rows[:max_rows]
+        columns, rows = _adapt_results(result_rows)
     finally:
         engine.close()
 
@@ -109,7 +92,7 @@ def execute_query(
     output = {
         "columns": columns,
         "row_count": len(rows),
-        "total": int(total),
+        "total": len(rows),
         "execution_time_ms": round(elapsed, 2),
         "rows": rows,
         "cached": False,

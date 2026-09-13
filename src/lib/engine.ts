@@ -41,8 +41,6 @@ export async function execute(src: SourceRef & {
   timeoutSec?: number
   params?: Record<string, string>
   useCache?: boolean
-  limit?: number
-  offset?: number
 }) {
   const client = getClient()
   return promisify((cb) =>
@@ -56,8 +54,6 @@ export async function execute(src: SourceRef & {
         timeoutSec: src.timeoutSec ?? 30,
         params: src.params ?? {},
         useCache: src.useCache ?? true,
-        limit: src.limit ?? 0,
-        offset: src.offset ?? 0,
       },
       cb
     )
@@ -70,8 +66,6 @@ export function executeStream(src: SourceRef & {
   timeoutSec?: number
   params?: Record<string, string>
   useCache?: boolean
-  limit?: number
-  offset?: number
 }) {
   const client = getClient()
   return client.ExecuteStream({
@@ -83,8 +77,6 @@ export function executeStream(src: SourceRef & {
     timeoutSec: src.timeoutSec ?? 60,
     params: src.params ?? {},
     useCache: src.useCache ?? true,
-    limit: src.limit ?? 0,
-    offset: src.offset ?? 0,
   })
 }
 
@@ -110,4 +102,10 @@ export async function testConnection(params: {
 export async function invalidateCache(sourceId: string) {
   const client = getClient()
   return promisify((cb) => client.InvalidateCache({ sourceId }, cb))
+}
+
+export function cleanError(err: unknown): string {
+  if (err && typeof err === "object" && "details" in err) return String((err as { details: unknown }).details)
+  if (err instanceof Error) return err.message
+  return String(err)
 }
