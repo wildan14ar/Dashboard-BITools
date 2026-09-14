@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import logging
 import re
-from typing import Any
 
 from src.conn import Engine as BaseEngine
 from src.conn import register
@@ -46,10 +45,9 @@ class MongoEngine(BaseEngine):
         )
         logger.info(f"Created mongodb engine for [{source_id}]")
 
-    def execute(self, sql: str, params: dict | None = None) -> Any:
-        raise NotImplementedError("MongoDB source is read-only via fetch_all")
-
-    def fetch_all(self, sql: str, params: dict | None = None) -> list[dict]:
+    def fetch_all(
+        self, sql: str, params: dict | None = None, timeout_sec: int | None = None
+    ) -> list[dict]:
         try:
             command = json.loads(
                 _PARAM_RE.sub(
@@ -78,7 +76,18 @@ class MongoEngine(BaseEngine):
         if command.get("sort"):
             cursor = cursor.sort(command["sort"])
         limit = int(command.get("limit", 1000))
-        return [_normalize(doc) for doc in cursor.limit(max(limit, 1))]
+        cursor = cursor.limit(max(limit, 1))
+        if timeout_sec:
+            cursor = cursor.max_time_ms(int(timeout_sec) * 1000)
+        return [_normalize(doc) for doc in cursor]
+
+    def list_tables(self) -> list[dict]:
+        if not self._db_name:
+            return []
+        return [
+            {"name": name, "schema": self._db_name, "columns": []}
+            for name in self._client[self._db_name].list_collection_names()
+        ]
 
     def close(self) -> None:
         self._client.close()

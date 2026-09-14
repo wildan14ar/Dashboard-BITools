@@ -28,4 +28,8 @@ export const settings = {
     ttlSec: Number(process.env.QUERY_CACHE_TTL_SEC || "300"),
     staleWindowSec: Number(process.env.QUERY_CACHE_STALE_WINDOW_SEC || "600"),
   },
+
+  cron: {
+    secret: process.env.CRON_SECRET || "",
+  },
 } as const

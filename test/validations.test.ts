@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test"
 import { loginSchema } from "@/validations/auth"
 import { dashboardSchema, panelSchema } from "@/validations/dashboard"
-import { datasetSchema } from "@/validations/dataset"
+import { batchRunSchema, datasetSchema } from "@/validations/dataset"
 import { sourceSchema } from "@/validations/source"
 
 test("dashboardSchema accepts valid dashboard", () => {
@@ -57,6 +57,19 @@ test("sourceSchema accepts all supported db types", () => {
     config: { project: "p", dataset: "d", credentials_path: "/k.json" },
   })
   expect(bq.success).toBe(true)
+})
+
+test("batchRunSchema accepts up to 50 items, rejects empty", () => {
+  const ok = batchRunSchema.safeParse({
+    items: [{ datasetId: "a", params: { city: "Jakarta" } }, { datasetId: "b" }],
+  })
+  expect(ok.success).toBe(true)
+  expect(batchRunSchema.safeParse({ items: [] }).success).toBe(false)
+  expect(
+    batchRunSchema.safeParse({
+      items: Array.from({ length: 51 }, (_, i) => ({ datasetId: `d${i}` })),
+    }).success,
+  ).toBe(false)
 })
 
 test("loginSchema accepts identifier login", () => {

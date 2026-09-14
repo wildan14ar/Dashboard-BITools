@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any
 from urllib.parse import quote_plus
 
 from sqlalchemy import Engine, create_engine, text
@@ -45,10 +44,9 @@ class ClickhouseEngine(BaseEngine):
         )
         logger.info(f"Created clickhouse engine for [{source_id}]")
 
-    def execute(self, sql: str, params: dict | None = None) -> Any:
-        raise PermissionError("Query engine is read-only")
-
-    def fetch_all(self, sql: str, params: dict | None = None) -> list[dict]:
+    def fetch_all(
+        self, sql: str, params: dict | None = None, timeout_sec: int | None = None
+    ) -> list[dict]:
         with self._engine.connect() as conn:
             try:
                 conn.execute(text("SET readonly = 1"))
@@ -56,6 +54,8 @@ class ClickhouseEngine(BaseEngine):
                 logger.warning(
                     "Could not set ClickHouse readonly=1; relying on sanitizer"
                 )
+            if timeout_sec:
+                conn.execute(text(f"SET max_execution_time = {int(timeout_sec)}"))
             try:
                 result = conn.execute(text(sql), params or {})
                 return [dict(r._mapping) for r in result.fetchall()]

@@ -2,6 +2,7 @@ import path from "node:path"
 import * as grpc from "@grpc/grpc-js"
 import * as protoLoader from "@grpc/proto-loader"
 import type { ProtoGrpcType } from "@/lib/grpc/engine"
+import { ResponseHandler } from "@/middlewares/response-handler"
 
 const PROTO_PATH = path.join(process.cwd(), "proto", "engine.proto")
 
@@ -118,4 +119,41 @@ export function cleanError(err: unknown): string {
     return String((err as { details: unknown }).details)
   if (err instanceof Error) return err.message
   return String(err)
+}
+
+// gRPC status codes (subset yang dipakai engine).
+const GRPC_PERMISSION_DENIED = 7
+const GRPC_INVALID_ARGUMENT = 3
+
+function grpcCode(err: unknown): number | null {
+  if (err && typeof err === "object" && "code" in err) {
+    const code = (err as { code: unknown }).code
+    return typeof code === "number" ? code : null
+  }
+  return null
+}
+
+/**
+ * Petakan error engine ke respons HTTP yang aman: detail driver mentah
+ * (host, user, potongan connection string) TIDAK PERNAH diteruskan ke client.
+ * Hanya pesan sanitizer/validasi yang aman ditampilkan verbatim.
+ */
+export function mapEngineError(err: unknown): { status: 400 | 403 | 500; message: string } {
+  const details = cleanError(err)
+  const code = grpcCode(err)
+  if (code === GRPC_PERMISSION_DENIED || /blocked by sanitizer/i.test(details)) {
+    return { status: 403, message: "Query tidak diizinkan: hanya query baca yang didukung" }
+  }
+  if (code === GRPC_INVALID_ARGUMENT || /^Missing query parameters/i.test(details)) {
+    return { status: 400, message: details }
+  }
+  return { status: 500, message: "Source tidak terjangkau atau query gagal. Cek log server." }
+}
+
+/** Helper route: detail driver tetap di log server, client terima pesan aman. */
+export function engineErrorResponse(err: unknown) {
+  const mapped = mapEngineError(err)
+  if (mapped.status === 403) return ResponseHandler.forbidden(mapped.message)
+  if (mapped.status === 400) return ResponseHandler.badRequest(mapped.message)
+  return ResponseHandler.internalError(mapped.message)
 }

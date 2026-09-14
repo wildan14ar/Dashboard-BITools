@@ -76,10 +76,13 @@ services:
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET:-${DASHBOARD_AUTH_SECRET:-your_secret_key}}
       - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
       - QUERY_ENGINE_HOST=engine:50051
+      - REDIS_URL=redis://redis:6379
     depends_on:
       engine:
         condition: service_healthy
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     restart: unless-stopped
     networks:

@@ -3,6 +3,7 @@ import logging
 import time
 
 from src import conn as conn_mod
+from src import factory
 from src.cache import (
     cache_key,
 )
@@ -88,14 +89,12 @@ def execute_query(
         refresh_lease = stale is not None
 
     start = time.monotonic()
-    engine = conn_mod.create(db_type, source_id, config_json)
+    # Pool koneksi dipakai ulang via factory (jangan dispose per query).
+    engine = factory.get(source_id, db_type, config_json)
 
-    try:
-        result_rows = engine.fetch_all(sql, bound)
-        result_rows = result_rows[:max_rows]
-        columns, rows = _adapt_results(result_rows)
-    finally:
-        engine.close()
+    result_rows = engine.fetch_all(sql, bound, timeout_sec)
+    result_rows = result_rows[:max_rows]
+    columns, rows = _adapt_results(result_rows)
 
     elapsed = (time.monotonic() - start) * 1000
     output = {
@@ -118,6 +117,8 @@ def execute_query(
 def invalidate_cache(source_id: str) -> dict:
     cache_invalidate_pattern(f"qcache:{source_id}:*")
     cache_invalidate_pattern(f"schema:{source_id}*")
+    # Buang pool lama agar kredensial/config baru dipakai query berikutnya.
+    factory.dispose(source_id)
     return {"ok": True}
 
 
@@ -139,16 +140,15 @@ def get_schema_info(source_id: str, db_type: str, config_json: str) -> dict:
         logger.info(f"Schema cache hit: {source_id}")
         return cached
 
-    engine = conn_mod.create(db_type, source_id, config_json)
-    try:
-        if db_type in NON_SQL_TYPES:
-            tables = engine.fetch_all("listCollections")
-            result = {"tables": tables}
-        else:
-            tables = get_schema(engine.sa_engine)
-            result = {"tables": tables}
-    finally:
-        engine.close()
+    engine = factory.get(source_id, db_type, config_json)
+    if db_type == "mongodb":
+        result = {"tables": engine.list_tables()}
+    elif db_type == "api":
+        # REST API tak punya konsep skema yang bisa diintrospeksi.
+        result = {"tables": []}
+    else:
+        tables = get_schema(engine.sa_engine)
+        result = {"tables": tables}
 
     cache_set(schema_cache_key, result)
     return result

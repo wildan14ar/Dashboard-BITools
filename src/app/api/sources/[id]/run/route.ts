@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server"
 import prisma from "@/config/prisma"
 import { settings } from "@/config/settings"
 import { logActivity } from "@/lib/activity"
-import { cleanError, execute } from "@/lib/engine"
+import { engineErrorResponse, execute } from "@/lib/engine"
 import { rateLimit } from "@/lib/rate-limit"
 import { ResponseHandler, requireAuth } from "@/middlewares"
 
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { error, session } = await requireAuth({ permissions: ["sources:read"] })
   if (error) return error
 
-  const rl = rateLimit(`run:${session.user.id}`)
+  const rl = await rateLimit(`run:${session.user.id}`)
   if (!rl.ok) {
     return ResponseHandler.tooManyRequests(
       `Terlalu banyak query, coba lagi dalam ${rl.retryAfterSec} detik`,
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       await logActivity(session?.user?.id || "system", "ERROR", "BiSource", source.id, {
         error: String(err),
       })
-      return ResponseHandler.internalError(cleanError(err), err)
+      return engineErrorResponse(err)
     }
   } catch (err) {
     await logActivity(session?.user?.id || "system", "ERROR", "BiSource", undefined, {

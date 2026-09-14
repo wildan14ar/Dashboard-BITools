@@ -19,12 +19,16 @@ class Engine(ABC):
     def __init__(self, source_id: str, config: dict) -> None: ...
 
     @abstractmethod
-    def execute(self, sql: str, params: dict | None = None) -> Any:
-        """Jalur tulis — konektor read-only wajib raise PermissionError."""
+    def fetch_all(
+        self, sql: str, params: dict | None = None, timeout_sec: int | None = None
+    ) -> Any:
+        """Query baca. timeout_sec wajib ditegakkan konektor bila didukung dialek."""
         ...
 
-    @abstractmethod
-    def fetch_all(self, sql: str, params: dict | None = None) -> Any: ...
+    def list_tables(self) -> list[dict]:
+        """Daftar tabel untuk introspeksi skema. Engine SQL memakai
+        introspector.get_schema(sa_engine); non-SQL override bila didukung."""
+        raise NotImplementedError
 
     @abstractmethod
     def close(self) -> None: ...

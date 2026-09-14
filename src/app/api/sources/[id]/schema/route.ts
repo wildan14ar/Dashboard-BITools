@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server"
 import prisma from "@/config/prisma"
 import { logActivity } from "@/lib/activity"
-import { cleanError, getSchema } from "@/lib/engine"
+import { engineErrorResponse, getSchema } from "@/lib/engine"
 import { ResponseHandler, requireAuth } from "@/middlewares"
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -24,7 +24,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       await logActivity(session?.user?.id || "system", "ERROR", "BiSource", source.id, {
         error: String(err),
       })
-      return ResponseHandler.internalError(cleanError(err), err)
+      return engineErrorResponse(err)
     }
   } catch (err) {
     await logActivity(session?.user?.id || "system", "ERROR", "BiSource", undefined, {

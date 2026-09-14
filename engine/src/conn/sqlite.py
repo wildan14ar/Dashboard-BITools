@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 from sqlalchemy import Engine, create_engine, text
 
@@ -22,18 +21,32 @@ class SQLiteEngine(BaseEngine):
         )
         logger.info(f"Created sqlite engine for [{source_id}]")
 
-    def execute(self, sql: str, params: dict | None = None) -> Any:
-        raise PermissionError("Query engine is read-only")
-
-    def fetch_all(self, sql: str, params: dict | None = None) -> list[dict]:
+    def fetch_all(
+        self, sql: str, params: dict | None = None, timeout_sec: int | None = None
+    ) -> list[dict]:
         # Read-only berlapis: sanitizer (executor) + PRAGMA query_only level
         # koneksi + rollback eksplisit. Lolos sanitizer pun tetap tak bisa tulis.
+        import time
+
         with self._engine.connect() as conn:
             conn.execute(text("PRAGMA query_only=ON"))
+            deadline = time.monotonic() + timeout_sec if timeout_sec else None
+            raw = None
             try:
+                # Best-effort abort query SQLite yang kelewat batas waktu.
+                raw = conn.connection.driver_connection
+                if deadline is not None:
+                    raw.set_progress_handler(
+                        lambda: 0 if time.monotonic() < deadline else 1, 1000
+                    )
                 result = conn.execute(text(sql), params or {})
                 return [dict(r._mapping) for r in result.fetchall()]
             finally:
+                try:
+                    if raw is not None:
+                        raw.set_progress_handler(None, 0)
+                except Exception:
+                    logger.debug("Could not clear SQLite progress handler")
                 conn.rollback()
 
     @property

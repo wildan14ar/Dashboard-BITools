@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any
 from urllib.parse import quote_plus
 
 from sqlalchemy import Engine, create_engine, text
@@ -46,11 +45,15 @@ class MssqlEngine(BaseEngine):
         )
         logger.info(f"Created mssql engine for [{source_id}]")
 
-    def execute(self, sql: str, params: dict | None = None) -> Any:
-        raise PermissionError("Query engine is read-only")
-
-    def fetch_all(self, sql: str, params: dict | None = None) -> list[dict]:
+    def fetch_all(
+        self, sql: str, params: dict | None = None, timeout_sec: int | None = None
+    ) -> list[dict]:
+        # T-SQL tak punya mode READ ONLY level sesi: sanitizer + tanpa commit +
+        # rollback eksplisit. LOCK_TIMEOUT membatasi tunggu lock; batas total
+        # query ditegakkan via deadline gRPC di server.
         with self._engine.connect() as conn:
+            if timeout_sec:
+                conn.execute(text(f"SET LOCK_TIMEOUT {int(timeout_sec) * 1000}"))
             try:
                 result = conn.execute(text(sql), params or {})
                 return [dict(r._mapping) for r in result.fetchall()]

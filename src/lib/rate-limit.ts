@@ -1,7 +1,8 @@
-// In-memory fixed-window rate limiter untuk route berat (dataset/source run).
-// NOTE: per-process Map — akurat untuk deploy single-instance (postur sama
-// seperti cache permission di middlewares/rbac.ts). Untuk multi-replica,
-// pindahkan bucket ke Redis.
+import { getRedis, redisKey } from "@/lib/redis"
+
+// Fixed-window rate limiter untuk route berat (dataset/source run).
+// Backend utama Redis (dibagi antar replika); fallback ke memori bila
+// Redis tak tersedia. Selalu fail-open agar limiter tak memblokir traffic sah.
 
 type Bucket = { count: number; resetAt: number }
 
@@ -17,11 +18,7 @@ function sweep(now: number) {
   }
 }
 
-export function rateLimit(
-  key: string,
-  limit = 30,
-  windowMs = 60_000,
-): { ok: boolean; retryAfterSec: number } {
+function memoryCheck(key: string, limit: number, windowMs: number) {
   const now = Date.now()
   sweep(now)
   const bucket = buckets.get(key)
@@ -34,4 +31,37 @@ export function rateLimit(
   }
   bucket.count += 1
   return { ok: true, retryAfterSec: 0 }
+}
+
+async function redisCheck(key: string, limit: number, windowMs: number) {
+  const redis = getRedis()
+  if (!redis) return null
+  const rkey = redisKey("ratelimit", key)
+  // INCR + PEXPIRE bukan atomik penuh, tapi cukup untuk rate limiting.
+  const count = await redis.incr(rkey)
+  if (count === 1) await redis.pexpire(rkey, windowMs)
+  const ttl = await redis.pttl(rkey)
+  if (count > limit) {
+    return { ok: false, retryAfterSec: Math.max(1, Math.ceil(ttl / 1000)) }
+  }
+  return { ok: true, retryAfterSec: 0 }
+}
+
+export async function rateLimit(
+  key: string,
+  limit = 30,
+  windowMs = 60_000,
+): Promise<{ ok: boolean; retryAfterSec: number }> {
+  try {
+    const res = await redisCheck(key, limit, windowMs)
+    if (res) return res
+  } catch {
+    // Redis gagal → fallback memori (fail-open).
+  }
+  return memoryCheck(key, limit, windowMs)
+}
+
+/** Reset bucket memori untuk testing. */
+export function _resetRateLimitForTests() {
+  buckets.clear()
 }

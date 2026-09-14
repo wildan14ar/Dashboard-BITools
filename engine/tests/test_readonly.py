@@ -47,12 +47,6 @@ def test_fetch_all_blocks_write_at_db_level(cfg):
         engine.fetch_all("INSERT INTO items VALUES (99)", {})
 
 
-def test_execute_method_refuses_write(cfg):
-    _, engine = cfg
-    with pytest.raises(PermissionError, match="read-only"):
-        engine.execute("SELECT 1", {})
-
-
 def test_data_unchanged_and_readable(cfg):
     config_json, engine = cfg
     # Upaya tulis gagal di atas; data harus utuh dan masih bisa dibaca.

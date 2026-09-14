@@ -35,24 +35,18 @@ export function usePanelData(panels: PanelLike[] | null | undefined) {
   useEffect(() => {
     if (!panels?.length) return
     let cancelled = false
+    const paramsOf = (panel: PanelLike) => {
+      const own = filtersToParams((panel.config?.filters as FilterDef[]) ?? [])
+      return { ...globalValues, ...own }
+    }
     const runAll = async () => {
-      const results: Record<string, RunData | null> = {}
-      await Promise.all(
-        panels.map(async (panel) => {
-          if (!panel.dataSetId) return
-          try {
-            const own = filtersToParams((panel.config?.filters as FilterDef[]) ?? [])
-            const params = { ...globalValues, ...own }
-            const res = await api.post<RunData | null>(`/datasets/${panel.dataSetId}/run`, {
-              cache: false,
-              params,
-            })
-            results[panel.id] = res.data ?? null
-          } catch {
-            results[panel.id] = null
-          }
-        }),
-      )
+      let results: Record<string, RunData | null>
+      try {
+        // Satu round-trip untuk semua panel; fallback ke per-panel bila batch gagal.
+        results = await runViaBatch(panels, paramsOf)
+      } catch {
+        results = await runPerPanel(panels, paramsOf)
+      }
       if (!cancelled) setPanelData(results)
     }
     runAll()
@@ -62,4 +56,47 @@ export function usePanelData(panels: PanelLike[] | null | undefined) {
   }, [panels, globalValues])
 
   return panelData
+}
+
+type BatchItemResult = { datasetId: string; data: RunData | null; error: string | null }
+
+async function runViaBatch(
+  panels: PanelLike[],
+  paramsOf: (panel: PanelLike) => Record<string, string>,
+): Promise<Record<string, RunData | null>> {
+  const res = await api.post<BatchItemResult[]>("/datasets/run-batch", {
+    items: panels
+      .filter((p) => p.dataSetId)
+      .map((p) => ({ datasetId: p.dataSetId, params: paramsOf(p) })),
+    useCache: false,
+  })
+  const results: Record<string, RunData | null> = {}
+  const dataByDataset = new Map((res.data ?? []).map((r) => [r.datasetId, r.data]))
+  for (const panel of panels) {
+    if (!panel.dataSetId) continue
+    results[panel.id] = dataByDataset.get(panel.dataSetId) ?? null
+  }
+  return results
+}
+
+async function runPerPanel(
+  panels: PanelLike[],
+  paramsOf: (panel: PanelLike) => Record<string, string>,
+): Promise<Record<string, RunData | null>> {
+  const results: Record<string, RunData | null> = {}
+  await Promise.all(
+    panels.map(async (panel) => {
+      if (!panel.dataSetId) return
+      try {
+        const res = await api.post<RunData | null>(`/datasets/${panel.dataSetId}/run`, {
+          cache: false,
+          params: paramsOf(panel),
+        })
+        results[panel.id] = res.data ?? null
+      } catch {
+        results[panel.id] = null
+      }
+    }),
+  )
+  return results
 }

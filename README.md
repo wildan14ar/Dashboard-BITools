@@ -55,7 +55,7 @@ Atau semuanya via Docker: `docker compose up -d` (dashboard `:3000`, engine `:50
 bun run dev | build | start
 bun run lint | lint:fix | typecheck | test
 bun run db:generate | db:push | db:migrate | db:studio | db:seed | db:reset
-cd engine && pytest                       # 17 tes: sanitizer, executor, cache, nosql
+cd engine && pytest                       # 35 tes: sanitizer, executor, cache, connectors
 ./scripts/backup.sh                       # dump Postgres ke ./backups (simpan 7)
 ```
 
@@ -68,4 +68,5 @@ Lihat `.env.example`. Kunci: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_
 - API: `RequestHandler.validateRequest` + `requireAuth({permissions})` + `ResponseHandler` + `logActivity`; envelope `{success, message, data}`.
 - Permission: `dashboards|datasets|sources:read/create/update/delete/admin`, `users:*`, `roles:*` (`prisma/seed/permissions.ts`). Superadmin bypass.
 - Validasi di `src/validations/`; Prisma client dari `src/config/prisma.ts`; ID = ULID.
-- Health: `GET /api/health` (cek Postgres + engine TCP). Rate limit 30 query/menit/user di route run.
+- Health: `GET /api/health` (cek Postgres + engine TCP). Rate limit 30 query/menit/user di route run (Redis, fallback memori).
+- Cache warmer: `POST /api/cron/refresh` + header `x-cron-secret` (lihat `CRON_SECRET` di `.env.example`).

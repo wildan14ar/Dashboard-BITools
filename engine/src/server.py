@@ -26,6 +26,10 @@ logger = logging.getLogger(__name__)
 
 class QueryEngineServicer(rpc.QueryEngineServicer):
     def Execute(self, request: pb.QueryRequest, context):
+        if not context.is_active():
+            context.set_code(grpc.StatusCode.DEADLINE_EXCEEDED)
+            context.set_details("Client cancelled or deadline exceeded")
+            return pb.QueryResponse()
         try:
             result = execute_query(
                 source_id=request.source_id,
@@ -49,6 +53,10 @@ class QueryEngineServicer(rpc.QueryEngineServicer):
             context.set_code(grpc.StatusCode.PERMISSION_DENIED)
             context.set_details(str(e))
             return pb.QueryResponse()
+        except ValueError as e:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details(str(e))
+            return pb.QueryResponse()
         except Exception as e:
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(str(e))
@@ -56,6 +64,10 @@ class QueryEngineServicer(rpc.QueryEngineServicer):
             return pb.QueryResponse()
 
     def ExecuteStream(self, request: pb.QueryRequest, context):
+        if not context.is_active():
+            context.set_code(grpc.StatusCode.DEADLINE_EXCEEDED)
+            context.set_details("Client cancelled or deadline exceeded")
+            return
         try:
             result = execute_query(
                 source_id=request.source_id,

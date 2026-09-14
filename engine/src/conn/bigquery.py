@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
 from urllib.parse import quote_plus
 
 from sqlalchemy import Engine, create_engine, text
@@ -46,13 +45,15 @@ class BigqueryEngine(BaseEngine):
         self._engine: Engine = create_engine(url, echo=False)
         logger.info(f"Created bigquery engine for [{source_id}] {project}.{dataset}")
 
-    def execute(self, sql: str, params: dict | None = None) -> Any:
-        raise PermissionError("Query engine is read-only")
-
-    def fetch_all(self, sql: str, params: dict | None = None) -> list[dict]:
+    def fetch_all(
+        self, sql: str, params: dict | None = None, timeout_sec: int | None = None
+    ) -> list[dict]:
         from google.cloud.bigquery import QueryJobConfig
 
-        job_config = QueryJobConfig(maximum_bytes_billed=self._max_bytes)
+        job_kwargs: dict = {"maximum_bytes_billed": self._max_bytes}
+        if timeout_sec:
+            job_kwargs["timeoutMs"] = int(timeout_sec) * 1000
+        job_config = QueryJobConfig(**job_kwargs)
         with self._engine.connect() as conn:
             try:
                 result = conn.execute(

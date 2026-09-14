@@ -9,3 +9,15 @@ export const datasetSchema = z.object({
 })
 
 export type DatasetInput = z.infer<typeof datasetSchema>
+
+export const batchRunItemSchema = z.object({
+  datasetId: z.string().min(1, "Required"),
+  params: z.record(z.string(), z.string()).optional(),
+})
+
+export const batchRunSchema = z.object({
+  items: z.array(batchRunItemSchema).min(1).max(50),
+  useCache: z.boolean().optional(),
+})
+
+export type BatchRunInput = z.infer<typeof batchRunSchema>

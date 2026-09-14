@@ -2,6 +2,7 @@ import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import prisma from "@/config/prisma"
 import { auth } from "@/lib/auth"
+import { getRedis, redisKey } from "@/lib/redis"
 
 type BetterAuthSession = NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>
 
@@ -15,9 +16,37 @@ export type CachedPermissions = {
 }
 
 const CACHE_TTL_MS = 30_000
+const CACHE_TTL_SEC = 30
 
-// module-level Map, per-process cache; good enough for single-instance deploys
+// module-level Map, fallback bila Redis tak tersedia (single-instance).
 const fallbackCache = new Map<string, CachedPermissions & { userId: string }>()
+
+async function readSharedCache(userId: string): Promise<CachedPermissions | null> {
+  const fallback = fallbackCache.get(userId)
+  if (fallback && Date.now() - fallback.fetchedAt < CACHE_TTL_MS) return fallback
+  try {
+    const redis = getRedis()
+    if (!redis) return fallback && Date.now() - fallback.fetchedAt < CACHE_TTL_MS ? fallback : null
+    const raw = await redis.get(redisKey("perms", userId))
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as CachedPermissions
+    if (Date.now() - parsed.fetchedAt > CACHE_TTL_MS) return null
+    return parsed
+  } catch {
+    return fallback && Date.now() - fallback.fetchedAt < CACHE_TTL_MS ? fallback : null
+  }
+}
+
+async function writeSharedCache(userId: string, result: CachedPermissions) {
+  fallbackCache.set(userId, { ...result, userId })
+  try {
+    const redis = getRedis()
+    if (redis)
+      await redis.set(redisKey("perms", userId), JSON.stringify(result), "EX", CACHE_TTL_SEC)
+  } catch {
+    // Redis opsional; fallback memori sudah terisi.
+  }
+}
 
 function authErr(body: object, status: number): { error: NextResponse; session: AuthSession } {
   return {
@@ -27,10 +56,8 @@ function authErr(body: object, status: number): { error: NextResponse; session: 
 }
 
 export async function fetchAndCachePermissions(userId: string): Promise<CachedPermissions | null> {
-  const entry = fallbackCache.get(userId)
-  if (entry && Date.now() - entry.fetchedAt < CACHE_TTL_MS) {
-    return entry
-  }
+  const shared = await readSharedCache(userId)
+  if (shared) return shared
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -59,12 +86,22 @@ export async function fetchAndCachePermissions(userId: string): Promise<CachedPe
   }
 
   fallbackCache.set(userId, { ...result, userId })
+  await writeSharedCache(userId, result)
   return result
 }
 
-export function invalidatePermissionCache(userId?: string) {
-  if (userId) fallbackCache.delete(userId)
-  else fallbackCache.clear()
+export async function invalidatePermissionCache(userId?: string) {
+  if (userId) {
+    fallbackCache.delete(userId)
+    try {
+      const redis = getRedis()
+      if (redis) await redis.del(redisKey("perms", userId))
+    } catch {
+      // abaikan; TTL 30 detik membersihkan sendiri
+    }
+  } else {
+    fallbackCache.clear()
+  }
 }
 
 export async function requireAuth(options?: {

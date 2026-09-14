@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any
 
 from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.pool import QueuePool
@@ -39,14 +38,17 @@ class PostgresEngine(BaseEngine):
         )
         logger.info(f"Created postgres engine for [{source_id}]")
 
-    def execute(self, sql: str, params: dict | None = None) -> Any:
-        raise PermissionError("Query engine is read-only")
-
-    def fetch_all(self, sql: str, params: dict | None = None) -> list[dict]:
+    def fetch_all(
+        self, sql: str, params: dict | None = None, timeout_sec: int | None = None
+    ) -> list[dict]:
         # Read-only berlapis: sanitizer (executor) + transaksi READ ONLY level
         # database + rollback eksplisit. Lolos sanitizer pun tetap tak bisa tulis.
         with self._engine.connect() as conn:
             conn.execute(text("SET TRANSACTION READ ONLY"))
+            if timeout_sec:
+                conn.execute(
+                    text(f"SET LOCAL statement_timeout = {int(timeout_sec) * 1000}")
+                )
             try:
                 result = conn.execute(text(sql), params or {})
                 return [dict(r._mapping) for r in result.fetchall()]

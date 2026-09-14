@@ -60,13 +60,13 @@ class RestApiEngine(BaseEngine):
         self._timeout = float(config.get("timeout", 10))
         logger.info(f"Created REST API engine for [{source_id}] {self._base_url}")
 
-    def _get(self, path: str) -> Any:
+    def _get(self, path: str, timeout: float | None = None) -> Any:
         url = f"{self._base_url}{path if path.startswith('/') else '/' + path}"
         req = urllib.request.Request(
             url, headers={"Accept": "application/json", **self._headers}
         )
         try:
-            with urllib.request.urlopen(req, timeout=self._timeout) as resp:
+            with urllib.request.urlopen(req, timeout=timeout or self._timeout) as resp:
                 if not 200 <= resp.status < 300:
                     raise RuntimeError(f"API returned status {resp.status} for {url}")
                 return json.loads(resp.read().decode("utf-8") or "null")
@@ -75,10 +75,9 @@ class RestApiEngine(BaseEngine):
         except urllib.error.URLError as e:
             raise ConnectionError(f"Cannot reach API {url}: {e.reason}") from e
 
-    def execute(self, sql: str, params: dict | None = None) -> Any:
-        raise NotImplementedError("REST API source is read-only")
-
-    def fetch_all(self, sql: str, params: dict | None = None) -> list[dict]:
+    def fetch_all(
+        self, sql: str, params: dict | None = None, timeout_sec: int | None = None
+    ) -> list[dict]:
         if not self._base_url:
             raise ValueError("REST API source requires 'base_url' in config")
         path, rest = _substitute_path(sql, params or {})
@@ -86,7 +85,8 @@ class RestApiEngine(BaseEngine):
             path += ("&" if "?" in path else "?") + urllib.parse.urlencode(
                 {k: str(v) for k, v in rest.items()}
             )
-        return _normalize(self._get(path))
+        timeout = float(timeout_sec) if timeout_sec else None
+        return _normalize(self._get(path, timeout))
 
     def close(self) -> None:
         pass

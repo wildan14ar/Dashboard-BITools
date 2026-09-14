@@ -4,6 +4,7 @@ from unittest import mock
 
 import pytest
 
+from src import factory
 from src.conn import _REGISTRY
 from src.conn import create as conn_create
 
@@ -86,19 +87,19 @@ def test_bigquery_url_and_cost_guard():
     eng2.close()
 
 
-def test_new_connectors_refuse_write_execute():
+def test_write_path_removed_from_connectors():
+    """Jalur tulis dihapus total: tidak ada metode execute() di konektor mana pun."""
     for db_type, cfg in (
         ("mysql", {"host": "db", "database": "d"}),
         ("mssql", {"host": "db", "database": "d"}),
         ("clickhouse", {"host": "ch"}),
+        ("sqlite", {"path": ":memory:"}),
     ):
         eng = conn_create(db_type, "w", json.dumps(cfg))
-        with pytest.raises(PermissionError, match="read-only"):
-            eng.execute("SELECT 1", {})
+        assert not hasattr(eng, "execute")
         eng.close()
     eng, _ = _make_bigquery("w", {"project": "p", "dataset": "d"})
-    with pytest.raises(PermissionError, match="read-only"):
-        eng.execute("SELECT 1", {})
+    assert not hasattr(eng, "execute")
     eng.close()
 
 
@@ -134,6 +135,28 @@ def _patch_engine(eng, log):
         (),
         {"connect": lambda self: fake_connect(), "dispose": lambda self: None},
     )()
+
+
+def test_factory_reuses_pool_and_dispose(tmp_path):
+    cfg = json.dumps({"path": str(tmp_path / "factory.db")})
+    e1 = factory.get("factory_reuse", "sqlite", cfg)
+    e2 = factory.get("factory_reuse", "sqlite", cfg)
+    assert e1 is e2
+    factory.dispose("factory_reuse")
+    e3 = factory.get("factory_reuse", "sqlite", cfg)
+    assert e3 is not e1
+    factory.dispose("factory_reuse")
+
+
+def test_invalidate_cache_disposes_factory(tmp_path):
+    from src.executor import invalidate_cache
+
+    cfg = json.dumps({"path": str(tmp_path / "inv.db")})
+    e1 = factory.get("inv_test", "sqlite", cfg)
+    invalidate_cache("inv_test")
+    e2 = factory.get("inv_test", "sqlite", cfg)
+    assert e2 is not e1
+    factory.dispose("inv_test")
 
 
 def test_mysql_issues_readonly_guard_first():

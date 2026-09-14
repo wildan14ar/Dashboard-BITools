@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { logActivity } from "@/lib/activity"
-import { cleanError, testConnection } from "@/lib/engine"
+import { engineErrorResponse, testConnection } from "@/lib/engine"
 import { RequestHandler, ResponseHandler, requireAuth } from "@/middlewares"
 import { CONFIG_SCHEMAS, sourceTypeSchema } from "@/validations"
 
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       await logActivity(session?.user?.id || "system", "ERROR", "BiSource", undefined, {
         error: String(err),
       })
-      return ResponseHandler.internalError(cleanError(err), err)
+      return engineErrorResponse(err)
     }
   } catch (err) {
     await logActivity(session?.user?.id || "system", "ERROR", "BiSource", undefined, {
