@@ -6,7 +6,7 @@ Platform Business Intelligence self-hosted: daftarkan koneksi database (**Source
 Browser ──▶ Next.js (src/app + src/app/api)
                 │  gRPC (src/lib/engine.ts)
                 ▼
-         Python Query Engine :50051 ──▶ Source DB user (PG/MySQL/Mongo/API…)
+         Python Query Engine :50051 ──▶ Source DB user (PG/MySQL/MariaDB/MSSQL/SQLite/ClickHouse/BigQuery/Mongo/API)
                 │                              ▲
                 └─ cache hasil ─▶ Redis        │ definisi (SQL, koneksi,
                                                │ dashboard) ◀── Prisma ◀── meta DB

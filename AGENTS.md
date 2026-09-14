@@ -10,7 +10,7 @@ Design pattern disamakan dengan PortoNext-Base boilerplate.
 - `bun run lint` — Biome lint/format (`bunx biome check src/ prisma/`)
 - DB (Prisma 7, PostgreSQL): `db:generate` `db:push` `db:migrate` `db:studio` `db:seed` `db:reset`
 - Engine standalone: `cd engine; python -m engine.src.server` — gRPC `:50051`
-- Engine tests: `cd engine; uv run pytest` — sanitizer, executor, cache/stale-serve, MongoDB/REST API (17 tes)
+- Engine tests: `cd engine; uv run pytest` — sanitizer, executor, cache/stale-serve, connectors (31 tes)
 - Frontend tests: `bun run test` — `test/hash.test.ts`, `test/validations.test.ts`, `test/response.test.ts`
 - CI: `.github/workflows/ci.yaml` — install → generate → lint → typecheck → test → build → pytest
 - `docker compose up -d` — redis, postgres, engine gRPC, dashboard

@@ -11,6 +11,8 @@ import { type SourceInput, sourceSchema } from "@/validations/source"
 const DB_TYPES = [
   { value: "postgresql", label: "PostgreSQL" },
   { value: "mysql", label: "MySQL" },
+  { value: "mariadb", label: "MariaDB" },
+  { value: "mssql", label: "SQL Server" },
   { value: "sqlite", label: "SQLite" },
   { value: "clickhouse", label: "ClickHouse" },
   { value: "bigquery", label: "BigQuery" },

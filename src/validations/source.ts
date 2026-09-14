@@ -30,6 +30,8 @@ export const apiConfigSchema = z.object({
 export const CONFIG_SCHEMAS = {
   postgresql: sqlConfigSchema,
   mysql: sqlConfigSchema,
+  mariadb: sqlConfigSchema,
+  mssql: sqlConfigSchema,
   sqlite: sqlConfigSchema,
   clickhouse: sqlConfigSchema,
   bigquery: bigqueryConfigSchema,
@@ -40,6 +42,8 @@ export const CONFIG_SCHEMAS = {
 export const sourceTypeSchema = z.enum([
   "postgresql",
   "mysql",
+  "mariadb",
+  "mssql",
   "sqlite",
   "clickhouse",
   "bigquery",

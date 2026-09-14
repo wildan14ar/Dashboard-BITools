@@ -23,14 +23,18 @@ class SQLiteEngine(BaseEngine):
         logger.info(f"Created sqlite engine for [{source_id}]")
 
     def execute(self, sql: str, params: dict | None = None) -> Any:
-        with self._engine.connect() as conn:
-            conn.execute(text(sql), params or {})
-            conn.commit()
+        raise PermissionError("Query engine is read-only")
 
     def fetch_all(self, sql: str, params: dict | None = None) -> list[dict]:
+        # Read-only berlapis: sanitizer (executor) + PRAGMA query_only level
+        # koneksi + rollback eksplisit. Lolos sanitizer pun tetap tak bisa tulis.
         with self._engine.connect() as conn:
-            result = conn.execute(text(sql), params or {})
-            return [dict(r._mapping) for r in result.fetchall()]
+            conn.execute(text("PRAGMA query_only=ON"))
+            try:
+                result = conn.execute(text(sql), params or {})
+                return [dict(r._mapping) for r in result.fetchall()]
+            finally:
+                conn.rollback()
 
     @property
     def sa_engine(self):

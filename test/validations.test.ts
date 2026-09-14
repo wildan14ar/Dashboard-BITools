@@ -45,6 +45,20 @@ test("sourceSchema validates config per type", () => {
   expect(invalid.success).toBe(false)
 })
 
+test("sourceSchema accepts all supported db types", () => {
+  const sqlConfig = { host: "db", port: "3306", user: "u", password: "p", database: "d" }
+  for (const type of ["mysql", "mariadb", "mssql", "sqlite", "clickhouse"]) {
+    const result = sourceSchema.safeParse({ name: "S", type, config: sqlConfig })
+    expect(result.success).toBe(true)
+  }
+  const bq = sourceSchema.safeParse({
+    name: "BQ",
+    type: "bigquery",
+    config: { project: "p", dataset: "d", credentials_path: "/k.json" },
+  })
+  expect(bq.success).toBe(true)
+})
+
 test("loginSchema accepts identifier login", () => {
   const result = loginSchema.safeParse({ identifier: "admin", password: "password123" })
   expect(result.success).toBe(true)

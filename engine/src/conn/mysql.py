@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import os
 from typing import Any
+from urllib.parse import quote_plus
 
 from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.pool import QueuePool
@@ -13,19 +14,21 @@ from src.conn import register
 logger = logging.getLogger(__name__)
 
 
-@register("postgresql")
-class PostgresEngine(BaseEngine):
+@register("mysql")
+@register("mariadb")
+class MysqlEngine(BaseEngine):
+    """Konektor MySQL/MariaDB via pymysql. Read-only (SET TRANSACTION READ ONLY)."""
+
     def __init__(self, source_id: str, config: dict) -> None:
         self._source_id = source_id
         host = config.get("host", "localhost")
-        port = config.get("port", 5432)
+        port = config.get("port", 3306)
         user = config.get("user", "")
         password = config.get("password", "")
         database = config.get("database", "")
-        params = config.get("params", "")
 
-        creds = f"{user}:{password}@" if user else ""
-        url = f"postgresql+psycopg2://{creds}{host}:{port}/{database}{params}"
+        creds = f"{quote_plus(str(user))}:{quote_plus(str(password))}@" if user else ""
+        url = f"mysql+pymysql://{creds}{host}:{port}/{database}?charset=utf8mb4"
 
         self._engine: Engine = create_engine(
             url,
@@ -37,14 +40,14 @@ class PostgresEngine(BaseEngine):
             connect_args={"connect_timeout": 5},
             echo=False,
         )
-        logger.info(f"Created postgres engine for [{source_id}]")
+        logger.info(f"Created mysql engine for [{source_id}]")
 
     def execute(self, sql: str, params: dict | None = None) -> Any:
         raise PermissionError("Query engine is read-only")
 
     def fetch_all(self, sql: str, params: dict | None = None) -> list[dict]:
         # Read-only berlapis: sanitizer (executor) + transaksi READ ONLY level
-        # database + rollback eksplisit. Lolos sanitizer pun tetap tak bisa tulis.
+        # database + rollback eksplisit.
         with self._engine.connect() as conn:
             conn.execute(text("SET TRANSACTION READ ONLY"))
             try:
@@ -59,7 +62,7 @@ class PostgresEngine(BaseEngine):
 
     def close(self) -> None:
         self._engine.dispose()
-        logger.info(f"Disposed postgres engine [{self._source_id}]")
+        logger.info(f"Disposed mysql engine [{self._source_id}]")
 
     def ping(self) -> bool:
         try:

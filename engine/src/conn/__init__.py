@@ -10,13 +10,18 @@ logger = logging.getLogger(__name__)
 
 
 class Engine(ABC):
-    """Base interface for all DB connectors."""
+    """Base interface for all DB connectors. Engine ini READ-ONLY:
+    fetch_all hanya boleh membaca (konektor SQL wajib menegakkannya di level
+    sesi + rollback), execute() untuk tulis harus menolak dengan PermissionError.
+    """
 
     @abstractmethod
     def __init__(self, source_id: str, config: dict) -> None: ...
 
     @abstractmethod
-    def execute(self, sql: str, params: dict | None = None) -> Any: ...
+    def execute(self, sql: str, params: dict | None = None) -> Any:
+        """Jalur tulis — konektor read-only wajib raise PermissionError."""
+        ...
 
     @abstractmethod
     def fetch_all(self, sql: str, params: dict | None = None) -> Any: ...
@@ -65,6 +70,7 @@ for _mod in (
     "mysql",
     "mssql",
     "clickhouse",
+    "bigquery",
     "mariadb",
     "mongodb",
     "restfull",
