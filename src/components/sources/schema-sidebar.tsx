@@ -72,6 +72,7 @@ export function SchemaSidebar({
           />
           {searchTerm && (
             <button
+              type="button"
               onClick={() => onSearchChange("")}
               className="text-muted-foreground hover:text-foreground"
             >
@@ -100,6 +101,7 @@ export function SchemaSidebar({
             <div key={sn}>
               <div className="flex items-center group hover:bg-muted/50 pr-1">
                 <button
+                  type="button"
                   onClick={() => onToggleSchema(sn)}
                   className="flex flex-1 items-center gap-1.5 px-2 py-1 text-[11px] font-semibold text-muted-foreground hover:text-foreground"
                 >
@@ -114,6 +116,7 @@ export function SchemaSidebar({
                 </button>
                 <div className="relative">
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation()
                       onOpenMenu(sn)
@@ -128,10 +131,12 @@ export function SchemaSidebar({
                   </button>
                   {menuSchema === sn && (
                     <div
+                      role="menu"
                       className="absolute right-0 top-full z-50 min-w-[130px] rounded-md border bg-popover shadow-md p-1 text-xs"
                       onMouseDown={(e) => e.stopPropagation()}
                     >
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation()
                           onNewQuery()
@@ -141,6 +146,7 @@ export function SchemaSidebar({
                         <Plus className="size-3.5" /> New Query
                       </button>
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation()
                           onViewErd(sn)
@@ -162,14 +168,23 @@ export function SchemaSidebar({
                     return (
                       <div key={t.name}>
                         <button
+                          type="button"
                           onClick={() => onOpenTab(t)}
                           onDoubleClick={() => onToggleTableColumns(sn, t.name)}
                           className="flex w-full items-center gap-1.5 pl-7 pr-2 py-0.5 text-xs hover:bg-muted/50 group"
                         >
                           <span
+                            role="button"
+                            tabIndex={0}
                             onClick={(e) => {
                               e.stopPropagation()
                               onToggleTableColumns(sn, t.name)
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.stopPropagation()
+                                onToggleTableColumns(sn, t.name)
+                              }
                             }}
                             className="p-0.5 opacity-0 group-hover:opacity-100 shrink-0 cursor-pointer"
                           >
@@ -207,6 +222,8 @@ export function SchemaSidebar({
       </div>
 
       <div
+        role="separator"
+        aria-orientation="vertical"
         className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/20 z-10"
         onMouseDown={(e) => {
           e.preventDefault()

@@ -25,11 +25,19 @@ export function DatasetPalette({ editor }: { editor: PanelEditor }) {
             return (
               <div key={ds.id}>
                 <div
+                  role="button"
+                  tabIndex={0}
                   draggable
                   onDragStart={(e) => {
                     e.dataTransfer.setData("dataset-id", ds.id)
                     e.dataTransfer.setData("dataset-name", ds.name)
                     e.dataTransfer.effectAllowed = "copy"
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault()
+                      toggleDatasetExpand(ds.id)
+                    }
                   }}
                   className={cn(
                     "flex items-center gap-1 px-2 py-1.5 text-xs transition-colors cursor-grab active:cursor-grabbing group",
@@ -39,6 +47,7 @@ export function DatasetPalette({ editor }: { editor: PanelEditor }) {
                   <Layers className="size-3 shrink-0" />
                   <span className="truncate flex-1">{ds.name}</span>
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation()
                       toggleDatasetExpand(ds.id)
@@ -58,6 +67,8 @@ export function DatasetPalette({ editor }: { editor: PanelEditor }) {
                     {dsCols.map((col, colIdx) => (
                       <div
                         key={col}
+                        role="button"
+                        tabIndex={0}
                         draggable
                         onDragStart={(e) => {
                           e.dataTransfer.setData("dataset-id", ds.id)

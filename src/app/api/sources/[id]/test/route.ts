@@ -4,7 +4,7 @@ import { logActivity } from "@/lib/activity"
 import { cleanError, testConnection } from "@/lib/engine"
 import { ResponseHandler, requireAuth } from "@/middlewares"
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { error, session } = await requireAuth({ permissions: ["sources:read"] })
   if (error) return error
 

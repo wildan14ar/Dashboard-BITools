@@ -5,7 +5,6 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import DashboardGrid from "@/components/dashboard/dashboard-grid"
 import { Button } from "@/components/ui/button"
-import { DashboardFilterProvider } from "@/hooks/use-dashboard-filters"
 import { useDashboard } from "@/hooks/use-dashboards"
 
 export default function DashboardViewPage() {

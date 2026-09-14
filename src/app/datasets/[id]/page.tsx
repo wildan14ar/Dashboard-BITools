@@ -30,7 +30,7 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
 
   useEffect(() => {
     params.then((p) => setId(p.id))
-  }, [])
+  }, [params])
 
   const displayName = name || dataset?.name || ""
   const displaySql = sql || dataset?.sql || ""

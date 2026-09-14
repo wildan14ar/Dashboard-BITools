@@ -11,7 +11,7 @@ type Props = {
   preview?: boolean
 }
 
-export function FilterChart({ panel, data, preview = false }: Props) {
+export function FilterChart({ panel, data }: Props) {
   const cfg = (panel.config ?? {}) as Record<string, unknown>
   const filters = (cfg.filters as PanelFilter[]) ?? []
   const { values, setValue } = useDashboardFilters()

@@ -3,11 +3,19 @@ import prisma from "@/config/prisma"
 import { settings } from "@/config/settings"
 import { logActivity } from "@/lib/activity"
 import { cleanError, execute } from "@/lib/engine"
+import { rateLimit } from "@/lib/rate-limit"
 import { ResponseHandler, requireAuth } from "@/middlewares"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { error, session } = await requireAuth({ permissions: ["sources:read"] })
   if (error) return error
+
+  const rl = rateLimit(`run:${session.user.id}`)
+  if (!rl.ok) {
+    return ResponseHandler.tooManyRequests(
+      `Terlalu banyak query, coba lagi dalam ${rl.retryAfterSec} detik`,
+    )
+  }
 
   try {
     const { id } = await params

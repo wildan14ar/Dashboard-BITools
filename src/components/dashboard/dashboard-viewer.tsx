@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react"
 import GridLayout from "react-grid-layout"
 import "./react-grid.css"
 import { PanelBody } from "@/components/dashboard/dashboard-grid"
+import { RunMetaBadge } from "@/components/dashboard/run-meta"
 import { DashboardFilterProvider } from "@/hooks/use-dashboard-filters"
 import { useDashboard } from "@/hooks/use-dashboards"
 import { usePanelData } from "@/hooks/use-panel-data"
@@ -76,10 +77,16 @@ export default function DashboardViewer({ id, variant, requirePublic = false }: 
                 )}
               >
                 {showTitle && (
-                  <div className={cn("border-b", isEmbed ? "px-2 py-0.5" : "px-3 py-1.5")}>
+                  <div
+                    className={cn(
+                      "flex items-center justify-between gap-2 border-b",
+                      isEmbed ? "px-2 py-0.5" : "px-3 py-1.5",
+                    )}
+                  >
                     <h3 className={cn("truncate font-medium", isEmbed ? "text-[10px]" : "text-xs")}>
                       {panel.title}
                     </h3>
+                    <RunMetaBadge data={panelData[panel.id]} />
                   </div>
                 )}
                 <div

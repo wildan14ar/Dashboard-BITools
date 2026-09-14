@@ -48,6 +48,7 @@ export default function Sidebar({
           </Link>
         )}
         <button
+          type="button"
           onClick={() => setOpen(!open)}
           className="p-2 rounded-lg hover:bg-accent transition-colors"
           aria-label={open ? "Close sidebar" : "Open sidebar"}

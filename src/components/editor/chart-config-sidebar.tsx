@@ -138,6 +138,7 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
             {CHART_TYPES.map((ct) => (
               <button
                 key={ct.value}
+                type="button"
                 onClick={() => setChartType(ct.value)}
                 className={cn(
                   "flex flex-col items-center gap-0.5 rounded-md border px-1 py-1.5 text-[9px] transition-colors",
@@ -583,12 +584,19 @@ function TableConfig({ editor }: { editor: PanelEditor }) {
         <>
           <Field label="Columns">
             <div
+              role="button"
+              tabIndex={0}
               onDragOver={(e) => {
                 e.preventDefault()
                 setOver(true)
               }}
               onDragLeave={() => setOver(false)}
               onDrop={handleDrop}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault()
+                }
+              }}
               className={cn(
                 "flex h-8 items-center rounded-md border border-dashed px-2 text-[10px] transition-colors",
                 over
@@ -609,6 +617,8 @@ function TableConfig({ editor }: { editor: PanelEditor }) {
                   return (
                     <div
                       key={colIdx}
+                      role="button"
+                      tabIndex={0}
                       draggable
                       onDragStart={(e) => {
                         setDraggingIdx(i)
@@ -624,6 +634,11 @@ function TableConfig({ editor }: { editor: PanelEditor }) {
                         e.preventDefault()
                         const from = Number(e.dataTransfer.getData("text/plain"))
                         if (!Number.isNaN(from)) moveColumn(from, i)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault()
+                        }
                       }}
                       className={cn(
                         "flex items-center gap-1.5 rounded-md border bg-muted/40 px-2 py-1.5 text-xs cursor-grab active:cursor-grabbing",

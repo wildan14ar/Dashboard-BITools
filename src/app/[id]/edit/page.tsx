@@ -51,6 +51,8 @@ export default function DashboardEditPage() {
 
       <div className="flex flex-1 overflow-hidden">
         <div
+          role="group"
+          aria-label="Dashboard canvas"
           className="flex-1 overflow-auto p-4"
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}

@@ -1,3 +1,4 @@
+import json
 import logging
 import time
 
@@ -25,7 +26,7 @@ from src.cache import (
 )
 from src.config import MAX_ROWS_HARD, TIMEOUT_SEC_HARD
 from src.introspector import get_schema
-from src.sanitizer import apply_params, is_safe
+from src.sanitizer import bind_params, is_safe
 
 logger = logging.getLogger(__name__)
 
@@ -52,17 +53,25 @@ def execute_query(
     use_cache: bool = True,
 ) -> dict:
     non_sql = db_type in NON_SQL_TYPES
+    bound: dict[str, str] = dict(params or {})
 
     if not non_sql:
         if not is_safe(sql):
             raise PermissionError("Query blocked by sanitizer")
-        sql = apply_params(sql, params or {})
+        # {{name}} -> :name bound params; driver yang meng-escape nilai.
+        sql, bound = bind_params(sql, params or {})
 
     max_rows = min(max_rows, MAX_ROWS_HARD)
     timeout_sec = min(timeout_sec, TIMEOUT_SEC_HARD)
 
     sql = sql.rstrip().rstrip(";").strip()
-    key = cache_key(source_id, sql) if use_cache else None
+    # Cache key mencakup nilai param agar filter berbeda tidak berbagi cache.
+    cacheable = (
+        sql
+        if not bound
+        else f"{sql}\n--params:{json.dumps(bound, sort_keys=True, default=str)}"
+    )
+    key = cache_key(source_id, cacheable) if use_cache else None
 
     refresh_lease = False
     if key:
@@ -82,7 +91,7 @@ def execute_query(
     engine = conn_mod.create(db_type, source_id, config_json)
 
     try:
-        result_rows = engine.fetch_all(sql, params or {})
+        result_rows = engine.fetch_all(sql, bound)
         result_rows = result_rows[:max_rows]
         columns, rows = _adapt_results(result_rows)
     finally:

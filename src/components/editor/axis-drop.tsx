@@ -40,7 +40,7 @@ export function AxisDrop({
 
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-[10px] text-muted-foreground">{label}</label>
+      <span className="text-[10px] text-muted-foreground">{label}</span>
       <div className="flex gap-1">
         {agg && onAggChange && (
           <select
@@ -56,12 +56,19 @@ export function AxisDrop({
           </select>
         )}
         <div
+          role="button"
+          tabIndex={0}
           onDragOver={(e) => {
             e.preventDefault()
             setOver(true)
           }}
           onDragLeave={() => setOver(false)}
           onDrop={handleDrop}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault()
+            }
+          }}
           className={cn(
             "h-8 flex-1 rounded-md border border-dashed px-2 flex items-center text-xs transition-colors",
             over ? "border-primary bg-primary/5" : "border-border",

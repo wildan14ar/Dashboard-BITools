@@ -9,6 +9,11 @@ services:
     restart: unless-stopped
     networks:
       - bi-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   engine:
     build:
@@ -28,6 +33,15 @@ services:
     restart: unless-stopped
     networks:
       - bi-network
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import socket;socket.create_connection((\"127.0.0.1\",50051),timeout=5)'"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   postgres:
     image: postgres:15-alpine
@@ -43,6 +57,11 @@ services:
     restart: unless-stopped
     networks:
       - bi-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-fycuser}"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   dashboard:
     build:
@@ -54,13 +73,23 @@ services:
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://${POSTGRES_USER:-fycuser}:${POSTGRES_PASSWORD:-fycpassword}@postgres:5432/${POSTGRES_DB:-fycdb}
-      - AUTH_SECRET=${DASHBOARD_AUTH_SECRET:-your_secret_key}
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET:-${DASHBOARD_AUTH_SECRET:-your_secret_key}}
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
       - QUERY_ENGINE_HOST=engine:50051
     depends_on:
-      - engine
+      engine:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - bi-network
+    healthcheck:
+      test: ["CMD-SHELL", "bun -e 'fetch(\"http://127.0.0.1:3000/api/health\").then(r=>{if(!r.ok)process.exit(1)})'"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 volumes:
   redis_data:

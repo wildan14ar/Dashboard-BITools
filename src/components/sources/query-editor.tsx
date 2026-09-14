@@ -78,6 +78,8 @@ export function QueryEditorArea({
       </div>
 
       <div
+        role="separator"
+        aria-orientation="horizontal"
         className="h-1 bg-border cursor-row-resize hover:bg-primary/30 shrink-0"
         onMouseDown={(e) => {
           e.preventDefault()
@@ -131,8 +133,14 @@ export function QueryEditorArea({
             className="flex flex-col gap-4 min-w-[320px]"
           >
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Name</label>
+              <label
+                htmlFor="save-dataset-name"
+                className="text-xs font-medium text-muted-foreground"
+              >
+                Name
+              </label>
               <input
+                id="save-dataset-name"
                 value={saveName}
                 onChange={(e) => setSaveName(e.target.value)}
                 className="flex h-9 rounded-md border bg-transparent px-3 py-1 text-sm outline-none focus:border-ring"

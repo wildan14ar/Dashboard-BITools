@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils"
 
 export function FieldLabel({ children }: { children: React.ReactNode }) {
-  return <label className="text-[10px] text-muted-foreground">{children}</label>
+  return <span className="text-[10px] text-muted-foreground">{children}</span>
 }
 
 export function Field({ label, children }: { label?: string; children: React.ReactNode }) {

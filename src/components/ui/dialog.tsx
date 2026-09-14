@@ -33,7 +33,11 @@ export function Dialog({ open, onClose, title, children, className }: DialogProp
     >
       <div className="flex items-center justify-between border-b px-6 py-3">
         <h2 className="text-lg font-semibold">{title}</h2>
-        <button onClick={onClose} className="rounded-md p-1 hover:bg-muted transition-colors">
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-md p-1 hover:bg-muted transition-colors"
+        >
           <X className="size-4" />
         </button>
       </div>

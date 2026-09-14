@@ -102,7 +102,7 @@ export function usePanelEditor(id: string) {
     return () => {
       cancelled = true
     }
-  }, [datasetId])
+  }, [datasetId, chartType])
 
   function toggleDatasetExpand(dsId: string) {
     setExpandedDatasets((prev) => {

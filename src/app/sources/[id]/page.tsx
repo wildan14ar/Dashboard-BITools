@@ -2,7 +2,7 @@
 
 import { ArrowLeft, Columns, Database, GitBranch, Plus, Table2, X } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { use, useEffect, useMemo, useState } from "react"
+import { use, useCallback, useEffect, useMemo, useState } from "react"
 import { QueryEditorArea } from "@/components/sources/query-editor"
 import type { QueryResult, TabDef, TabState } from "@/components/sources/query-types"
 import { SchemaERD } from "@/components/sources/schema-erd"
@@ -49,17 +49,23 @@ export default function SourceSchemaPage({ params }: { params: Promise<{ id: str
       .filter(([, tables]) => tables.length > 0)
   }, [schemas, searchTerm])
 
-  function getState(tabId: string): TabState {
-    return tabStates[tabId] ?? { result: null, error: "", running: false }
-  }
+  const getState = useCallback(
+    (tabId: string): TabState => {
+      return tabStates[tabId] ?? { result: null, error: "", running: false }
+    },
+    [tabStates],
+  )
 
-  function setState(tabId: string, update: Partial<TabState>) {
-    setTabStates((p) => ({ ...p, [tabId]: { ...getState(tabId), ...update } }))
-  }
+  const setState = useCallback((tabId: string, update: Partial<TabState>) => {
+    setTabStates((p) => ({
+      ...p,
+      [tabId]: { ...(p[tabId] ?? { result: null, error: "", running: false }), ...update },
+    }))
+  }, [])
 
   function openTab(table: TableItem) {
     const tabId = `tbl:${table.name}`
-    const label = `${table.schema !== "public" ? table.schema + "." : ""}${table.name}`
+    const label = `${table.schema !== "public" ? `${table.schema}.` : ""}${table.name}`
     if (!tabs.find((t) => t.id === tabId)) {
       setTabs((p) => [...p, { id: tabId, kind: "table", label, sql: `SELECT * FROM ${label}` }])
     }
@@ -96,22 +102,25 @@ export default function SourceSchemaPage({ params }: { params: Promise<{ id: str
     }
   }
 
-  async function handleRun(tabId: string) {
-    const tab = tabs.find((t) => t.id === tabId)
-    if (!tab || !tab.sql) return
-    setState(tabId, { running: true, error: "", result: null })
-    try {
-      const res = await api.post<QueryResult & { error?: string }>(`/sources/${id}/run`, {
-        sql: tab.sql,
-      })
-      const data = res.data
-      if (data?.error) setState(tabId, { error: data.error, running: false })
-      else if (data?.columns && data?.rows) setState(tabId, { result: data, running: false })
-      else setState(tabId, { error: "Unexpected empty response", running: false })
-    } catch (err: unknown) {
-      setState(tabId, { error: err instanceof Error ? err.message : String(err), running: false })
-    }
-  }
+  const handleRun = useCallback(
+    async (tabId: string) => {
+      const tab = tabs.find((t) => t.id === tabId)
+      if (!tab?.sql) return
+      setState(tabId, { running: true, error: "", result: null })
+      try {
+        const res = await api.post<QueryResult & { error?: string }>(`/sources/${id}/run`, {
+          sql: tab.sql,
+        })
+        const data = res.data
+        if (data?.error) setState(tabId, { error: data.error, running: false })
+        else if (data?.columns && data?.rows) setState(tabId, { result: data, running: false })
+        else setState(tabId, { error: "Unexpected empty response", running: false })
+      } catch (err: unknown) {
+        setState(tabId, { error: err instanceof Error ? err.message : String(err), running: false })
+      }
+    },
+    [tabs, id, setState],
+  )
 
   function toggleSchema(sn: string) {
     setExpandedSchemas((p) => {
@@ -144,7 +153,7 @@ export default function SourceSchemaPage({ params }: { params: Promise<{ id: str
     ) {
       handleRun(activeTab)
     }
-  }, [activeTab])
+  }, [activeTab, tabs, getState, handleRun])
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
@@ -272,11 +281,20 @@ function TabBar({
       {tabs.map((t) => (
         <div
           key={t.id}
+          role="tab"
+          aria-selected={activeTab === t.id}
+          tabIndex={0}
           className={cn(
             "group flex items-center border-r shrink-0 pr-0.5 cursor-pointer",
             activeTab === t.id && "border-b-2 border-b-primary bg-background -mb-px",
           )}
           onClick={() => onSelect(t.id)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault()
+              onSelect(t.id)
+            }
+          }}
         >
           <span className="px-3 py-1.5 text-[11px] font-medium whitespace-nowrap">
             {t.kind === "table" && <Table2 className="inline size-3 mr-1" />}
@@ -285,6 +303,7 @@ function TabBar({
             {t.label}
           </span>
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation()
               onClose(t.id)
@@ -296,6 +315,7 @@ function TabBar({
         </div>
       ))}
       <button
+        type="button"
         onClick={onNewQuery}
         className="shrink-0 p-1 mx-0.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
         title="New Query"

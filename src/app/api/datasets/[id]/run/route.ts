@@ -2,17 +2,24 @@ import type { NextRequest } from "next/server"
 import prisma from "@/config/prisma"
 import { logActivity } from "@/lib/activity"
 import { cleanError, execute } from "@/lib/engine"
+import { rateLimit } from "@/lib/rate-limit"
 import { ResponseHandler, requireAuth } from "@/middlewares"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { error, session } = await requireAuth({ permissions: ["datasets:read"] })
   if (error) return error
 
+  const rl = rateLimit(`run:${session.user.id}`)
+  if (!rl.ok) {
+    return ResponseHandler.tooManyRequests(
+      `Terlalu banyak query, coba lagi dalam ${rl.retryAfterSec} detik`,
+    )
+  }
+
   try {
     const { id } = await params
     const dataset = await prisma.biDataset.findUnique({ where: { id }, include: { source: true } })
-    if (!dataset || !dataset.source)
-      return ResponseHandler.notFound("Dataset atau source tidak ditemukan")
+    if (!dataset?.source) return ResponseHandler.notFound("Dataset atau source tidak ditemukan")
 
     const body = await req.json().catch(() => ({}))
     const paramsOverrides = body.params ?? {}

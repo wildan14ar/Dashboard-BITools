@@ -1,6 +1,12 @@
 import type { Panel } from "@/hooks/use-dashboards"
 
-export type RunData = { columns: string[]; rows: { values: string[] }[] }
+export type RunData = {
+  columns: string[]
+  rows: { values: string[] }[]
+  cached?: boolean
+  execution_time_ms?: number
+  row_count?: number
+}
 
 export const CHART_COLORS = [
   "#5470c6",

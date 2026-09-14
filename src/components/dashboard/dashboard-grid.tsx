@@ -7,6 +7,7 @@ import GridLayout, { type Layout, useContainerWidth } from "react-grid-layout"
 import "./react-grid.css"
 import { EChart, FilterChart, KpiChart, TableChart, TextChart } from "@/components/charts"
 import { renderPanelTitle } from "@/components/dashboard/panel-title"
+import { RunMetaBadge } from "@/components/dashboard/run-meta"
 import type { Dashboard, Panel } from "@/hooks/use-dashboards"
 import { usePanelData } from "@/hooks/use-panel-data"
 import type { RunData } from "@/lib/chart"
@@ -123,7 +124,14 @@ export default function DashboardGrid({
                     }}
                   />
                 )}
-                {titlePosition === "top" && titleEl}
+                {titlePosition === "top" && (
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">{titleEl}</div>
+                    <div className="shrink-0 pr-2">
+                      <RunMetaBadge data={panelData[panel.id]} />
+                    </div>
+                  </div>
+                )}
                 <div className="flex-1 overflow-hidden" style={{ padding: pad }}>
                   {panel.chartType === "text" ? (
                     <TextChart panel={panel} />
@@ -135,7 +143,14 @@ export default function DashboardGrid({
                     </div>
                   )}
                 </div>
-                {titlePosition === "bottom" && titleEl}
+                {titlePosition === "bottom" && (
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">{titleEl}</div>
+                    <div className="shrink-0 pr-2">
+                      <RunMetaBadge data={panelData[panel.id]} />
+                    </div>
+                  </div>
+                )}
               </div>
             )
           })}
@@ -177,6 +192,7 @@ function PanelMenu({
         <GripVertical className="size-3.5" />
       </span>
       <button
+        type="button"
         onClick={() => setOpen((v) => !v)}
         className="rounded p-1 text-muted-foreground hover:bg-muted"
         aria-label="Panel options"
@@ -187,6 +203,7 @@ function PanelMenu({
         <div className="absolute right-0 top-7 w-32 rounded-md border bg-background p-1 shadow-md">
           {onEdit && (
             <button
+              type="button"
               onClick={() => {
                 setOpen(false)
                 onEdit(panel)
@@ -198,6 +215,7 @@ function PanelMenu({
           )}
           {onDownload && (
             <button
+              type="button"
               onClick={() => {
                 setOpen(false)
                 onDownload(panel)
@@ -209,6 +227,7 @@ function PanelMenu({
           )}
           {onDelete && (
             <button
+              type="button"
               onClick={() => {
                 setOpen(false)
                 onDelete(panel.id)

@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const limit = Number(limitStr) || 10
     const skip = (page - 1) * limit
 
-    const { error, session } = await requireAuth({ permissions: ["users:admin"] })
+    const { error } = await requireAuth({ permissions: ["users:admin"] })
     if (error) return error
 
     const where = search
