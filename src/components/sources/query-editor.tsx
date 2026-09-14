@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import type { TabDef, TabState } from "@/components/sources/query-types"
 import { Button } from "@/components/ui/button"
 import { Dialog } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import { useCreateDataset } from "@/hooks/use-datasets"
 
 export function QueryEditorArea({
@@ -139,11 +140,10 @@ export function QueryEditorArea({
               >
                 Name
               </label>
-              <input
+              <Input
                 id="save-dataset-name"
                 value={saveName}
                 onChange={(e) => setSaveName(e.target.value)}
-                className="flex h-9 rounded-md border bg-transparent px-3 py-1 text-sm outline-none focus:border-ring"
                 placeholder="Dataset name"
                 autoFocus
               />

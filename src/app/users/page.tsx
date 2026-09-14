@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { type User, useCreateUser, useDeleteUser, useUpdateUser, useUsers } from "@/hooks/use-users"
 import {
   type CreateBiUserInput,
@@ -58,15 +59,10 @@ export default function UsersPage() {
           className="mb-6 space-y-3 rounded-lg border p-4"
         >
           <div className="grid grid-cols-2 gap-3">
-            <input {...createForm.register("username")} placeholder="Username" className="input" />
-            <input {...createForm.register("fullname")} placeholder="Full Name" className="input" />
-            <input {...createForm.register("email")} placeholder="Email" className="input" />
-            <input
-              {...createForm.register("password")}
-              type="password"
-              placeholder="Password"
-              className="input"
-            />
+            <Input {...createForm.register("username")} placeholder="Username" />
+            <Input {...createForm.register("fullname")} placeholder="Full Name" />
+            <Input {...createForm.register("email")} placeholder="Email" />
+            <Input {...createForm.register("password")} type="password" placeholder="Password" />
           </div>
           <div className="flex gap-2">
             <Button type="submit" disabled={createUser.isPending}>
@@ -95,13 +91,12 @@ export default function UsersPage() {
           className="mb-6 space-y-3 rounded-lg border p-4"
         >
           <div className="grid grid-cols-2 gap-3">
-            <input {...editForm.register("fullname")} placeholder="Full Name" className="input" />
-            <input {...editForm.register("email")} placeholder="Email" className="input" />
-            <input
+            <Input {...editForm.register("fullname")} placeholder="Full Name" />
+            <Input {...editForm.register("email")} placeholder="Email" />
+            <Input
               {...editForm.register("password")}
               type="password"
               placeholder="New password (optional)"
-              className="input"
             />
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" {...editForm.register("isSuperAdmin")} />

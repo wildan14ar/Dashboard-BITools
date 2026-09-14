@@ -3,8 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FlaskConical } from "lucide-react"
 import { useState } from "react"
-import { type FieldError, useForm } from "react-hook-form"
+import { type FieldError as RHFFieldError, useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { FieldError, Label } from "@/components/ui/label"
 import { useTestSource, useTestSourceAdhoc } from "@/hooks/use-sources"
 import { type SourceInput, sourceSchema } from "@/validations/source"
 
@@ -76,15 +78,15 @@ export function SourceForm({
 
   const testing = testExisting.isPending || testAdhoc.isPending
   const cfgErr = (t: keyof SourceInput["config"]) =>
-    (errors.config?.[t] as FieldError | undefined)?.message
+    (errors.config?.[t] as RHFFieldError | undefined)?.message
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <label className="block space-y-1.5">
-        <span className="text-sm font-medium">Name</span>
-        <input {...register("name")} placeholder="Production DB" className="input" />
-        {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-      </label>
+      <div className="block space-y-1.5">
+        <Label htmlFor="name">Name</Label>
+        <Input id="name" {...register("name")} placeholder="Production DB" />
+        {errors.name && <FieldError>{errors.name.message}</FieldError>}
+      </div>
 
       <label className="block space-y-1.5">
         <span className="text-sm font-medium">Type</span>
@@ -102,66 +104,76 @@ export function SourceForm({
 
         {selectedType === "bigquery" && (
           <div className="grid grid-cols-1 gap-3">
-            <label className="block space-y-1">
-              <span className="text-xs font-medium">Project</span>
-              <input {...register("config.project")} placeholder="my-project" className="input" />
-              {cfgErr("project") && <p className="text-xs text-destructive">{cfgErr("project")}</p>}
-            </label>
-            <label className="block space-y-1">
-              <span className="text-xs font-medium">Dataset</span>
-              <input {...register("config.dataset")} placeholder="analytics" className="input" />
-              {cfgErr("dataset") && <p className="text-xs text-destructive">{cfgErr("dataset")}</p>}
-            </label>
-            <label className="block space-y-1">
-              <span className="text-xs font-medium">Credentials Path</span>
-              <input
+            <div className="block space-y-1">
+              <Label htmlFor="config-project" className="text-xs">
+                Project
+              </Label>
+              <Input id="config-project" {...register("config.project")} placeholder="my-project" />
+              {cfgErr("project") && <FieldError>{cfgErr("project")}</FieldError>}
+            </div>
+            <div className="block space-y-1">
+              <Label htmlFor="config-dataset" className="text-xs">
+                Dataset
+              </Label>
+              <Input id="config-dataset" {...register("config.dataset")} placeholder="analytics" />
+              {cfgErr("dataset") && <FieldError>{cfgErr("dataset")}</FieldError>}
+            </div>
+            <div className="block space-y-1">
+              <Label htmlFor="config-credentials_path" className="text-xs">
+                Credentials Path
+              </Label>
+              <Input
+                id="config-credentials_path"
                 {...register("config.credentials_path")}
                 placeholder="/path/to/key.json"
-                className="input"
               />
-              {cfgErr("credentials_path") && (
-                <p className="text-xs text-destructive">{cfgErr("credentials_path")}</p>
-              )}
-            </label>
+              {cfgErr("credentials_path") && <FieldError>{cfgErr("credentials_path")}</FieldError>}
+            </div>
           </div>
         )}
 
         {selectedType === "mongodb" && (
           <div className="grid grid-cols-2 gap-3">
-            <label className="block space-y-1 col-span-2">
-              <span className="text-xs font-medium">Connection String</span>
-              <input
+            <div className="block space-y-1 col-span-2">
+              <Label htmlFor="config-connection_string" className="text-xs">
+                Connection String
+              </Label>
+              <Input
+                id="config-connection_string"
                 {...register("config.connection_string")}
                 placeholder="mongodb://localhost:27017"
-                className="input"
               />
               {cfgErr("connection_string") && (
-                <p className="text-xs text-destructive">{cfgErr("connection_string")}</p>
+                <FieldError>{cfgErr("connection_string")}</FieldError>
               )}
-            </label>
-            <label className="block space-y-1">
-              <span className="text-xs font-medium">Database</span>
-              <input {...register("config.database")} placeholder="mydb" className="input" />
-              {cfgErr("database") && (
-                <p className="text-xs text-destructive">{cfgErr("database")}</p>
-              )}
-            </label>
+            </div>
+            <div className="block space-y-1">
+              <Label htmlFor="config-database-mongodb" className="text-xs">
+                Database
+              </Label>
+              <Input
+                id="config-database-mongodb"
+                {...register("config.database")}
+                placeholder="mydb"
+              />
+              {cfgErr("database") && <FieldError>{cfgErr("database")}</FieldError>}
+            </div>
           </div>
         )}
 
         {selectedType === "api" && (
           <div className="grid grid-cols-2 gap-3">
-            <label className="block space-y-1 col-span-2">
-              <span className="text-xs font-medium">Base URL</span>
-              <input
+            <div className="block space-y-1 col-span-2">
+              <Label htmlFor="config-base_url" className="text-xs">
+                Base URL
+              </Label>
+              <Input
+                id="config-base_url"
                 {...register("config.base_url")}
                 placeholder="https://api.example.com"
-                className="input"
               />
-              {cfgErr("base_url") && (
-                <p className="text-xs text-destructive">{cfgErr("base_url")}</p>
-              )}
-            </label>
+              {cfgErr("base_url") && <FieldError>{cfgErr("base_url")}</FieldError>}
+            </div>
             <label className="block space-y-1">
               <span className="text-xs font-medium">Method</span>
               <select {...register("config.method")} className="input">
@@ -172,67 +184,79 @@ export function SourceForm({
                 ))}
               </select>
             </label>
-            <label className="block space-y-1">
-              <span className="text-xs font-medium">Path</span>
-              <input {...register("config.path")} placeholder="/users/{id}" className="input" />
-              {cfgErr("path") && <p className="text-xs text-destructive">{cfgErr("path")}</p>}
-            </label>
-            <label className="block space-y-1 col-span-2">
-              <span className="text-xs font-medium">Headers (JSON)</span>
-              <input
+            <div className="block space-y-1">
+              <Label htmlFor="config-path" className="text-xs">
+                Path
+              </Label>
+              <Input id="config-path" {...register("config.path")} placeholder="/users/{id}" />
+              {cfgErr("path") && <FieldError>{cfgErr("path")}</FieldError>}
+            </div>
+            <div className="block space-y-1 col-span-2">
+              <Label htmlFor="config-headers" className="text-xs">
+                Headers (JSON)
+              </Label>
+              <Input
+                id="config-headers"
                 {...register("config.headers")}
                 placeholder='{"Authorization": "Bearer xxx"}'
-                className="input"
               />
-              {cfgErr("headers") && <p className="text-xs text-destructive">{cfgErr("headers")}</p>}
-            </label>
-            <label className="block space-y-1 col-span-2">
-              <span className="text-xs font-medium">Body (JSON)</span>
-              <input {...register("config.body")} placeholder="{}" className="input" />
-            </label>
+              {cfgErr("headers") && <FieldError>{cfgErr("headers")}</FieldError>}
+            </div>
+            <div className="block space-y-1 col-span-2">
+              <Label htmlFor="config-body" className="text-xs">
+                Body (JSON)
+              </Label>
+              <Input id="config-body" {...register("config.body")} placeholder="{}" />
+            </div>
           </div>
         )}
 
         {!["bigquery", "mongodb", "api"].includes(selectedType) && (
           <>
             <div className="grid grid-cols-3 gap-3">
-              <label className="block space-y-1">
-                <span className="text-xs font-medium">Host</span>
-                <input {...register("config.host")} placeholder="localhost" className="input" />
-                {cfgErr("host") && <p className="text-xs text-destructive">{cfgErr("host")}</p>}
-              </label>
-              <label className="block space-y-1">
-                <span className="text-xs font-medium">Port</span>
-                <input {...register("config.port")} placeholder="5432" className="input" />
-                {cfgErr("port") && <p className="text-xs text-destructive">{cfgErr("port")}</p>}
-              </label>
-              <label className="block space-y-1">
-                <span className="text-xs font-medium">Database</span>
-                <input {...register("config.database")} placeholder="mydb" className="input" />
-                {cfgErr("database") && (
-                  <p className="text-xs text-destructive">{cfgErr("database")}</p>
-                )}
-              </label>
+              <div className="block space-y-1">
+                <Label htmlFor="config-host" className="text-xs">
+                  Host
+                </Label>
+                <Input id="config-host" {...register("config.host")} placeholder="localhost" />
+                {cfgErr("host") && <FieldError>{cfgErr("host")}</FieldError>}
+              </div>
+              <div className="block space-y-1">
+                <Label htmlFor="config-port" className="text-xs">
+                  Port
+                </Label>
+                <Input id="config-port" {...register("config.port")} placeholder="5432" />
+                {cfgErr("port") && <FieldError>{cfgErr("port")}</FieldError>}
+              </div>
+              <div className="block space-y-1">
+                <Label htmlFor="config-database" className="text-xs">
+                  Database
+                </Label>
+                <Input id="config-database" {...register("config.database")} placeholder="mydb" />
+                {cfgErr("database") && <FieldError>{cfgErr("database")}</FieldError>}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <label className="block space-y-1">
-                <span className="text-xs font-medium">User</span>
-                <input {...register("config.user")} placeholder="postgres" className="input" />
-                {cfgErr("user") && <p className="text-xs text-destructive">{cfgErr("user")}</p>}
-              </label>
-              <label className="block space-y-1">
-                <span className="text-xs font-medium">Password</span>
-                <input
+              <div className="block space-y-1">
+                <Label htmlFor="config-user" className="text-xs">
+                  User
+                </Label>
+                <Input id="config-user" {...register("config.user")} placeholder="postgres" />
+                {cfgErr("user") && <FieldError>{cfgErr("user")}</FieldError>}
+              </div>
+              <div className="block space-y-1">
+                <Label htmlFor="config-password" className="text-xs">
+                  Password
+                </Label>
+                <Input
+                  id="config-password"
                   type="password"
                   {...register("config.password")}
                   placeholder="password"
-                  className="input"
                 />
-                {cfgErr("password") && (
-                  <p className="text-xs text-destructive">{cfgErr("password")}</p>
-                )}
-              </label>
+                {cfgErr("password") && <FieldError>{cfgErr("password")}</FieldError>}
+              </div>
             </div>
           </>
         )}

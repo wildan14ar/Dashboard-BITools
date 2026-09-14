@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react"
 import { useEffect } from "react"
+import { Input } from "@/components/ui/input"
 import type { ColumnInfo, TableItem } from "@/hooks/use-sources"
 import { cn } from "@/lib/utils"
 
@@ -64,11 +65,11 @@ export function SchemaSidebar({
       <div className="border-b px-2 py-1.5">
         <div className="flex items-center gap-1.5 rounded-md border bg-background px-2 py-1">
           <Search className="size-3 text-muted-foreground shrink-0" />
-          <input
+          <Input
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Filter tables..."
-            className="flex-1 bg-transparent text-xs outline-none placeholder:text-muted-foreground/50"
+            className="h-auto flex-1 border-0 bg-transparent p-0 text-xs shadow-none focus-visible:ring-0 dark:bg-transparent"
           />
           {searchTerm && (
             <button

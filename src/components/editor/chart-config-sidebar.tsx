@@ -16,6 +16,8 @@ import {
 import { useState } from "react"
 import { Heading } from "@/components/charts/heading"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import type { PanelEditor, PanelFilter } from "@/hooks/use-panel-editor"
 import { cn } from "@/lib/utils"
 import { AxisDrop } from "./axis-drop"
@@ -157,10 +159,10 @@ export function ChartConfigSidebar({ editor }: { editor: PanelEditor }) {
         {chartType !== "text" && (
           <>
             <Field label="Title">
-              <input
+              <Input
                 value={panelTitle}
                 onChange={(e) => setPanelTitle(e.target.value)}
-                className="h-8 rounded-md border bg-background px-2 text-xs outline-none focus:border-ring"
+                className="h-8 text-xs"
                 placeholder="Panel title"
               />
             </Field>
@@ -247,13 +249,13 @@ function TitlePositionEditor({ editor }: { editor: PanelEditor }) {
             onChange={(e) => setTitleColor(e.target.value)}
             className="size-7 cursor-pointer rounded border"
           />
-          <input
+          <Input
             type="number"
             min={8}
             max={32}
             value={titleSize}
             onChange={(e) => setTitleSize(Number(e.target.value))}
-            className="h-7 w-12 rounded-md border bg-background px-1 text-[10px] outline-none"
+            className="h-7 w-12 text-[10px]"
           />
         </div>
       </div>
@@ -430,10 +432,10 @@ function TextConfig({ editor }: { editor: PanelEditor }) {
   return (
     <>
       <Field label="Content">
-        <textarea
+        <Textarea
           value={panelText}
           onChange={(e) => setPanelText(e.target.value)}
-          className="min-h-24 rounded-md border bg-background px-2 py-1.5 text-xs outline-none focus:border-ring resize-y"
+          className="min-h-24 resize-y text-xs"
           placeholder="Write your text, markdown supported"
         />
       </Field>
@@ -727,27 +729,27 @@ function FilterConfig({ editor }: { editor: PanelEditor }) {
             </div>
             {f.type === "date_range" ? (
               <div className="flex items-center gap-1">
-                <input
+                <Input
                   type="date"
                   value={f.from ?? ""}
                   onChange={(e) => updateFilter(i, { from: e.target.value })}
-                  className="h-7 w-full rounded-md border bg-background px-1 text-[10px]"
+                  className="h-7 text-[10px]"
                 />
                 <span className="text-[10px] text-muted-foreground">–</span>
-                <input
+                <Input
                   type="date"
                   value={f.to ?? ""}
                   onChange={(e) => updateFilter(i, { to: e.target.value })}
-                  className="h-7 w-full rounded-md border bg-background px-1 text-[10px]"
+                  className="h-7 text-[10px]"
                 />
               </div>
             ) : (
-              <input
+              <Input
                 type="text"
                 value={f.value ?? ""}
                 onChange={(e) => updateFilter(i, { value: e.target.value })}
                 placeholder="value"
-                className="h-7 w-full rounded-md border bg-background px-1 text-[10px]"
+                className="h-7 text-[10px]"
               />
             )}
           </div>

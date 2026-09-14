@@ -5,6 +5,9 @@ import { ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { FieldError, Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { useCreateDataset } from "@/hooks/use-datasets"
 import { useSources } from "@/hooks/use-sources"
 import { type DatasetInput, datasetSchema } from "@/validations/dataset"
@@ -33,11 +36,11 @@ export default function NewDatasetPage() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium">Name</span>
-          <input {...register("name")} placeholder="Monthly Sales" className="input" />
-          {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-        </label>
+        <div className="block space-y-1.5">
+          <Label htmlFor="name">Name</Label>
+          <Input id="name" {...register("name")} placeholder="Monthly Sales" />
+          {errors.name && <FieldError>{errors.name.message}</FieldError>}
+        </div>
 
         <label className="block space-y-1.5">
           <span className="text-sm font-medium">Source</span>
@@ -49,19 +52,20 @@ export default function NewDatasetPage() {
               </option>
             ))}
           </select>
-          {errors.sourceId && <p className="text-xs text-destructive">{errors.sourceId.message}</p>}
+          {errors.sourceId && <FieldError>{errors.sourceId.message}</FieldError>}
         </label>
 
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium">SQL Query</span>
-          <textarea
+        <div className="block space-y-1.5">
+          <Label htmlFor="sql">SQL Query</Label>
+          <Textarea
+            id="sql"
             {...register("sql")}
             rows={8}
             placeholder="SELECT * FROM orders WHERE created_at > '2024-01-01'"
-            className="input font-mono text-xs min-h-[160px] py-2"
+            className="min-h-[160px] font-mono text-xs"
           />
-          {errors.sql && <p className="text-xs text-destructive">{errors.sql.message}</p>}
-        </label>
+          {errors.sql && <FieldError>{errors.sql.message}</FieldError>}
+        </div>
 
         <div className="flex gap-2">
           <Button type="submit" disabled={isSubmitting || createDataset.isPending}>

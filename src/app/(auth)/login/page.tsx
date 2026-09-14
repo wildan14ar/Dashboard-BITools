@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { FieldError, Label } from "@/components/ui/label"
 import { useLogin } from "@/hooks/use-auth"
 import { type LoginInput, loginSchema } from "@/validations/auth"
 
@@ -39,26 +41,17 @@ export default function LoginPage() {
       >
         <h1 className="text-xl font-semibold tracking-tight">BI Dashboard</h1>
 
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium">Username atau Email</span>
-          <input
-            {...register("identifier")}
-            className="flex h-9 w-full rounded-lg border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 outline-none"
-          />
-          {errors.identifier && (
-            <p className="text-xs text-destructive">{errors.identifier.message}</p>
-          )}
-        </label>
+        <div className="block space-y-1.5">
+          <Label htmlFor="identifier">Username atau Email</Label>
+          <Input id="identifier" {...register("identifier")} />
+          {errors.identifier && <FieldError>{errors.identifier.message}</FieldError>}
+        </div>
 
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium">Password</span>
-          <input
-            type="password"
-            {...register("password")}
-            className="flex h-9 w-full rounded-lg border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 outline-none"
-          />
-          {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
-        </label>
+        <div className="block space-y-1.5">
+          <Label htmlFor="password">Password</Label>
+          <Input id="password" type="password" {...register("password")} />
+          {errors.password && <FieldError>{errors.password.message}</FieldError>}
+        </div>
 
         {error && <p className="text-sm text-destructive">{error}</p>}
 

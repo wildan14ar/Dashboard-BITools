@@ -1,5 +1,6 @@
 "use client"
 
+import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
 export function FieldLabel({ children }: { children: React.ReactNode }) {
@@ -85,11 +86,11 @@ export function ColorField({
         onChange={(e) => onChange(e.target.value)}
         className="size-7 cursor-pointer rounded border"
       />
-      <input
+      <Input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-7 flex-1 rounded-md border bg-background px-2 text-[10px] font-mono outline-none focus:border-ring"
+        className="h-7 flex-1 font-mono text-[10px]"
         placeholder="#hex / color name"
       />
       {value && onReset && (

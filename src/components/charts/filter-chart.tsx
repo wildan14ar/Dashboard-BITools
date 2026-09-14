@@ -1,5 +1,6 @@
 "use client"
 
+import { Input } from "@/components/ui/input"
 import { useDashboardFilters } from "@/hooks/use-dashboard-filters"
 import type { Panel } from "@/hooks/use-dashboards"
 import type { PanelFilter } from "@/hooks/use-panel-editor"
@@ -27,18 +28,18 @@ export function FilterChart({ panel, data }: Props) {
             <div key={key} className="flex flex-col gap-1">
               <span className="text-[10px] font-medium text-muted-foreground">{key}</span>
               <div className="flex items-center gap-1">
-                <input
+                <Input
                   type="date"
                   value={from}
                   onChange={(e) => setValue(`${key}_from`, e.target.value)}
-                  className="h-7 w-full min-w-0 rounded-md border bg-background px-1 text-[10px]"
+                  className="h-7 min-w-0 px-1 text-[10px]"
                 />
                 <span className="text-[10px] text-muted-foreground">–</span>
-                <input
+                <Input
                   type="date"
                   value={to}
                   onChange={(e) => setValue(`${key}_to`, e.target.value)}
-                  className="h-7 w-full min-w-0 rounded-md border bg-background px-1 text-[10px]"
+                  className="h-7 min-w-0 px-1 text-[10px]"
                 />
               </div>
             </div>

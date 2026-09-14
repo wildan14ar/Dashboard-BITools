@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { FieldError, Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { useCreateDashboard } from "@/hooks/use-dashboards"
 import { type DashboardInput, dashboardSchema } from "@/validations/dashboard"
 
@@ -54,25 +57,20 @@ export default function NewDashboardPage() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium">Name</span>
-          <input {...register("name")} placeholder="Sales Overview" className="input" />
-          {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-        </label>
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium">Description</span>
-          <textarea
-            {...register("description")}
-            placeholder="Optional"
-            className="input py-2"
-            rows={3}
-          />
-        </label>
+        <div className="block space-y-1.5">
+          <Label htmlFor="name">Name</Label>
+          <Input id="name" {...register("name")} placeholder="Sales Overview" />
+          {errors.name && <FieldError>{errors.name.message}</FieldError>}
+        </div>
+        <div className="block space-y-1.5">
+          <Label htmlFor="description">Description</Label>
+          <Textarea id="description" {...register("description")} placeholder="Optional" rows={3} />
+        </div>
 
         <div className="space-y-1.5">
           <span className="text-sm font-medium">Tags</span>
           <div className="flex gap-1.5">
-            <input
+            <Input
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={(e) => {
@@ -82,7 +80,7 @@ export default function NewDashboardPage() {
                 }
               }}
               placeholder="Press Enter to add"
-              className="input flex-1"
+              className="flex-1"
             />
             <Button type="button" variant="outline" onClick={addTag}>
               Add

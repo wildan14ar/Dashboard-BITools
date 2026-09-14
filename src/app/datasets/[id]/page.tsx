@@ -4,6 +4,8 @@ import { ArrowLeft, Clock, Loader2, Play } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { useDataset, useRunDataset } from "@/hooks/use-datasets"
 
 export default function DatasetPage({ params }: { params: Promise<{ id: string }> }) {
@@ -56,11 +58,7 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
           <ArrowLeft className="size-4" />
         </Button>
         {isEdit ? (
-          <input
-            value={displayName}
-            onChange={(e) => setName(e.target.value)}
-            className="input w-64"
-          />
+          <Input value={displayName} onChange={(e) => setName(e.target.value)} className="w-64" />
         ) : (
           <h1 className="text-lg font-semibold">{dataset.name}</h1>
         )}
@@ -90,10 +88,10 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
           <div className="border-b px-4 py-1.5">
             <span className="text-xs font-medium text-muted-foreground">SQL Editor</span>
           </div>
-          <textarea
+          <Textarea
             value={displaySql}
             onChange={(e) => setSql(e.target.value)}
-            className="flex-1 resize-none border-0 bg-transparent p-4 font-mono text-sm outline-none"
+            className="flex-1 resize-none border-0 bg-transparent p-4 font-mono text-sm shadow-none focus-visible:ring-0"
             placeholder="SELECT * FROM ..."
             readOnly={!isEdit}
             spellCheck={false}
