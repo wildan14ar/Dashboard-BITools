@@ -483,10 +483,6 @@ export type BiDatasetUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.BiDatasetScalarWhereInput | Prisma.BiDatasetScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type BiDatasetCreateNestedManyWithoutSourceInput = {
   create?: Prisma.XOR<Prisma.BiDatasetCreateWithoutSourceInput, Prisma.BiDatasetUncheckedCreateWithoutSourceInput> | Prisma.BiDatasetCreateWithoutSourceInput[] | Prisma.BiDatasetUncheckedCreateWithoutSourceInput[]
   connectOrCreate?: Prisma.BiDatasetCreateOrConnectWithoutSourceInput | Prisma.BiDatasetCreateOrConnectWithoutSourceInput[]

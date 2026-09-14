@@ -1,34 +1,47 @@
-import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
-import { execute, cleanError } from "@/lib/engine"
+import type { NextRequest } from "next/server"
+import prisma from "@/config/prisma"
 import { settings } from "@/config/settings"
+import { logActivity } from "@/lib/activity"
+import { cleanError, execute } from "@/lib/engine"
+import { ResponseHandler, requireAuth } from "@/middlewares"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-
-  const { id } = await params
-  const source = await prisma.biSource.findUnique({ where: { id } })
-  if (!source) return NextResponse.json({ error: "Not found" }, { status: 404 })
-
-  const body = await req.json()
-  if (!body.sql || typeof body.sql !== "string") return NextResponse.json({ error: "SQL required" }, { status: 400 })
-
-  const useCache = body.cache !== false
+  const { error, session } = await requireAuth({ permissions: ["sources:read"] })
+  if (error) return error
 
   try {
-    const result = await execute({
-      sourceId: source.id,
-      dbType: source.type,
-      configJson: JSON.stringify(source.config ?? {}),
-      sql: body.sql,
-      maxRows: settings.query.maxRows,
-      timeoutSec: settings.query.timeoutSec,
-      useCache,
-    })
-    return NextResponse.json(result)
+    const { id } = await params
+    const source = await prisma.biSource.findUnique({ where: { id } })
+    if (!source) return ResponseHandler.notFound("Source tidak ditemukan")
+
+    const body = await req.json()
+    if (!body.sql || typeof body.sql !== "string")
+      return ResponseHandler.badRequest("SQL wajib diisi")
+
+    const useCache = body.cache !== false
+
+    try {
+      const result = await execute({
+        sourceId: source.id,
+        dbType: source.type,
+        configJson: JSON.stringify(source.config ?? {}),
+        sql: body.sql,
+        maxRows: settings.query.maxRows,
+        timeoutSec: settings.query.timeoutSec,
+        useCache,
+      })
+      await logActivity(session.user.id, "EXECUTE", "BiSource", source.id, { name: source.name })
+      return ResponseHandler.success("Query executed successfully", result)
+    } catch (err) {
+      await logActivity(session?.user?.id || "system", "ERROR", "BiSource", source.id, {
+        error: String(err),
+      })
+      return ResponseHandler.internalError(cleanError(err), err)
+    }
   } catch (err) {
-    return NextResponse.json({ error: cleanError(err) }, { status: 500 })
+    await logActivity(session?.user?.id || "system", "ERROR", "BiSource", undefined, {
+      error: String(err),
+    })
+    return ResponseHandler.internalError("Gagal menjalankan query", err)
   }
 }

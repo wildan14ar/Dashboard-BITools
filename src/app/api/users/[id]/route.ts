@@ -1,37 +1,78 @@
-import { NextRequest, NextResponse } from "next/server"
-import bcrypt from "bcrypt"
+import { type NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
-import { RequestHandler } from "@/middlewares/request-handler"
-import { updateUserSchema } from "@/validation/user"
+import prisma from "@/config/prisma"
+import { logActivity } from "@/lib/activity"
+import { setCredentialPassword } from "@/lib/credentials"
+import { RequestHandler, ResponseHandler, requireAuth } from "@/middlewares"
+import { UpdateUserSchema } from "@/validations"
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  const { error, session } = await requireAuth({ permissions: ["users:admin"] })
+  if (error) return error
 
-  const { id } = await params
-  const validated = await RequestHandler.validateRequest(z.object({ body: updateUserSchema }), req)
-  if (validated instanceof NextResponse) return validated
-  const data = validated.body
+  try {
+    const { id } = await params
+    const validated = await RequestHandler.validateRequest(
+      z.object({ body: UpdateUserSchema }),
+      req,
+    )
+    if (validated instanceof NextResponse) return validated
+    const data = validated.body
 
-  const { password, ...rest } = data
-  const updateData: Record<string, unknown> = { ...rest }
-  if (password) updateData.passwordHash = await bcrypt.hash(password, 10)
+    const { password, roleIds, ...rest } = data
 
-  const user = await prisma.user.update({
-    where: { id },
-    data: updateData,
-    select: { id: true, userName: true, fullName: true, email: true, isSuperAdmin: true },
-  })
-  return NextResponse.json(user)
+    const user = await prisma.user.update({
+      where: { id },
+      data: {
+        ...rest,
+        ...(roleIds
+          ? {
+              userRoles: {
+                deleteMany: {},
+                create: roleIds.map((roleId: string) => ({ role: { connect: { id: roleId } } })),
+              },
+            }
+          : {}),
+      },
+      select: {
+        id: true,
+        username: true,
+        fullname: true,
+        email: true,
+        avatar: true,
+        quote: true,
+        isActive: true,
+        isPublic: true,
+        isSuperAdmin: true,
+      },
+    })
+
+    if (password) await setCredentialPassword(id, password)
+
+    await logActivity(session.user.id, "UPDATE", "User", user.id, { email: user.email })
+    return ResponseHandler.success("User berhasil diperbarui", user)
+  } catch (err) {
+    await logActivity(session?.user?.id || "system", "ERROR", "User", undefined, {
+      error: String(err),
+    })
+    return ResponseHandler.internalError("Gagal memperbarui user", err)
+  }
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  const { error, session } = await requireAuth({ permissions: ["users:admin"] })
+  if (error) return error
 
-  const { id } = await params
-  await prisma.user.delete({ where: { id } })
-  return NextResponse.json({ ok: true })
+  try {
+    const { id } = await params
+    await prisma.user.delete({ where: { id } })
+
+    await logActivity(session.user.id, "DELETE", "User", id)
+    return ResponseHandler.success("User berhasil dihapus", { ok: true })
+  } catch (err) {
+    await logActivity(session?.user?.id || "system", "ERROR", "User", undefined, {
+      error: String(err),
+    })
+    return ResponseHandler.internalError("Gagal menghapus user", err)
+  }
 }

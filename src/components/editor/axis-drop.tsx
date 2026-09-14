@@ -5,7 +5,14 @@ import { cn } from "@/lib/utils"
 
 export type DroppedField = { datasetId: string; datasetName: string; columnIndex: number }
 
-export function AxisDrop({ label, column, agg, onAggChange, onChange, onDropField }: {
+export function AxisDrop({
+  label,
+  column,
+  agg,
+  onAggChange,
+  onChange,
+  onDropField,
+}: {
   label: string
   column?: string
   agg?: string
@@ -21,7 +28,11 @@ export function AxisDrop({ label, column, agg, onAggChange, onChange, onDropFiel
     const datasetId = e.dataTransfer.getData("dataset-id")
     const columnIndex = e.dataTransfer.getData("column-index")
     if (datasetId) {
-      onDropField?.({ datasetId, datasetName: e.dataTransfer.getData("dataset-name"), columnIndex: Number(columnIndex) || 0 })
+      onDropField?.({
+        datasetId,
+        datasetName: e.dataTransfer.getData("dataset-name"),
+        columnIndex: Number(columnIndex) || 0,
+      })
     } else if (columnIndex) {
       onChange(Number(columnIndex))
     }
@@ -32,7 +43,11 @@ export function AxisDrop({ label, column, agg, onAggChange, onChange, onDropFiel
       <label className="text-[10px] text-muted-foreground">{label}</label>
       <div className="flex gap-1">
         {agg && onAggChange && (
-          <select value={agg} onChange={(e) => onAggChange(e.target.value)} className="h-8 w-16 rounded-md border bg-background px-1 text-[10px] shrink-0">
+          <select
+            value={agg}
+            onChange={(e) => onAggChange(e.target.value)}
+            className="h-8 w-16 rounded-md border bg-background px-1 text-[10px] shrink-0"
+          >
             <option value="sum">SUM</option>
             <option value="avg">AVG</option>
             <option value="count">CNT</option>
@@ -41,13 +56,16 @@ export function AxisDrop({ label, column, agg, onAggChange, onChange, onDropFiel
           </select>
         )}
         <div
-          onDragOver={(e) => { e.preventDefault(); setOver(true) }}
+          onDragOver={(e) => {
+            e.preventDefault()
+            setOver(true)
+          }}
           onDragLeave={() => setOver(false)}
           onDrop={handleDrop}
           className={cn(
             "h-8 flex-1 rounded-md border border-dashed px-2 flex items-center text-xs transition-colors",
             over ? "border-primary bg-primary/5" : "border-border",
-            column ? "border-solid bg-muted/50" : ""
+            column ? "border-solid bg-muted/50" : "",
           )}
         >
           {column ? (

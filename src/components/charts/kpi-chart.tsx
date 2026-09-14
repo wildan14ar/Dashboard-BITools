@@ -1,6 +1,6 @@
 import type { Panel } from "@/hooks/use-dashboards"
-import { aggregate } from "@/lib/chart"
 import type { RunData } from "@/lib/chart"
+import { aggregate } from "@/lib/chart"
 
 type Props = {
   panel: Panel
@@ -10,12 +10,18 @@ type Props = {
 
 export function KpiChart({ panel, data, preview = false }: Props) {
   if (!data || data.rows.length === 0) {
-    return <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No data</div>
+    return (
+      <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
+        No data
+      </div>
+    )
   }
   const cfg = (panel.config as Record<string, unknown>) ?? {}
   const column = Number(cfg.column) || 0
   const agg = (cfg.agg as string) || "sum"
-  const vals = data.rows.map((r) => r.values[column]).filter((v) => v !== null && v !== undefined && v !== "")
+  const vals = data.rows
+    .map((r) => r.values[column])
+    .filter((v) => v !== null && v !== undefined && v !== "")
   const val = aggregate(vals, agg)
   const label = data.columns[column] ?? data.columns[0] ?? "KPI"
 

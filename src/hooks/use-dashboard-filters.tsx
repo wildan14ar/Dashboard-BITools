@@ -11,13 +11,8 @@ const Ctx = createContext<{ values: FilterValues; setValue: (key: string, val: s
 
 export function DashboardFilterProvider({ children }: { children: React.ReactNode }) {
   const [values, setValues] = useState<FilterValues>({})
-  const setValue = (key: string, val: string) =>
-    setValues((prev) => ({ ...prev, [key]: val }))
-  return (
-    <Ctx.Provider value={{ values, setValue }}>
-      {children}
-    </Ctx.Provider>
-  )
+  const setValue = (key: string, val: string) => setValues((prev) => ({ ...prev, [key]: val }))
+  return <Ctx.Provider value={{ values, setValue }}>{children}</Ctx.Provider>
 }
 
 export function useDashboardFilters() {

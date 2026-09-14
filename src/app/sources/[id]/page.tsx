@@ -1,19 +1,16 @@
 "use client"
 
-import { use, useState, useMemo, useEffect } from "react"
+import { ArrowLeft, Columns, Database, GitBranch, Plus, Table2, X } from "lucide-react"
 import { useRouter } from "next/navigation"
-import api from "@/lib/axios"
-import {
-  ArrowLeft, X, Table2, Database,
-  Columns, GitBranch, Plus,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { useSource, useSourceSchema, type TableItem } from "@/hooks/use-sources"
-import { SchemaERD } from "@/components/sources/schema-erd"
-import { SchemaSidebar } from "@/components/sources/schema-sidebar"
+import { use, useEffect, useMemo, useState } from "react"
 import { QueryEditorArea } from "@/components/sources/query-editor"
 import type { QueryResult, TabDef, TabState } from "@/components/sources/query-types"
+import { SchemaERD } from "@/components/sources/schema-erd"
+import { SchemaSidebar } from "@/components/sources/schema-sidebar"
+import { Button } from "@/components/ui/button"
+import { type TableItem, useSource, useSourceSchema } from "@/hooks/use-sources"
+import api from "@/lib/api"
+import { cn } from "@/lib/utils"
 
 export default function SourceSchemaPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
@@ -104,7 +101,10 @@ export default function SourceSchemaPage({ params }: { params: Promise<{ id: str
     if (!tab || !tab.sql) return
     setState(tabId, { running: true, error: "", result: null })
     try {
-      const data = await api.post<QueryResult & { error?: string }>(`/sources/${id}/run`, { sql: tab.sql })
+      const res = await api.post<QueryResult & { error?: string }>(`/sources/${id}/run`, {
+        sql: tab.sql,
+      })
+      const data = res.data
       if (data?.error) setState(tabId, { error: data.error, running: false })
       else if (data?.columns && data?.rows) setState(tabId, { result: data, running: false })
       else setState(tabId, { error: "Unexpected empty response", running: false })
@@ -116,7 +116,8 @@ export default function SourceSchemaPage({ params }: { params: Promise<{ id: str
   function toggleSchema(sn: string) {
     setExpandedSchemas((p) => {
       const next = new Set(p)
-      if (next.has(sn)) next.delete(sn); else next.add(sn)
+      if (next.has(sn)) next.delete(sn)
+      else next.add(sn)
       return next
     })
   }
@@ -125,7 +126,8 @@ export default function SourceSchemaPage({ params }: { params: Promise<{ id: str
     const key = `${sn}.${tableName}`
     setExpandedTables((p) => {
       const next = new Set(p)
-      if (next.has(key)) next.delete(key); else next.add(key)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
       return next
     })
   }
@@ -133,7 +135,13 @@ export default function SourceSchemaPage({ params }: { params: Promise<{ id: str
   useEffect(() => {
     if (!activeTab) return
     const tab = tabs.find((t) => t.id === activeTab)
-    if (tab && tab.kind === "table" && !getState(activeTab).result && !getState(activeTab).error && !getState(activeTab).running) {
+    if (
+      tab &&
+      tab.kind === "table" &&
+      !getState(activeTab).result &&
+      !getState(activeTab).error &&
+      !getState(activeTab).running
+    ) {
       handleRun(activeTab)
     }
   }, [activeTab])
@@ -141,7 +149,8 @@ export default function SourceSchemaPage({ params }: { params: Promise<{ id: str
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
       if (isResizingSidebar) setSidebarWidth(Math.max(180, Math.min(500, e.clientX)))
-      if (isResizingEditor) setEditorHeight(Math.max(80, Math.min(600, window.innerHeight - e.clientY - 120)))
+      if (isResizingEditor)
+        setEditorHeight(Math.max(80, Math.min(600, window.innerHeight - e.clientY - 120)))
     }
     function handleMouseUp() {
       setIsResizingSidebar(false)
@@ -161,7 +170,12 @@ export default function SourceSchemaPage({ params }: { params: Promise<{ id: str
     }
   }, [isResizingSidebar, isResizingEditor])
 
-  if (sourceLoading) return <div className="flex h-full items-center justify-center text-muted-foreground">Loading...</div>
+  if (sourceLoading)
+    return (
+      <div className="flex h-full items-center justify-center text-muted-foreground">
+        Loading...
+      </div>
+    )
 
   const activeTabObj = activeTab ? tabs.find((t) => t.id === activeTab) : null
 
@@ -194,13 +208,25 @@ export default function SourceSchemaPage({ params }: { params: Promise<{ id: str
           onToggleTableColumns={toggleTableColumns}
           onOpenTab={openTab}
           onOpenMenu={(sn) => setMenuSchema(menuSchema === sn ? null : sn)}
-          onNewQuery={() => { setMenuSchema(null); openQueryTab() }}
-          onViewErd={(sn) => { setMenuSchema(null); openErdTab(sn, sn) }}
+          onNewQuery={() => {
+            setMenuSchema(null)
+            openQueryTab()
+          }}
+          onViewErd={(sn) => {
+            setMenuSchema(null)
+            openErdTab(sn, sn)
+          }}
           onResizeStart={() => setIsResizingSidebar(true)}
         />
 
         <div className="flex-1 flex flex-col min-w-0">
-          <TabBar tabs={tabs} activeTab={activeTab} onSelect={setActiveTab} onClose={closeTab} onNewQuery={openQueryTab} />
+          <TabBar
+            tabs={tabs}
+            activeTab={activeTab}
+            onSelect={setActiveTab}
+            onClose={closeTab}
+            onNewQuery={openQueryTab}
+          />
 
           {activeTabObj ? (
             activeTabObj.kind === "erd" ? (
@@ -210,7 +236,9 @@ export default function SourceSchemaPage({ params }: { params: Promise<{ id: str
                 tab={activeTabObj}
                 state={getState(activeTabObj.id)}
                 sourceId={id}
-                onSqlChange={(sql) => setTabs((p) => p.map((t) => t.id === activeTab ? { ...t, sql } : t))}
+                onSqlChange={(sql) =>
+                  setTabs((p) => p.map((t) => (t.id === activeTab ? { ...t, sql } : t)))
+                }
                 onRun={() => handleRun(activeTab!)}
                 editorHeight={editorHeight}
                 onEditorResizeStart={() => setIsResizingEditor(true)}
@@ -225,7 +253,13 @@ export default function SourceSchemaPage({ params }: { params: Promise<{ id: str
   )
 }
 
-function TabBar({ tabs, activeTab, onSelect, onClose, onNewQuery }: {
+function TabBar({
+  tabs,
+  activeTab,
+  onSelect,
+  onClose,
+  onNewQuery,
+}: {
   tabs: TabDef[]
   activeTab: string | null
   onSelect: (id: string) => void
@@ -236,14 +270,27 @@ function TabBar({ tabs, activeTab, onSelect, onClose, onNewQuery }: {
   return (
     <div className="flex items-center border-b bg-muted/20 shrink-0 overflow-x-auto overflow-y-hidden">
       {tabs.map((t) => (
-        <div key={t.id} className={cn("group flex items-center border-r shrink-0 pr-0.5 cursor-pointer", activeTab === t.id && "border-b-2 border-b-primary bg-background -mb-px")} onClick={() => onSelect(t.id)}>
+        <div
+          key={t.id}
+          className={cn(
+            "group flex items-center border-r shrink-0 pr-0.5 cursor-pointer",
+            activeTab === t.id && "border-b-2 border-b-primary bg-background -mb-px",
+          )}
+          onClick={() => onSelect(t.id)}
+        >
           <span className="px-3 py-1.5 text-[11px] font-medium whitespace-nowrap">
             {t.kind === "table" && <Table2 className="inline size-3 mr-1" />}
             {t.kind === "query" && <Columns className="inline size-3 mr-1" />}
             {t.kind === "erd" && <GitBranch className="inline size-3 mr-1" />}
             {t.label}
           </span>
-          <button onClick={(e) => { e.stopPropagation(); onClose(t.id) }} className="p-0.5 mr-0.5 rounded hover:bg-muted opacity-0 group-hover:opacity-100">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onClose(t.id)
+            }}
+            className="p-0.5 mr-0.5 rounded hover:bg-muted opacity-0 group-hover:opacity-100"
+          >
             <X className="size-3" />
           </button>
         </div>
@@ -278,9 +325,13 @@ function EmptyState({ onNewQuery, tableCount }: { onNewQuery: () => void; tableC
       <Database className="size-12 opacity-15" />
       <div className="text-center">
         <p className="font-medium">Database Explorer</p>
-        <p className="text-xs opacity-60 mt-1">{tableCount > 0 ? "Select a table or use the toolbar" : "No objects available"}</p>
+        <p className="text-xs opacity-60 mt-1">
+          {tableCount > 0 ? "Select a table or use the toolbar" : "No objects available"}
+        </p>
       </div>
-      <Button variant="outline" size="sm" onClick={onNewQuery} className="gap-1.5 mt-2"><Plus className="size-3.5" /> New Query</Button>
+      <Button variant="outline" size="sm" onClick={onNewQuery} className="gap-1.5 mt-2">
+        <Plus className="size-3.5" /> New Query
+      </Button>
     </div>
   )
 }

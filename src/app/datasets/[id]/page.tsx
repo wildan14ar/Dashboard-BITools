@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { ArrowLeft, Clock, Loader2, Play } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowLeft, Play, Clock, Loader2 } from "lucide-react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useDataset, useRunDataset } from "@/hooks/use-datasets"
 
@@ -14,14 +14,23 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
   const [id, setId] = useState("")
   const [sql, setSql] = useState("")
   const [name, setName] = useState("")
-  const [result, setResult] = useState<{ columns: string[]; rows: { values: string[] }[]; rowCount: number; executionTimeMs: number; cached?: boolean; total?: number } | null>(null)
+  const [result, setResult] = useState<{
+    columns: string[]
+    rows: { values: string[] }[]
+    rowCount: number
+    executionTimeMs: number
+    cached?: boolean
+    total?: number
+  } | null>(null)
   const [error, setError] = useState("")
   const [useCache, setUseCache] = useState(true)
 
   const { data: dataset } = useDataset(id)
   const runDataset = useRunDataset(id)
 
-  useEffect(() => { params.then((p) => setId(p.id)) }, [])
+  useEffect(() => {
+    params.then((p) => setId(p.id))
+  }, [])
 
   const displayName = name || dataset?.name || ""
   const displaySql = sql || dataset?.sql || ""
@@ -34,7 +43,7 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
       {
         onSuccess: (data) => setResult(data),
         onError: (err) => setError(String(err)),
-      }
+      },
     )
   }
 
@@ -43,19 +52,34 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3 border-b px-6 py-3">
-        <Button variant="ghost" size="icon" onClick={() => router.push("/datasets")}><ArrowLeft className="size-4" /></Button>
+        <Button variant="ghost" size="icon" onClick={() => router.push("/datasets")}>
+          <ArrowLeft className="size-4" />
+        </Button>
         {isEdit ? (
-          <input value={displayName} onChange={(e) => setName(e.target.value)} className="input w-64" />
+          <input
+            value={displayName}
+            onChange={(e) => setName(e.target.value)}
+            className="input w-64"
+          />
         ) : (
           <h1 className="text-lg font-semibold">{dataset.name}</h1>
         )}
         <div className="ml-auto flex items-center gap-2">
           <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <input type="checkbox" checked={useCache} onChange={(e) => setUseCache(e.target.checked)} className="size-3.5 accent-primary" />
+            <input
+              type="checkbox"
+              checked={useCache}
+              onChange={(e) => setUseCache(e.target.checked)}
+              className="size-3.5 accent-primary"
+            />
             Cache
           </label>
           <Button onClick={handleRun} disabled={runDataset.isPending}>
-            {runDataset.isPending ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
+            {runDataset.isPending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Play className="size-4" />
+            )}
             Run
           </Button>
         </div>
@@ -82,20 +106,35 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
             {result && (
               <span className="flex items-center gap-3 text-xs text-muted-foreground">
                 {result.cached && <span className="font-medium text-emerald-500">cached</span>}
-                <span className="flex items-center gap-1"><Clock className="size-3" />{result.executionTimeMs}ms</span>
-                <span>{result.rowCount}{result.total != null ? ` / ${result.total}` : ""} rows</span>
+                <span className="flex items-center gap-1">
+                  <Clock className="size-3" />
+                  {result.executionTimeMs}ms
+                </span>
+                <span>
+                  {result.rowCount}
+                  {result.total != null ? ` / ${result.total}` : ""} rows
+                </span>
               </span>
             )}
           </div>
           <div className="flex-1 overflow-auto">
             {error && <div className="p-4 text-sm text-destructive">{error}</div>}
-            {runDataset.isPending && <div className="flex items-center gap-2 p-4 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" /> Running query...</div>}
+            {runDataset.isPending && (
+              <div className="flex items-center gap-2 p-4 text-sm text-muted-foreground">
+                <Loader2 className="size-4 animate-spin" /> Running query...
+              </div>
+            )}
             {result && (
               <table className="w-full text-xs">
                 <thead className="sticky top-0 bg-muted/50">
                   <tr>
                     {result.columns.map((c) => (
-                      <th key={c} className="border-b px-3 py-2 text-left font-medium whitespace-nowrap">{c}</th>
+                      <th
+                        key={c}
+                        className="border-b px-3 py-2 text-left font-medium whitespace-nowrap"
+                      >
+                        {c}
+                      </th>
                     ))}
                   </tr>
                 </thead>
@@ -103,7 +142,10 @@ export default function DatasetPage({ params }: { params: Promise<{ id: string }
                   {result.rows.map((row, i) => (
                     <tr key={i} className="border-b hover:bg-muted/30">
                       {row.values.map((v, j) => (
-                        <td key={j} className="px-3 py-1.5 whitespace-nowrap font-mono text-muted-foreground">
+                        <td
+                          key={j}
+                          className="px-3 py-1.5 whitespace-nowrap font-mono text-muted-foreground"
+                        >
                           {v ?? <span className="italic text-muted-foreground/50">NULL</span>}
                         </td>
                       ))}

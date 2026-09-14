@@ -1,6 +1,6 @@
+import path from "node:path"
 import * as grpc from "@grpc/grpc-js"
 import * as protoLoader from "@grpc/proto-loader"
-import path from "node:path"
 import type { ProtoGrpcType } from "@/lib/grpc/engine"
 
 const PROTO_PATH = path.join(process.cwd(), "proto", "engine.proto")
@@ -35,13 +35,15 @@ function promisify<T>(fn: (callback: grpc.requestCallback<T>) => grpc.ClientUnar
 
 type SourceRef = { sourceId: string; dbType: string; configJson: string }
 
-export async function execute(src: SourceRef & {
-  sql: string
-  maxRows?: number
-  timeoutSec?: number
-  params?: Record<string, string>
-  useCache?: boolean
-}) {
+export async function execute(
+  src: SourceRef & {
+    sql: string
+    maxRows?: number
+    timeoutSec?: number
+    params?: Record<string, string>
+    useCache?: boolean
+  },
+) {
   const client = getClient()
   return promisify((cb) =>
     client.Execute(
@@ -55,18 +57,20 @@ export async function execute(src: SourceRef & {
         params: src.params ?? {},
         useCache: src.useCache ?? true,
       },
-      cb
-    )
+      cb,
+    ),
   )
 }
 
-export function executeStream(src: SourceRef & {
-  sql: string
-  maxRows?: number
-  timeoutSec?: number
-  params?: Record<string, string>
-  useCache?: boolean
-}) {
+export function executeStream(
+  src: SourceRef & {
+    sql: string
+    maxRows?: number
+    timeoutSec?: number
+    params?: Record<string, string>
+    useCache?: boolean
+  },
+) {
   const client = getClient()
   return client.ExecuteStream({
     sourceId: src.sourceId,
@@ -82,7 +86,12 @@ export function executeStream(src: SourceRef & {
 
 export async function getSchema(src: SourceRef) {
   const client = getClient()
-  return promisify((cb) => client.GetSchema({ sourceId: src.sourceId, dbType: src.dbType, configJson: src.configJson }, cb))
+  return promisify((cb) =>
+    client.GetSchema(
+      { sourceId: src.sourceId, dbType: src.dbType, configJson: src.configJson },
+      cb,
+    ),
+  )
 }
 
 export async function testConnection(params: {
@@ -94,8 +103,8 @@ export async function testConnection(params: {
   return promisify((cb) =>
     client.TestConnection(
       { sourceId: params.sourceId, dbType: params.dbType, configJson: params.configJson },
-      cb
-    )
+      cb,
+    ),
   )
 }
 
@@ -105,7 +114,8 @@ export async function invalidateCache(sourceId: string) {
 }
 
 export function cleanError(err: unknown): string {
-  if (err && typeof err === "object" && "details" in err) return String((err as { details: unknown }).details)
+  if (err && typeof err === "object" && "details" in err)
+    return String((err as { details: unknown }).details)
   if (err instanceof Error) return err.message
   return String(err)
 }

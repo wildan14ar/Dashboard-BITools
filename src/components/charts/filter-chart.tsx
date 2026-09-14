@@ -1,9 +1,9 @@
 "use client"
 
-import type { Panel } from "@/hooks/use-dashboards"
-import type { RunData } from "@/lib/chart"
 import { useDashboardFilters } from "@/hooks/use-dashboard-filters"
+import type { Panel } from "@/hooks/use-dashboards"
 import type { PanelFilter } from "@/hooks/use-panel-editor"
+import type { RunData } from "@/lib/chart"
 
 type Props = {
   panel: Panel
@@ -47,7 +47,7 @@ export function FilterChart({ panel, data, preview = false }: Props) {
 
         const colIdx = (data?.columns ?? []).indexOf(key)
         const options = Array.from(
-          new Set((data?.rows ?? []).map((r) => r.values[colIdx]).filter(Boolean))
+          new Set((data?.rows ?? []).map((r) => r.values[colIdx]).filter(Boolean)),
         )
         return (
           <div key={key} className="flex flex-col gap-1">
@@ -58,7 +58,11 @@ export function FilterChart({ panel, data, preview = false }: Props) {
               className="h-7 w-full rounded-md border bg-background px-1 text-[10px]"
             >
               <option value="">All</option>
-              {options.map((o) => <option key={o} value={o}>{o}</option>)}
+              {options.map((o) => (
+                <option key={o} value={o}>
+                  {o}
+                </option>
+              ))}
             </select>
           </div>
         )

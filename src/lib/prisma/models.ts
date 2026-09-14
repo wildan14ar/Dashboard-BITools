@@ -9,9 +9,14 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User'
+export type * from './models/Session'
+export type * from './models/Account'
+export type * from './models/Verification'
 export type * from './models/Role'
 export type * from './models/UserRole'
 export type * from './models/RolePermission'
+export type * from './models/Notification'
+export type * from './models/ActivityLog'
 export type * from './models/BiDashboard'
 export type * from './models/BiDashboardMember'
 export type * from './models/BiDataset'

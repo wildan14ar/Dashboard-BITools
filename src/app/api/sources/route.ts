@@ -1,28 +1,44 @@
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
-import { RequestHandler } from "@/middlewares/request-handler"
-import { sourceSchema } from "@/validation/source"
+import prisma from "@/config/prisma"
+import { logActivity } from "@/lib/activity"
+import { RequestHandler, ResponseHandler, requireAuth } from "@/middlewares"
+import { sourceSchema } from "@/validations"
 
 export async function GET() {
-  const session = await auth()
-  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  const { error, session } = await requireAuth({ permissions: ["sources:read"] })
+  if (error) return error
 
-  const sources = await prisma.biSource.findMany({ orderBy: { createdAt: "desc" } })
-  return NextResponse.json(sources)
+  try {
+    const sources = await prisma.biSource.findMany({ orderBy: { createdAt: "desc" } })
+    return ResponseHandler.success("Sources fetched successfully", sources)
+  } catch (err) {
+    await logActivity(session?.user?.id || "system", "ERROR", "BiSource", undefined, {
+      error: String(err),
+    })
+    return ResponseHandler.internalError("Gagal mengambil sources", err)
+  }
 }
 
-export async function POST(req: Request) {
-  const session = await auth()
-  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+export async function POST(req: NextRequest) {
+  const { error, session } = await requireAuth({ permissions: ["sources:create"] })
+  if (error) return error
 
-  const validated = await RequestHandler.validateRequest(z.object({ body: sourceSchema }), req)
-  if (validated instanceof NextResponse) return validated
-  const data = validated.body
+  try {
+    const validated = await RequestHandler.validateRequest(z.object({ body: sourceSchema }), req)
+    if (validated instanceof NextResponse) return validated
+    const data = validated.body
 
-  const source = await prisma.biSource.create({
-    data: { name: data.name, type: data.type, config: data.config as object },
-  })
-  return NextResponse.json(source, { status: 201 })
+    const source = await prisma.biSource.create({
+      data: { name: data.name, type: data.type, config: data.config as object },
+    })
+
+    await logActivity(session.user.id, "CREATE", "BiSource", source.id, { name: source.name })
+    return ResponseHandler.created("Source berhasil dibuat", source)
+  } catch (err) {
+    await logActivity(session?.user?.id || "system", "ERROR", "BiSource", undefined, {
+      error: String(err),
+    })
+    return ResponseHandler.internalError("Gagal membuat source", err)
+  }
 }

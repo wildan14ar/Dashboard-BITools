@@ -26,6 +26,8 @@ export function renderPanelTitle(title: string, config: TitleConfig): React.Reac
   if (titlePosition === "none" || !title) return null
 
   return (
-    <div className="px-2 py-1" style={buildTitleStyle(config)}>{title}</div>
+    <div className="px-2 py-1" style={buildTitleStyle(config)}>
+      {title}
+    </div>
   )
 }

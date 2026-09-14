@@ -7,27 +7,104 @@ datasource db {
   provider = "postgresql"
 }
 
+// ============================================================================
+// User & Access Control — pola PortoNext (Better Auth + RBAC)
+// Naming mengikuti Porto: fullname/username lowercase.
+// passwordHash dipertahankan opsional untuk migrasi bcrypt -> Account.
+// ============================================================================
 model User {
-  id           String  @id @default(cuid())
-  fullName     String?
-  avatar       String?
-  userName     String  @unique
-  email        String  @unique
-  passwordHash String
+  id       String  @id @default(ulid())
+  email    String  @unique
+  username String  @unique
+  fullname String?
+  avatar   String?
+  quote    String?
 
-  isSuperAdmin       Boolean             @default(false)
-  userRoles          UserRole[]
+  // Deprecated: dipakai NextAuth lama. Password baru di Account via setCredentialPassword.
+  passwordHash String?
+
+  isActive        Boolean @default(true)
+  isPublic        Boolean @default(true)
+  isSuperAdmin    Boolean @default(false)
+  isEmailVerified Boolean @default(false)
+
+  userRoles UserRole[]
+
+  // Better Auth
+  sessions Session[]
+  accounts Account[]
+
+  // Global
+  notifications Notification[]
+  activityLogs  ActivityLog[]
+
+  // BI domain
   biDashboards       BiDashboard[]
   biDashboardMembers BiDashboardMember[]
   biDatasets         BiDataset[]
 
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+// Better Auth core models (managed by prismaAdapter)
+// Nilai harus lowercase: Better Auth menulis providerId sebagai string lowercase
+enum AccountProvider {
+  credential
+  google
+  github
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String          @id
+  issuer                String
+  providerId            AccountProvider
+  accountId             String
+  userId                String
+  user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  @@unique([issuer, accountId])
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
 }
 
 // --- Role model ---
 model Role {
-  id          String  @id @default(uuid()) // Changed from roleId
+  id          String  @id @default(uuid())
   name        String  @unique
   description String?
   isPublic    Boolean @default(false)
@@ -65,13 +142,53 @@ model RolePermission {
   createdAt DateTime @default(now())
 }
 
+// ============================================================================
+// Audit — pola PortoNext, fire-and-forget via lib/activity.ts
+// ============================================================================
+model Notification {
+  id     String  @id @default(ulid())
+  userId String
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title  String
+  body   String?
+  link   String?
+  isRead Boolean @default(false)
+  type   String  @default("mention")
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+}
+
+model ActivityLog {
+  id        String  @id @default(ulid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String // e.g. "bi.dashboard.create", "user.login"
+  entity    String // e.g. "BiDashboard", "User"
+  entityId  String?
+  metadata  Json?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([action])
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// BI Domain — IDs diseragamkan ke ULID ala PortoNext
+// ============================================================================
 enum BiRole {
   VIEWER
   EDITOR
 }
 
 model BiDashboard {
-  id          String              @id @default(cuid())
+  id          String              @id @default(ulid())
   name        String
   description String?
   tags        String[]            @map("tags")
@@ -88,7 +205,7 @@ model BiDashboard {
 }
 
 model BiDashboardMember {
-  id          String      @id @default(cuid())
+  id          String      @id @default(ulid())
   dashboardId String      @map("dashboard_id")
   dashboard   BiDashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
   userId      String      @map("user_id")
@@ -100,7 +217,7 @@ model BiDashboardMember {
 }
 
 model BiDataset {
-  id          String    @id @default(cuid())
+  id          String    @id @default(ulid())
   name        String
   sql         String
   description String?
@@ -118,39 +235,39 @@ model BiDataset {
 }
 
 model BiSource {
-  id       String      @id @default(cuid())
-  name     String
-  type     String      @default("postgresql")
-  config   Json?
-  datasets BiDataset[]
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
+  id        String      @id @default(ulid())
+  name      String
+  type      String      @default("postgresql")
+  config    Json?
+  datasets  BiDataset[]
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
 
   @@map("bi_sources")
 }
 
 model BiPanel {
-  id          String      @id @default(cuid())
-  dashboardId String      @map("dashboard_id")
+  id          String     @id @default(ulid())
+  dashboardId String     @map("dashboard_id")
   dashboard   BiDashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
-  dataSetId   String?     @map("data_set_id")
+  dataSetId   String?    @map("data_set_id")
   dataSet     BiDataset? @relation(fields: [dataSetId], references: [id], onDelete: SetNull)
   title       String
-  chartType   String      @default("table")
+  chartType   String     @default("table")
   config      Json?
-  x           Int         @default(0)
-  y           Int         @default(0)
-  w           Int         @default(6)
-  h           Int         @default(4)
-  createdAt   DateTime    @default(now()) @map("created_at")
-  updatedAt   DateTime    @updatedAt @map("updated_at")
+  x           Int        @default(0)
+  y           Int        @default(0)
+  w           Int        @default(6)
+  h           Int        @default(4)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
 
   @@index([dashboardId])
   @@map("bi_panels")
 }
 
 model BiFilter {
-  id          String      @id @default(cuid())
+  id          String      @id @default(ulid())
   dashboardId String      @map("dashboard_id")
   dashboard   BiDashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
   name        String

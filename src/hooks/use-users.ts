@@ -1,28 +1,27 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import api from "@/lib/axios"
-import type { UpdateUserInput } from "@/validation/user"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import api from "@/lib/api"
+import type { CreateBiUserInput, UpdateBiUserInput } from "@/validations/user"
 
 export type User = {
   id: string
-  userName: string
+  username: string
+  fullname: string | null
   email: string
   isSuperAdmin: boolean
   createdAt: string
 }
 
-type UserInput = {
-  userName: string
-  email: string
-  password?: string
-  isSuperAdmin?: boolean
+export type UsersResponse = {
+  items: User[]
+  pagination: { page: number; limit: number; total: number }
 }
 
 export function useUsers() {
   return useQuery({
     queryKey: ["users"],
     queryFn: async () => {
-      const data = await api.get<User[]>("/users")
-      return data
+      const res = await api.get<UsersResponse>("/users")
+      return res.data
     },
   })
 }
@@ -30,9 +29,9 @@ export function useUsers() {
 export function useCreateUser() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (input: UserInput) => {
-      const data = await api.post("/users", input)
-      return data
+    mutationFn: async (input: CreateBiUserInput) => {
+      const res = await api.post("/users", input)
+      return res.data
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
   })
@@ -41,9 +40,9 @@ export function useCreateUser() {
 export function useUpdateUser() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, ...input }: UpdateUserInput & { id: string }) => {
-      const data = await api.put(`/users/${id}`, input)
-      return data
+    mutationFn: async ({ id, ...input }: UpdateBiUserInput & { id: string }) => {
+      const res = await api.put(`/users/${id}`, input)
+      return res.data
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
   })

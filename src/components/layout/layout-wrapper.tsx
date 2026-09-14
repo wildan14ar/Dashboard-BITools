@@ -1,10 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { SessionProvider } from "next-auth/react"
-import { Database, BarChart3, Users, Layers } from "lucide-react"
+import { BarChart3, Database, Layers, Users } from "lucide-react"
 import Sidebar from "@/components/layout/sidebar"
+import Providers from "@/components/Providers"
 
 const items = [
   { name: "Dashboards", icon: <BarChart3 size={18} />, href: "/" },
@@ -17,16 +15,12 @@ const items = [
 const showOn = ["/", "/sources/**", "/datasets/**", "/users/**", "/new"]
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient())
-
   return (
-    <SessionProvider>
-      <QueryClientProvider client={queryClient}>
-        <div className="flex h-screen">
-          <Sidebar items={items} showOn={showOn} brandName="BI Dashboard" />
-          <main className="flex-1 overflow-auto">{children}</main>
-        </div>
-      </QueryClientProvider>
-    </SessionProvider>
+    <Providers>
+      <div className="flex h-screen">
+        <Sidebar items={items} showOn={showOn} brandName="BI Dashboard" />
+        <main className="flex-1 overflow-auto">{children}</main>
+      </div>
+    </Providers>
   )
 }

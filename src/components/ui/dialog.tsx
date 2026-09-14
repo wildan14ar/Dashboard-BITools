@@ -1,7 +1,7 @@
 "use client"
 
-import { useRef, useEffect, type ReactNode } from "react"
 import { X } from "lucide-react"
+import { type ReactNode, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 
 type DialogProps = {
@@ -28,7 +28,7 @@ export function Dialog({ open, onClose, title, children, className }: DialogProp
       onClose={onClose}
       className={cn(
         "rounded-xl border bg-background p-0 shadow-xl backdrop:bg-black/50 backdrop:backdrop-blur-sm open:animate-in open:fade-in open:zoom-in-95",
-        className
+        className,
       )}
     >
       <div className="flex items-center justify-between border-b px-6 py-3">

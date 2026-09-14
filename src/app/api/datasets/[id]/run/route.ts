@@ -1,33 +1,46 @@
-import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
-import { execute, cleanError } from "@/lib/engine"
+import type { NextRequest } from "next/server"
+import prisma from "@/config/prisma"
+import { logActivity } from "@/lib/activity"
+import { cleanError, execute } from "@/lib/engine"
+import { ResponseHandler, requireAuth } from "@/middlewares"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-
-  const { id } = await params
-  const dataset = await prisma.biDataset.findUnique({ where: { id }, include: { source: true } })
-  if (!dataset || !dataset.source) return NextResponse.json({ error: "Dataset or source not found" }, { status: 404 })
-
-  const body = await req.json().catch(() => ({}))
-  const paramsOverrides = body.params ?? {}
-  const cache = body.cache !== false
+  const { error, session } = await requireAuth({ permissions: ["datasets:read"] })
+  if (error) return error
 
   try {
-    const result = await execute({
-      sourceId: dataset.source.id,
-      dbType: dataset.source.type,
-      configJson: JSON.stringify(dataset.source.config ?? {}),
-      sql: dataset.sql,
-      params: paramsOverrides,
-      useCache: cache,
-    })
+    const { id } = await params
+    const dataset = await prisma.biDataset.findUnique({ where: { id }, include: { source: true } })
+    if (!dataset || !dataset.source)
+      return ResponseHandler.notFound("Dataset atau source tidak ditemukan")
 
-    await prisma.biDataset.update({ where: { id }, data: { lastRunAt: new Date() } })
-    return NextResponse.json(result)
+    const body = await req.json().catch(() => ({}))
+    const paramsOverrides = body.params ?? {}
+    const cache = body.cache !== false
+
+    try {
+      const result = await execute({
+        sourceId: dataset.source.id,
+        dbType: dataset.source.type,
+        configJson: JSON.stringify(dataset.source.config ?? {}),
+        sql: dataset.sql,
+        params: paramsOverrides,
+        useCache: cache,
+      })
+
+      await prisma.biDataset.update({ where: { id }, data: { lastRunAt: new Date() } })
+      await logActivity(session.user.id, "EXECUTE", "BiDataset", id, { name: dataset.name })
+      return ResponseHandler.success("Dataset executed successfully", result)
+    } catch (err) {
+      await logActivity(session?.user?.id || "system", "ERROR", "BiDataset", id, {
+        error: String(err),
+      })
+      return ResponseHandler.internalError(cleanError(err), err)
+    }
   } catch (err) {
-    return NextResponse.json({ error: cleanError(err) }, { status: 500 })
+    await logActivity(session?.user?.id || "system", "ERROR", "BiDataset", undefined, {
+      error: String(err),
+    })
+    return ResponseHandler.internalError("Gagal menjalankan dataset", err)
   }
 }

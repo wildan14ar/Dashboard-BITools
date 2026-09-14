@@ -1,16 +1,34 @@
 "use client"
 
-import { useMemo } from "react"
 import {
-  ReactFlow, Background, Controls, MiniMap, Node, Edge, Handle, Position, MarkerType,
+  Background,
+  Controls,
+  type Edge,
+  Handle,
+  MarkerType,
+  MiniMap,
+  type Node,
+  Position,
+  ReactFlow,
 } from "@xyflow/react"
+import { useMemo } from "react"
 import "@xyflow/react/dist/style.css"
-import { KeyRound, ArrowRightLeft, Eye } from "lucide-react"
+import { ArrowRightLeft, Eye, KeyRound } from "lucide-react"
 import type { ColumnInfo, TableItem } from "@/hooks/use-sources"
 
-function TableNode({ data }: { data: { label: string; columns: ColumnInfo[]; schema: string; isView: boolean } }) {
+function TableNode({
+  data,
+}: {
+  data: { label: string; columns: ColumnInfo[]; schema: string; isView: boolean }
+}) {
   return (
-    <div className={data.isView ? "rounded-lg border-2 border-dashed border-blue-300/40 bg-card shadow-sm text-xs min-w-[200px]" : "rounded-lg border bg-card shadow-sm text-xs min-w-[200px]"}>
+    <div
+      className={
+        data.isView
+          ? "rounded-lg border-2 border-dashed border-blue-300/40 bg-card shadow-sm text-xs min-w-[200px]"
+          : "rounded-lg border bg-card shadow-sm text-xs min-w-[200px]"
+      }
+    >
       <div className="rounded-t-lg bg-muted px-3 py-1.5 font-semibold text-muted-foreground flex items-center gap-1.5">
         {data.isView && <Eye className="size-3 text-blue-400" />}
         {data.schema !== "public" && <span className="text-[10px] opacity-50">{data.schema}.</span>}
@@ -81,15 +99,24 @@ export function SchemaERD({ tables }: { tables: TableItem[] }) {
   const { nodes, edges } = useMemo(() => layoutGraph(tables), [tables])
 
   if (tables.length === 0) {
-    return <div className="flex h-full items-center justify-center text-muted-foreground">No tables found</div>
+    return (
+      <div className="flex h-full items-center justify-center text-muted-foreground">
+        No tables found
+      </div>
+    )
   }
 
   return (
     <div className="h-full w-full">
       <ReactFlow
-        nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes}
+        fitView
         fitViewOptions={{ padding: 0.3 }}
-        nodesDraggable nodesConnectable={false} elementsSelectable
+        nodesDraggable
+        nodesConnectable={false}
+        elementsSelectable
         proOptions={{ hideAttribution: true }}
       >
         <Background gap={20} size={0.5} />

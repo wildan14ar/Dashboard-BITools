@@ -1,13 +1,19 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import api from "@/lib/axios"
-import type { RunData } from "@/lib/chart"
 import { useDashboardFilters } from "@/hooks/use-dashboard-filters"
+import api from "@/lib/api"
+import type { RunData } from "@/lib/chart"
 
 type PanelLike = { id: string; dataSetId: string; config?: Record<string, unknown> | null }
 
-type FilterDef = { column: string; type: "date_range" | "enum"; from?: string; to?: string; value?: string }
+type FilterDef = {
+  column: string
+  type: "date_range" | "enum"
+  from?: string
+  to?: string
+  value?: string
+}
 
 export function filtersToParams(filters: FilterDef[] | undefined): Record<string, string> {
   const params: Record<string, string> = {}
@@ -37,12 +43,15 @@ export function usePanelData(panels: PanelLike[] | null | undefined) {
           try {
             const own = filtersToParams((panel.config?.filters as FilterDef[]) ?? [])
             const params = { ...globalValues, ...own }
-            const res = await api.post<RunData | null>(`/datasets/${panel.dataSetId}/run`, { cache: false, params })
-            results[panel.id] = res ?? null
+            const res = await api.post<RunData | null>(`/datasets/${panel.dataSetId}/run`, {
+              cache: false,
+              params,
+            })
+            results[panel.id] = res.data ?? null
           } catch {
             results[panel.id] = null
           }
-        })
+        }),
       )
       if (!cancelled) setPanelData(results)
     }

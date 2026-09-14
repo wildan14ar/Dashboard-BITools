@@ -12,7 +12,13 @@ type PivotResult = {
   grandTotal: number
 }
 
-function computePivot(data: RunData, rowIdx: number, colIdx: number, valIdx: number, agg: string): PivotResult {
+function computePivot(
+  data: RunData,
+  rowIdx: number,
+  colIdx: number,
+  valIdx: number,
+  agg: string,
+): PivotResult {
   const rowVals = [...new Set(data.rows.map((r) => r.values[rowIdx] ?? ""))].sort()
   const colVals = [...new Set(data.rows.map((r) => r.values[colIdx] ?? ""))].sort()
 
@@ -65,12 +71,17 @@ export function PivotTable({ panel, data, preview = false }: Props) {
   const agg = (cfg.pivotAgg as string) || "sum"
   const horizontal = (cfg.tableScroll as string) === "horizontal"
 
-  const { rowLabel, rowVals, colVals, cells, rowTotals, colTotals, grandTotal } =
-    computePivot(data, rowIdx, colIdx, valIdx, agg)
+  const { rowLabel, rowVals, colVals, cells, rowTotals, colTotals, grandTotal } = computePivot(
+    data,
+    rowIdx,
+    colIdx,
+    valIdx,
+    agg,
+  )
 
   const cellCls = cn(
     preview ? "px-1.5 py-0.5 text-[9px]" : "px-2 py-1 text-xs",
-    "border border-border/70"
+    "border border-border/70",
   )
   const headCls = cn("sticky top-0 z-10 font-medium text-left bg-muted", cellCls)
 
@@ -82,12 +93,19 @@ export function PivotTable({ panel, data, preview = false }: Props) {
         overflowY: "auto",
       }}
     >
-      <table className={cn("border-separate border-spacing-0", horizontal ? "min-w-full whitespace-nowrap" : "w-full")}>
+      <table
+        className={cn(
+          "border-separate border-spacing-0",
+          horizontal ? "min-w-full whitespace-nowrap" : "w-full",
+        )}
+      >
         <thead>
           <tr>
             <th className={headCls}>{rowLabel || "Rows"}</th>
             {colVals.map((cv) => (
-              <th key={cv} className={headCls}>{cv}</th>
+              <th key={cv} className={headCls}>
+                {cv}
+              </th>
             ))}
             <th className={headCls}>Total</th>
           </tr>
@@ -97,9 +115,13 @@ export function PivotTable({ panel, data, preview = false }: Props) {
             <tr key={rv} className={cn(i % 2 === 1 && "bg-muted/20")}>
               <td className={cn("font-medium bg-muted/30", cellCls)}>{rv}</td>
               {cells[i].map((c, j) => (
-                <td key={j} className={cn("tabular-nums text-right", cellCls)}>{fmt(c)}</td>
+                <td key={j} className={cn("tabular-nums text-right", cellCls)}>
+                  {fmt(c)}
+                </td>
               ))}
-              <td className={cn("bg-muted/30 font-medium tabular-nums text-right", cellCls)}>{fmt(rowTotals[i])}</td>
+              <td className={cn("bg-muted/30 font-medium tabular-nums text-right", cellCls)}>
+                {fmt(rowTotals[i])}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -107,9 +129,24 @@ export function PivotTable({ panel, data, preview = false }: Props) {
           <tr>
             <th className={cn("sticky bottom-0 z-10 bg-muted", cellCls)}>Total</th>
             {colTotals.map((ct, j) => (
-              <td key={j} className={cn("sticky bottom-0 z-10 bg-muted font-medium tabular-nums text-right", cellCls)}>{fmt(ct)}</td>
+              <td
+                key={j}
+                className={cn(
+                  "sticky bottom-0 z-10 bg-muted font-medium tabular-nums text-right",
+                  cellCls,
+                )}
+              >
+                {fmt(ct)}
+              </td>
             ))}
-            <td className={cn("sticky bottom-0 z-10 bg-muted font-semibold tabular-nums text-right", cellCls)}>{fmt(grandTotal)}</td>
+            <td
+              className={cn(
+                "sticky bottom-0 z-10 bg-muted font-semibold tabular-nums text-right",
+                cellCls,
+              )}
+            >
+              {fmt(grandTotal)}
+            </td>
           </tr>
         </tfoot>
       </table>

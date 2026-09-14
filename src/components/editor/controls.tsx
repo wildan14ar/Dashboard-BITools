@@ -15,7 +15,12 @@ export function Field({ label, children }: { label?: string; children: React.Rea
   )
 }
 
-export function OptionButton({ active, onClick, children, className }: {
+export function OptionButton({
+  active,
+  onClick,
+  children,
+  className,
+}: {
   active: boolean
   onClick: () => void
   children: React.ReactNode
@@ -27,8 +32,10 @@ export function OptionButton({ active, onClick, children, className }: {
       onClick={onClick}
       className={cn(
         "flex h-7 items-center justify-center rounded-md border text-[10px] transition-colors",
-        active ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:bg-muted",
-        className
+        active
+          ? "border-primary bg-primary/10 text-primary"
+          : "border-border text-muted-foreground hover:bg-muted",
+        className,
       )}
     >
       {children}
@@ -36,14 +43,22 @@ export function OptionButton({ active, onClick, children, className }: {
   )
 }
 
-export function Segmented<T extends string>({ value, onChange, options, columns }: {
+export function Segmented<T extends string>({
+  value,
+  onChange,
+  options,
+  columns,
+}: {
   value: T
   onChange: (v: T) => void
   options: readonly { value: T; label: string }[]
   columns?: number
 }) {
   return (
-    <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${columns ?? options.length}, minmax(0, 1fr))` }}>
+    <div
+      className="grid gap-1"
+      style={{ gridTemplateColumns: `repeat(${columns ?? options.length}, minmax(0, 1fr))` }}
+    >
       {options.map((o) => (
         <OptionButton key={o.value} active={value === o.value} onClick={() => onChange(o.value)}>
           {o.label}
@@ -53,7 +68,11 @@ export function Segmented<T extends string>({ value, onChange, options, columns 
   )
 }
 
-export function ColorField({ value, onChange, onReset }: {
+export function ColorField({
+  value,
+  onChange,
+  onReset,
+}: {
   value: string
   onChange: (v: string) => void
   onReset?: () => void
@@ -74,7 +93,11 @@ export function ColorField({ value, onChange, onReset }: {
         placeholder="#hex / color name"
       />
       {value && onReset && (
-        <button type="button" onClick={onReset} className="text-[10px] text-muted-foreground underline">
+        <button
+          type="button"
+          onClick={onReset}
+          className="text-[10px] text-muted-foreground underline"
+        >
           reset
         </button>
       )}
@@ -82,7 +105,14 @@ export function ColorField({ value, onChange, onReset }: {
   )
 }
 
-export function RangeField({ value, onChange, min, max, step, suffix }: {
+export function RangeField({
+  value,
+  onChange,
+  min,
+  max,
+  step,
+  suffix,
+}: {
   value: number
   onChange: (v: number) => void
   min: number
@@ -101,7 +131,10 @@ export function RangeField({ value, onChange, min, max, step, suffix }: {
         onChange={(e) => onChange(Number(e.target.value))}
         className="h-1.5 flex-1 cursor-pointer accent-primary"
       />
-      <span className="w-8 text-right text-xs tabular-nums">{value}{suffix}</span>
+      <span className="w-8 text-right text-xs tabular-nums">
+        {value}
+        {suffix}
+      </span>
     </div>
   )
 }

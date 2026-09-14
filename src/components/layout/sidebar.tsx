@@ -1,32 +1,37 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import type { ReactNode } from "react";
-import ButtonLogout from "@/components/layout/button-logout";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import type { ReactNode } from "react"
+import { useState } from "react"
+import ButtonLogout from "@/components/layout/button-logout"
 
-export type NavItem = { name: string; icon: ReactNode; href: string };
+export type NavItem = { name: string; icon: ReactNode; href: string }
 
 type SidebarProps = {
-  items?: NavItem[];
+  items?: NavItem[]
   /** Show the sidebar only on these path prefixes ("*" suffix = any depth). */
-  showOn?: string[];
-  brandName?: string;
-  children?: ReactNode;
-};
+  showOn?: string[]
+  brandName?: string
+  children?: ReactNode
+}
 
-export default function Sidebar({ items = [], showOn = ["/**"], brandName = "Dashboard", children }: SidebarProps) {
-  const pathname = usePathname();
-  const [open, setOpen] = useState(true);
+export default function Sidebar({
+  items = [],
+  showOn = ["/**"],
+  brandName = "Dashboard",
+  children,
+}: SidebarProps) {
+  const pathname = usePathname()
+  const [open, setOpen] = useState(true)
 
   const visible = showOn.some((p) =>
-    p.endsWith("/**") ? pathname.startsWith(p.slice(0, -3)) : p === "*" || pathname === p
-  );
-  if (!visible) return null;
+    p.endsWith("/**") ? pathname.startsWith(p.slice(0, -3)) : p === "*" || pathname === p,
+  )
+  if (!visible) return null
 
-  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href))
 
   return (
     <aside
@@ -77,5 +82,5 @@ export default function Sidebar({ items = [], showOn = ["/**"], brandName = "Das
         <ButtonLogout />
       </div>
     </aside>
-  );
+  )
 }

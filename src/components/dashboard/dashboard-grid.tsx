@@ -1,21 +1,15 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import GridLayout, { useContainerWidth, type Layout } from "react-grid-layout"
-import { GripVertical, ImageDown, Loader2, MoreVertical, Pencil, Trash2 } from "lucide-react"
 import { toPng } from "html-to-image"
+import { GripVertical, ImageDown, Loader2, MoreVertical, Pencil, Trash2 } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import GridLayout, { type Layout, useContainerWidth } from "react-grid-layout"
 import "./react-grid.css"
-import type { Dashboard, Panel } from "@/hooks/use-dashboards"
-import { type RunData } from "@/lib/chart"
-import { usePanelData } from "@/hooks/use-panel-data"
+import { EChart, FilterChart, KpiChart, TableChart, TextChart } from "@/components/charts"
 import { renderPanelTitle } from "@/components/dashboard/panel-title"
-import {
-  EChart,
-  KpiChart,
-  TableChart,
-  TextChart,
-  FilterChart,
-} from "@/components/charts"
+import type { Dashboard, Panel } from "@/hooks/use-dashboards"
+import { usePanelData } from "@/hooks/use-panel-data"
+import type { RunData } from "@/lib/chart"
 
 type Props = {
   dashboard: Dashboard
@@ -58,7 +52,15 @@ async function downloadPanelImage(panel: Panel, node: HTMLElement) {
   alert("Gagal mengekspor gambar panel")
 }
 
-export default function DashboardGrid({ dashboard, editable = false, layout, onLayoutChange, onEditPanel, onDeletePanel, className }: Props) {
+export default function DashboardGrid({
+  dashboard,
+  editable = false,
+  layout,
+  onLayoutChange,
+  onEditPanel,
+  onDeletePanel,
+  className,
+}: Props) {
   const { width, containerRef, mounted } = useContainerWidth()
   const panelData = usePanelData(dashboard.panels)
   const panelRefs = useRef<Map<string, HTMLDivElement>>(new Map())
@@ -74,7 +76,13 @@ export default function DashboardGrid({ dashboard, editable = false, layout, onL
   const gridLayout: Layout =
     layout && layout.length > 0
       ? layout
-      : dashboard.panels.map((p) => ({ i: p.id, x: p.x, y: p.y, w: p.w, h: p.h })) as unknown as Layout
+      : (dashboard.panels.map((p) => ({
+          i: p.id,
+          x: p.x,
+          y: p.y,
+          w: p.w,
+          h: p.h,
+        })) as unknown as Layout)
 
   return (
     <div ref={containerRef} className={className}>
@@ -83,7 +91,9 @@ export default function DashboardGrid({ dashboard, editable = false, layout, onL
           width={width}
           layout={gridLayout}
           gridConfig={{ cols: 12, rowHeight: 50, margin: [10, 10] }}
-          dragConfig={editable ? { enabled: true, handle: ".panel-drag-handle" } : { enabled: false }}
+          dragConfig={
+            editable ? { enabled: true, handle: ".panel-drag-handle" } : { enabled: false }
+          }
           resizeConfig={editable ? { enabled: true } : { enabled: false }}
           onLayoutChange={onLayoutChange}
         >
@@ -120,7 +130,9 @@ export default function DashboardGrid({ dashboard, editable = false, layout, onL
                   ) : panel.dataSetId ? (
                     <PanelBody panel={panel} data={panelData[panel.id]} />
                   ) : (
-                    <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No dataset</div>
+                    <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
+                      No dataset
+                    </div>
                   )}
                 </div>
                 {titlePosition === "bottom" && titleEl}
@@ -133,7 +145,12 @@ export default function DashboardGrid({ dashboard, editable = false, layout, onL
   )
 }
 
-function PanelMenu({ panel, onEdit, onDelete, onDownload }: {
+function PanelMenu({
+  panel,
+  onEdit,
+  onDelete,
+  onDownload,
+}: {
   panel: Panel
   onEdit?: (panel: Panel) => void
   onDelete?: (panelId: string) => void
@@ -152,7 +169,10 @@ function PanelMenu({ panel, onEdit, onDelete, onDownload }: {
   }, [open])
 
   return (
-    <div ref={ref} className="absolute right-1 top-1 z-20 flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+    <div
+      ref={ref}
+      className="absolute right-1 top-1 z-20 flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100"
+    >
       <span className="panel-drag-handle cursor-grab rounded p-1 text-muted-foreground hover:bg-muted">
         <GripVertical className="size-3.5" />
       </span>
@@ -167,7 +187,10 @@ function PanelMenu({ panel, onEdit, onDelete, onDownload }: {
         <div className="absolute right-0 top-7 w-32 rounded-md border bg-background p-1 shadow-md">
           {onEdit && (
             <button
-              onClick={() => { setOpen(false); onEdit(panel) }}
+              onClick={() => {
+                setOpen(false)
+                onEdit(panel)
+              }}
               className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs hover:bg-muted"
             >
               <Pencil className="size-3.5" /> Edit
@@ -175,7 +198,10 @@ function PanelMenu({ panel, onEdit, onDelete, onDownload }: {
           )}
           {onDownload && (
             <button
-              onClick={() => { setOpen(false); onDownload(panel) }}
+              onClick={() => {
+                setOpen(false)
+                onDownload(panel)
+              }}
               className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs hover:bg-muted"
             >
               <ImageDown className="size-3.5" /> Download Image
@@ -183,7 +209,10 @@ function PanelMenu({ panel, onEdit, onDelete, onDownload }: {
           )}
           {onDelete && (
             <button
-              onClick={() => { setOpen(false); onDelete(panel.id) }}
+              onClick={() => {
+                setOpen(false)
+                onDelete(panel.id)
+              }}
               className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs text-destructive hover:bg-destructive/10"
             >
               <Trash2 className="size-3.5" /> Delete
@@ -195,7 +224,15 @@ function PanelMenu({ panel, onEdit, onDelete, onDownload }: {
   )
 }
 
-export function PanelBody({ panel, data, preview = false }: { panel: Panel; data: RunData | null | undefined; preview?: boolean }) {
+export function PanelBody({
+  panel,
+  data,
+  preview = false,
+}: {
+  panel: Panel
+  data: RunData | null | undefined
+  preview?: boolean
+}) {
   if (data === undefined) {
     return (
       <div className="flex h-full items-center justify-center text-muted-foreground">
@@ -204,7 +241,11 @@ export function PanelBody({ panel, data, preview = false }: { panel: Panel; data
     )
   }
   if (!data) {
-    return <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No data</div>
+    return (
+      <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
+        No data
+      </div>
+    )
   }
 
   switch (panel.chartType) {

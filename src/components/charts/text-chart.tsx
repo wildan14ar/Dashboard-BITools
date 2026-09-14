@@ -1,5 +1,5 @@
-import type { Panel } from "@/hooks/use-dashboards"
 import { Heading } from "@/components/charts/heading"
+import type { Panel } from "@/hooks/use-dashboards"
 
 type Props = {
   panel: Panel
@@ -15,11 +15,12 @@ export function TextChart({ panel }: Props) {
   }
   const content = config.content ?? ""
   const level = config.level ?? "p"
-  const vAlignClass = {
-    top: "justify-start",
-    center: "justify-center",
-    bottom: "justify-end",
-  }[config.valign ?? "top"] ?? "justify-start"
+  const vAlignClass =
+    {
+      top: "justify-start",
+      center: "justify-center",
+      bottom: "justify-end",
+    }[config.valign ?? "top"] ?? "justify-start"
 
   return (
     <div

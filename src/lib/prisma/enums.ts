@@ -9,6 +9,15 @@
 * 🟢 You can import this file directly.
 */
 
+export const AccountProvider = {
+  credential: 'credential',
+  google: 'google',
+  github: 'github'
+} as const
+
+export type AccountProvider = (typeof AccountProvider)[keyof typeof AccountProvider]
+
+
 export const BiRole = {
   VIEWER: 'VIEWER',
   EDITOR: 'EDITOR'

@@ -1,10 +1,14 @@
-import NextAuth from "next-auth"
-import { authConfig } from "@/auth.config"
+import { getSessionCookie } from "better-auth/cookies"
+import type { NextRequest } from "next/server"
+import { NextResponse } from "next/server"
 
-export default NextAuth(authConfig).auth((req) => {
-  const { nextUrl } = req
-  const { pathname } = nextUrl
-  const isLoggedIn = !!req.auth
+/**
+ * Proxy untuk Next.js 16+ — pola PortoNext (Edge, cek session cookie).
+ * Public BI share (/bi/public, /bi/embed) tetap bisa diakses tanpa login.
+ */
+export default function proxy(request: NextRequest) {
+  const { pathname, search } = request.nextUrl
+  const sessionCookie = getSessionCookie(request)
 
   const isPublicPath =
     pathname.startsWith("/login") ||
@@ -12,16 +16,20 @@ export default NextAuth(authConfig).auth((req) => {
     pathname.startsWith("/bi/embed")
 
   if (isPublicPath) {
-    if (isLoggedIn && pathname === "/login") {
-      return Response.redirect(new URL("/", nextUrl))
+    if (sessionCookie && pathname === "/login") {
+      return NextResponse.redirect(new URL("/", request.url))
     }
-    return
+    return NextResponse.next()
   }
 
-  if (!isLoggedIn) {
-    return Response.redirect(new URL("/login", nextUrl))
+  if (!sessionCookie) {
+    const loginUrl = new URL("/login", request.url)
+    loginUrl.searchParams.set("callbackUrl", pathname + search)
+    return NextResponse.redirect(loginUrl)
   }
-})
+
+  return NextResponse.next()
+}
 
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)"],

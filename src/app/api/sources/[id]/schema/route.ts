@@ -1,24 +1,35 @@
-import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
-import { getSchema, cleanError } from "@/lib/engine"
+import type { NextRequest } from "next/server"
+import prisma from "@/config/prisma"
+import { logActivity } from "@/lib/activity"
+import { cleanError, getSchema } from "@/lib/engine"
+import { ResponseHandler, requireAuth } from "@/middlewares"
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth()
-  if (!session?.user?.isSuperAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-
-  const { id } = await params
-  const source = await prisma.biSource.findUnique({ where: { id } })
-  if (!source) return NextResponse.json({ error: "Not found" }, { status: 404 })
+  const { error, session } = await requireAuth({ permissions: ["sources:read"] })
+  if (error) return error
 
   try {
-    const result = await getSchema({
-      sourceId: source.id,
-      dbType: source.type,
-      configJson: JSON.stringify(source.config ?? {}),
-    })
-    return NextResponse.json(result)
+    const { id } = await params
+    const source = await prisma.biSource.findUnique({ where: { id } })
+    if (!source) return ResponseHandler.notFound("Source tidak ditemukan")
+
+    try {
+      const result = await getSchema({
+        sourceId: source.id,
+        dbType: source.type,
+        configJson: JSON.stringify(source.config ?? {}),
+      })
+      return ResponseHandler.success("Schema fetched successfully", result)
+    } catch (err) {
+      await logActivity(session?.user?.id || "system", "ERROR", "BiSource", source.id, {
+        error: String(err),
+      })
+      return ResponseHandler.internalError(cleanError(err), err)
+    }
   } catch (err) {
-    return NextResponse.json({ error: cleanError(err) }, { status: 500 })
+    await logActivity(session?.user?.id || "system", "ERROR", "BiSource", undefined, {
+      error: String(err),
+    })
+    return ResponseHandler.internalError("Gagal mengambil schema", err)
   }
 }

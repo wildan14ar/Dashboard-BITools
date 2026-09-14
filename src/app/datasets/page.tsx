@@ -1,7 +1,7 @@
 "use client"
 
+import { Edit3, Play, Plus, Trash2 } from "lucide-react"
 import Link from "next/link"
-import { Plus, Trash2, Play, Edit3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useDatasets, useDeleteDataset } from "@/hooks/use-datasets"
 
@@ -14,7 +14,9 @@ export default function DatasetsPage() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Datasets</h1>
         <Link href="/datasets/new">
-          <Button><Plus className="size-4" /> New Dataset</Button>
+          <Button>
+            <Plus className="size-4" /> New Dataset
+          </Button>
         </Link>
       </div>
 
@@ -29,24 +31,46 @@ export default function DatasetsPage() {
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={3} className="px-4 py-8 text-center text-muted-foreground">Loading...</td></tr>
+              <tr>
+                <td colSpan={3} className="px-4 py-8 text-center text-muted-foreground">
+                  Loading...
+                </td>
+              </tr>
             ) : datasets.length === 0 ? (
-              <tr><td colSpan={3} className="px-4 py-8 text-center text-muted-foreground">No datasets yet</td></tr>
+              <tr>
+                <td colSpan={3} className="px-4 py-8 text-center text-muted-foreground">
+                  No datasets yet
+                </td>
+              </tr>
             ) : (
               datasets.map((d) => (
                 <tr key={d.id} className="border-t">
                   <td className="px-4 py-2">
-                    <Link href={`/datasets/${d.id}`} className="font-medium hover:underline">{d.name}</Link>
+                    <Link href={`/datasets/${d.id}`} className="font-medium hover:underline">
+                      {d.name}
+                    </Link>
                   </td>
-                  <td className="px-4 py-2 text-muted-foreground">{d.lastRunAt ? new Date(d.lastRunAt).toLocaleString() : "Never"}</td>
+                  <td className="px-4 py-2 text-muted-foreground">
+                    {d.lastRunAt ? new Date(d.lastRunAt).toLocaleString() : "Never"}
+                  </td>
                   <td className="px-4 py-2 text-right">
                     <Link href={`/datasets/${d.id}`}>
-                      <Button variant="ghost" size="xs"><Play className="size-3.5" /></Button>
+                      <Button variant="ghost" size="xs">
+                        <Play className="size-3.5" />
+                      </Button>
                     </Link>
                     <Link href={`/datasets/${d.id}?edit=1`}>
-                      <Button variant="ghost" size="xs"><Edit3 className="size-3.5" /></Button>
+                      <Button variant="ghost" size="xs">
+                        <Edit3 className="size-3.5" />
+                      </Button>
                     </Link>
-                    <Button variant="ghost" size="xs" onClick={() => { if (confirm("Delete this dataset?")) deleteDataset.mutate(d.id) }}>
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      onClick={() => {
+                        if (confirm("Delete this dataset?")) deleteDataset.mutate(d.id)
+                      }}
+                    >
                       <Trash2 className="size-3.5" />
                     </Button>
                   </td>

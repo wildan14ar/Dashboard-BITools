@@ -5,7 +5,13 @@ import { renderPanelTitle, type TitleConfig } from "@/components/dashboard/panel
 import type { Panel } from "@/hooks/use-dashboards"
 import type { PreviewData } from "@/hooks/use-panel-editor"
 
-export function ChartPreview({ chartType, data, title, config, chartConfig }: {
+export function ChartPreview({
+  chartType,
+  data,
+  title,
+  config,
+  chartConfig,
+}: {
   chartType: string
   data: PreviewData
   title: string
@@ -23,7 +29,10 @@ export function ChartPreview({ chartType, data, title, config, chartConfig }: {
     chartType,
     dataSetId: "_preview",
     config: chartConfig ?? {},
-    x: 0, y: 0, w: 1, h: 1,
+    x: 0,
+    y: 0,
+    w: 1,
+    h: 1,
   }
 
   return (

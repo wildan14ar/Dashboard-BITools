@@ -1,6 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import api from "@/lib/axios"
-import type { SourceInput, SourceConfig } from "@/validation/source"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import api from "@/lib/api"
+import type { SourceConfig, SourceInput } from "@/validations/source"
 
 export type Source = {
   id: string
@@ -14,8 +14,8 @@ export function useSources() {
   return useQuery({
     queryKey: ["sources"],
     queryFn: async () => {
-      const data = await api.get<Source[]>("/sources")
-      return data
+      const res = await api.get<Source[]>("/sources")
+      return res.data
     },
   })
 }
@@ -24,8 +24,8 @@ export function useSource(id: string) {
   return useQuery({
     queryKey: ["sources", id],
     queryFn: async () => {
-      const data = await api.get<Source>(`/sources/${id}`)
-      return data
+      const res = await api.get<Source>(`/sources/${id}`)
+      return res.data
     },
     enabled: !!id,
   })
@@ -35,8 +35,8 @@ export function useCreateSource() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (input: SourceInput) => {
-      const data = await api.post("/sources", input)
-      return data
+      const res = await api.post("/sources", input)
+      return res.data
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["sources"] }),
   })
@@ -46,8 +46,8 @@ export function useUpdateSource() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...input }: SourceInput & { id: string }) => {
-      const data = await api.put(`/sources/${id}`, input)
-      return data
+      const res = await api.put(`/sources/${id}`, input)
+      return res.data
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["sources"] }),
   })
@@ -66,8 +66,8 @@ export function useDeleteSource() {
 export function useTestSource() {
   return useMutation({
     mutationFn: async (id: string) => {
-      const data = await api.post(`/sources/${id}/test`)
-      return data as { ok: boolean; error?: string }
+      const res = await api.post<{ ok: boolean; error?: string }>(`/sources/${id}/test`)
+      return res.data
     },
   })
 }
@@ -75,8 +75,8 @@ export function useTestSource() {
 export function useTestSourceAdhoc() {
   return useMutation({
     mutationFn: async (input: { type: string; config: SourceConfig }) => {
-      const data = await api.post("/sources/test", input)
-      return data as { ok: boolean; error?: string }
+      const res = await api.post<{ ok: boolean; error?: string }>("/sources/test", input)
+      return res.data
     },
   })
 }
@@ -100,8 +100,8 @@ export function useSourceSchema(id: string) {
   return useQuery({
     queryKey: ["sources", id, "schema"],
     queryFn: async () => {
-      const data = await api.get<{ tables: TableItem[] }>(`/sources/${id}/schema`)
-      return data.tables ?? []
+      const res = await api.get<{ tables: TableItem[] }>(`/sources/${id}/schema`)
+      return res.data.tables ?? []
     },
     enabled: !!id,
   })

@@ -1,22 +1,28 @@
 "use client"
 
-import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Button } from "@/components/ui/button"
-import { createUserSchema, updateUserSchema, type CreateUserInput, type UpdateUserInput } from "@/validation/user"
-import { useUsers, useCreateUser, useUpdateUser, useDeleteUser, type User } from "@/hooks/use-users"
 import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { Button } from "@/components/ui/button"
+import { type User, useCreateUser, useDeleteUser, useUpdateUser, useUsers } from "@/hooks/use-users"
+import {
+  type CreateBiUserInput,
+  createUserSchema,
+  type UpdateBiUserInput,
+  updateUserSchema,
+} from "@/validations/user"
 
 export default function UsersPage() {
-  const { data: users = [], isLoading } = useUsers()
+  const { data, isLoading } = useUsers()
+  const users = data?.items ?? []
   const createUser = useCreateUser()
   const updateUser = useUpdateUser()
   const deleteUser = useDeleteUser()
   const [editing, setEditing] = useState<User | null>(null)
   const [showCreate, setShowCreate] = useState(false)
 
-  const createForm = useForm<CreateUserInput>({ resolver: zodResolver(createUserSchema) })
-  const editForm = useForm<UpdateUserInput>({ resolver: zodResolver(updateUserSchema) })
+  const createForm = useForm<CreateBiUserInput>({ resolver: zodResolver(createUserSchema) })
+  const editForm = useForm<UpdateBiUserInput>({ resolver: zodResolver(updateUserSchema) })
 
   function onDelete(id: string) {
     if (!confirm("Delete user?")) return
@@ -25,7 +31,7 @@ export default function UsersPage() {
 
   function startEdit(user: User) {
     setEditing(user)
-    editForm.reset({ fullName: "", email: user.email })
+    editForm.reset({ fullname: "", email: user.email })
   }
 
   return (
@@ -33,39 +39,82 @@ export default function UsersPage() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Users</h1>
         <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={() => setShowCreate(!showCreate)}>New User</Button>
+          <Button variant="outline" onClick={() => setShowCreate(!showCreate)}>
+            New User
+          </Button>
         </div>
       </div>
 
       {showCreate && (
-        <form onSubmit={createForm.handleSubmit((data) => createUser.mutate(data, { onSuccess: () => { setShowCreate(false); createForm.reset() } }))} className="mb-6 space-y-3 rounded-lg border p-4">
+        <form
+          onSubmit={createForm.handleSubmit((formData) =>
+            createUser.mutate(formData, {
+              onSuccess: () => {
+                setShowCreate(false)
+                createForm.reset()
+              },
+            }),
+          )}
+          className="mb-6 space-y-3 rounded-lg border p-4"
+        >
           <div className="grid grid-cols-2 gap-3">
-            <input {...createForm.register("userName")} placeholder="Username" className="input" />
-            <input {...createForm.register("fullName")} placeholder="Full Name" className="input" />
+            <input {...createForm.register("username")} placeholder="Username" className="input" />
+            <input {...createForm.register("fullname")} placeholder="Full Name" className="input" />
             <input {...createForm.register("email")} placeholder="Email" className="input" />
-            <input {...createForm.register("password")} type="password" placeholder="Password" className="input" />
+            <input
+              {...createForm.register("password")}
+              type="password"
+              placeholder="Password"
+              className="input"
+            />
           </div>
           <div className="flex gap-2">
-            <Button type="submit" disabled={createUser.isPending}>Create</Button>
-            <Button variant="outline" onClick={() => setShowCreate(false)}>Cancel</Button>
+            <Button type="submit" disabled={createUser.isPending}>
+              Create
+            </Button>
+            <Button variant="outline" onClick={() => setShowCreate(false)}>
+              Cancel
+            </Button>
           </div>
         </form>
       )}
 
       {editing && (
-        <form onSubmit={editForm.handleSubmit((data) => updateUser.mutate({ id: editing.id, ...data }, { onSuccess: () => { setEditing(null); editForm.reset() } }))} className="mb-6 space-y-3 rounded-lg border p-4">
+        <form
+          onSubmit={editForm.handleSubmit((formData) =>
+            updateUser.mutate(
+              { id: editing.id, ...formData },
+              {
+                onSuccess: () => {
+                  setEditing(null)
+                  editForm.reset()
+                },
+              },
+            ),
+          )}
+          className="mb-6 space-y-3 rounded-lg border p-4"
+        >
           <div className="grid grid-cols-2 gap-3">
-            <input {...editForm.register("fullName")} placeholder="Full Name" className="input" />
+            <input {...editForm.register("fullname")} placeholder="Full Name" className="input" />
             <input {...editForm.register("email")} placeholder="Email" className="input" />
-            <input {...editForm.register("password")} type="password" placeholder="New password (optional)" className="input" />
+            <input
+              {...editForm.register("password")}
+              type="password"
+              placeholder="New password (optional)"
+              className="input"
+            />
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" {...editForm.register("isSuperAdmin")} />
               Super Admin
             </label>
           </div>
           <div className="flex gap-2">
-            <Button type="submit" disabled={updateUser.isPending}>Save</Button>
-            <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
+            <Button type="submit" disabled={updateUser.isPending}>
+              Save
+            </Button>
+            <Button variant="outline" onClick={() => setEditing(null)}>
+              Cancel
+            </Button>
           </div>
         </form>
       )}
@@ -82,18 +131,30 @@ export default function UsersPage() {
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">Loading...</td></tr>
+              <tr>
+                <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
+                  Loading...
+                </td>
+              </tr>
             ) : users.length === 0 ? (
-              <tr><td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">No users found</td></tr>
+              <tr>
+                <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
+                  No users found
+                </td>
+              </tr>
             ) : (
               users.map((u) => (
                 <tr key={u.id} className="border-t">
-                  <td className="px-4 py-2 font-medium">{u.userName}</td>
+                  <td className="px-4 py-2 font-medium">{u.username}</td>
                   <td className="px-4 py-2">{u.email}</td>
                   <td className="px-4 py-2">{u.isSuperAdmin ? "Yes" : "No"}</td>
                   <td className="px-4 py-2 text-right">
-                    <Button variant="ghost" size="xs" onClick={() => startEdit(u)}>Edit</Button>
-                    <Button variant="ghost" size="xs" onClick={() => onDelete(u.id)}>Delete</Button>
+                    <Button variant="ghost" size="xs" onClick={() => startEdit(u)}>
+                      Edit
+                    </Button>
+                    <Button variant="ghost" size="xs" onClick={() => onDelete(u.id)}>
+                      Delete
+                    </Button>
                   </td>
                 </tr>
               ))

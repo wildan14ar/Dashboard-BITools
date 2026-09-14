@@ -1,14 +1,26 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import api from "@/lib/axios"
+import { useEffect, useState } from "react"
 import type { Layout } from "react-grid-layout"
-import { useDashboard, useCreatePanel, useUpdatePanel, useDeletePanel, useReorderPanels } from "@/hooks/use-dashboards"
+import {
+  useCreatePanel,
+  useDashboard,
+  useDeletePanel,
+  useReorderPanels,
+  useUpdatePanel,
+} from "@/hooks/use-dashboards"
 import { useDatasets } from "@/hooks/use-datasets"
+import api from "@/lib/api"
 
 export type PreviewData = { columns: string[]; rows: { values: string[] }[] }
-export type PanelFilter = { column: string; type: "date_range" | "enum"; from?: string; to?: string; value?: string }
+export type PanelFilter = {
+  column: string
+  type: "date_range" | "enum"
+  from?: string
+  to?: string
+  value?: string
+}
 export type PanelEditor = ReturnType<typeof usePanelEditor>
 
 export function usePanelEditor(id: string) {
@@ -67,29 +79,42 @@ export function usePanelEditor(id: string) {
   }, [chartType, columns, tableColumns])
 
   useEffect(() => {
-    if (!datasetId) { setColumns([]); setPreviewData(null); return }
+    if (!datasetId) {
+      setColumns([])
+      setPreviewData(null)
+      return
+    }
     let cancelled = false
     setColumnsLoading(true)
     api
       .post<PreviewData>(`/datasets/${datasetId}/run`, {})
-      .then((data) => {
+      .then((res) => {
+        const data = res.data
         if (!cancelled && data?.columns) {
           setColumns(data.columns)
           setPreviewData(data)
           if (chartType === "table") setTableColumns(data.columns.map((_: string, i: number) => i))
         }
       })
-      .finally(() => { if (!cancelled) setColumnsLoading(false) })
-    return () => { cancelled = true }
+      .finally(() => {
+        if (!cancelled) setColumnsLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [datasetId])
 
   function toggleDatasetExpand(dsId: string) {
     setExpandedDatasets((prev) => {
       const next = new Set(prev)
-      if (next.has(dsId)) { next.delete(dsId); return next }
+      if (next.has(dsId)) {
+        next.delete(dsId)
+        return next
+      }
       next.add(dsId)
       if (!datasetColumns[dsId]) {
-        api.post<{ columns: string[] }>(`/datasets/${dsId}/run`, {}).then((data) => {
+        api.post<{ columns: string[] }>(`/datasets/${dsId}/run`, {}).then((res) => {
+          const data = res.data
           if (data?.columns) setDatasetColumns((p) => ({ ...p, [dsId]: data.columns }))
         })
       }
@@ -136,33 +161,86 @@ export function usePanelEditor(id: string) {
 
   const handleSave = () => {
     if (!dashboard) return
-    const currentLayout = layout ?? dashboard.panels!.map((p) => ({ i: p.id, x: p.x, y: p.y, w: p.w, h: p.h }))
+    const currentLayout =
+      layout ?? dashboard.panels!.map((p) => ({ i: p.id, x: p.x, y: p.y, w: p.w, h: p.h }))
     const payload = dashboard.panels!.map((p) => {
       const item = currentLayout.find((l) => l.i === p.id)
-      return item ? { id: p.id, x: item.x, y: item.y, w: item.w, h: item.h } : { id: p.id, x: p.x, y: p.y, w: p.w, h: p.h }
+      return item
+        ? { id: p.id, x: item.x, y: item.y, w: item.w, h: item.h }
+        : { id: p.id, x: p.x, y: p.y, w: p.w, h: p.h }
     })
-    reorder.mutate(payload, { onSuccess: () => { setDirty(false); router.push(`/${id}`) } })
+    reorder.mutate(payload, {
+      onSuccess: () => {
+        setDirty(false)
+        router.push(`/${id}`)
+      },
+    })
   }
 
   const handleAdd = () => {
     if (!datasetId && chartType !== "text" && chartType !== "filter") return
     const titleConfig = {
       titlePosition: chartType === "text" ? "none" : titlePosition,
-      titleAlign, titleBold, titleItalic, titleStrikethrough, titleColor, titleSize,
+      titleAlign,
+      titleBold,
+      titleItalic,
+      titleStrikethrough,
+      titleColor,
+      titleSize,
     }
-    const config: Record<string, unknown> = chartType === "text"
-      ? { content: panelText, level: panelTextLevel, color: panelTextColor, align: panelTextAlign, valign: panelTextVAlign, padding: panelPadding, ...titleConfig }
-      : chartType === "kpi" ? { column: yColumn, agg: yAgg, padding: panelPadding, ...titleConfig }
-      : chartType === "table" ? { columns: tableColumns, tableScroll, tableMode, pivotRowCol, pivotColCol, pivotValueCol, pivotAgg, padding: panelPadding, ...titleConfig }
-      : chartType === "pie" ? { xColumn, yColumn, yAgg, pieMode, donutThickness, padding: panelPadding, ...titleConfig }
-      : chartType === "filter" ? { filters, padding: panelPadding }
-      : { xColumn, yColumn, yAgg, lineFill, barOrientation, padding: panelPadding, ...titleConfig }
+    const config: Record<string, unknown> =
+      chartType === "text"
+        ? {
+            content: panelText,
+            level: panelTextLevel,
+            color: panelTextColor,
+            align: panelTextAlign,
+            valign: panelTextVAlign,
+            padding: panelPadding,
+            ...titleConfig,
+          }
+        : chartType === "kpi"
+          ? { column: yColumn, agg: yAgg, padding: panelPadding, ...titleConfig }
+          : chartType === "table"
+            ? {
+                columns: tableColumns,
+                tableScroll,
+                tableMode,
+                pivotRowCol,
+                pivotColCol,
+                pivotValueCol,
+                pivotAgg,
+                padding: panelPadding,
+                ...titleConfig,
+              }
+            : chartType === "pie"
+              ? {
+                  xColumn,
+                  yColumn,
+                  yAgg,
+                  pieMode,
+                  donutThickness,
+                  padding: panelPadding,
+                  ...titleConfig,
+                }
+              : chartType === "filter"
+                ? { filters, padding: panelPadding }
+                : {
+                    xColumn,
+                    yColumn,
+                    yAgg,
+                    lineFill,
+                    barOrientation,
+                    padding: panelPadding,
+                    ...titleConfig,
+                  }
     if (filters.length > 0 && chartType !== "filter") config.filters = filters
     const title = panelTitle || selectedDataset?.name || "Panel"
 
     if (editingPanelId) {
-      const layoutItem = (layout ?? dashboard!.panels!.map((p) => ({ i: p.id, x: p.x, y: p.y, w: p.w, h: p.h })))
-        .find((l) => l.i === editingPanelId)
+      const layoutItem = (
+        layout ?? dashboard!.panels!.map((p) => ({ i: p.id, x: p.x, y: p.y, w: p.w, h: p.h }))
+      ).find((l) => l.i === editingPanelId)
       updatePanel.mutate({
         panelId: editingPanelId,
         dataSetId: datasetId || undefined,
@@ -186,7 +264,13 @@ export function usePanelEditor(id: string) {
     resetEditor()
   }
 
-  function handleEditPanel(panel: { id: string; title: string; chartType: string; dataSetId: string | null; config: Record<string, unknown> | null }) {
+  function handleEditPanel(panel: {
+    id: string
+    title: string
+    chartType: string
+    dataSetId: string | null
+    config: Record<string, unknown> | null
+  }) {
     const cfg = panel.config ?? {}
     setEditingPanelId(panel.id)
     setPanelTitle(panel.title)
