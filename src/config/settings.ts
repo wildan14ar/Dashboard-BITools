@@ -32,4 +32,12 @@ export const settings = {
   cron: {
     secret: process.env.CRON_SECRET || "",
   },
+
+  /** Upload file tabular (source kind=file). Disimpan di DATA_DIR/uploads. */
+  uploads: {
+    dir: process.env.DATA_DIR || "./data",
+    maxBytes: Number(process.env.UPLOAD_MAX_BYTES || 500 * 1024 * 1024),
+    chunkMaxBytes: 5 * 1024 * 1024,
+    allowedExts: [".csv", ".xlsx"],
+  },
 } as const

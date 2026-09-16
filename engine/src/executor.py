@@ -25,13 +25,13 @@ from src.cache import (
 from src.cache import (
     try_lock as cache_try_lock,
 )
-from src.config import MAX_ROWS_HARD, TIMEOUT_SEC_HARD
+from src.config import MAX_ROWS_HARD, QUERY_CACHE_MAX_BYTES, TIMEOUT_SEC_HARD
 from src.introspector import get_schema
 from src.sanitizer import bind_params, is_safe
 
 logger = logging.getLogger(__name__)
 
-NON_SQL_TYPES = {"mongodb", "api"}
+NON_SQL_TYPES = {"mongodb", "api", "file"}
 
 
 def _adapt_results(rows: list[dict]) -> tuple[list[str], list[list[str]]]:
@@ -93,7 +93,12 @@ def execute_query(
     engine = factory.get(source_id, db_type, config_json)
 
     result_rows = engine.fetch_all(sql, bound, timeout_sec)
-    result_rows = result_rows[:max_rows]
+    # Konektor boleh memangkas sendiri + menandai sisa via atribut
+    # `last_truncated` (dipakai FileEngine dengan early-stop).
+    truncated = bool(getattr(engine, "last_truncated", False))
+    if len(result_rows) > max_rows:
+        truncated = True
+        result_rows = result_rows[:max_rows]
     columns, rows = _adapt_results(result_rows)
 
     elapsed = (time.monotonic() - start) * 1000
@@ -104,10 +109,16 @@ def execute_query(
         "execution_time_ms": round(elapsed, 2),
         "rows": rows,
         "cached": False,
+        "truncated": truncated,
     }
 
     if key:
-        cache_set(key, output)
+        # Jangan cemari Redis dengan payload raksasa; schema tetap di-cache.
+        try:
+            if len(json.dumps(output, default=str)) <= QUERY_CACHE_MAX_BYTES:
+                cache_set(key, output)
+        except Exception:
+            logger.warning("Cache skip: payload tidak dapat diserialisasi/dibatasi")
         if refresh_lease:
             cache_release_lock(key)
 
@@ -141,7 +152,7 @@ def get_schema_info(source_id: str, db_type: str, config_json: str) -> dict:
         return cached
 
     engine = factory.get(source_id, db_type, config_json)
-    if db_type == "mongodb":
+    if db_type in ("mongodb", "file"):
         result = {"tables": engine.list_tables()}
     elif db_type == "api":
         # REST API tak punya konsep skema yang bisa diintrospeksi.

@@ -1,12 +1,12 @@
 "use client"
 
-import { AlertCircle, Edit, Loader2, MoreVertical, Plus, Shield, Trash2 } from "lucide-react"
+import { AlertCircle, Edit, Loader2, MoreVertical, Plus, Trash2 } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import { Suspense, useCallback, useState } from "react"
 import { Protected } from "@/components/Protected"
 import { AccessDenied } from "@/components/shared/AccessDenied"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -94,7 +94,6 @@ function RolesContent() {
   )
 
   const roles = data?.items || []
-  const totalRoles = data?.pagination.total || 0
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-6">
@@ -112,17 +111,6 @@ function RolesContent() {
 
       {/* Roles Table */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              List Role
-            </span>
-            <span className="text-sm font-normal text-muted-foreground">
-              {totalRoles} {totalRoles === 1 ? "role" : "roles"}
-            </span>
-          </CardTitle>
-        </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="flex items-center justify-center py-12">

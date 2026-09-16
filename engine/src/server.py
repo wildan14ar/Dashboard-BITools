@@ -48,6 +48,7 @@ class QueryEngineServicer(rpc.QueryEngineServicer):
                 row_count=result["row_count"],
                 execution_time_ms=result["execution_time_ms"],
                 cached=result.get("cached", False),
+                truncated=result.get("truncated", False),
             )
         except PermissionError as e:
             context.set_code(grpc.StatusCode.PERMISSION_DENIED)

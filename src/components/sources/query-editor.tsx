@@ -13,6 +13,7 @@ export function QueryEditorArea({
   tab,
   state,
   sourceId,
+  sourceType,
   onSqlChange,
   onRun,
   editorHeight,
@@ -21,6 +22,7 @@ export function QueryEditorArea({
   tab: TabDef
   state: TabState
   sourceId: string
+  sourceType?: string
   onSqlChange: (sql: string) => void
   onRun: () => void
   editorHeight: number
@@ -43,6 +45,12 @@ export function QueryEditorArea({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
+      {sourceType === "file" && (
+        <p className="shrink-0 border-b bg-muted/40 px-3 py-1.5 font-mono text-[11px] text-muted-foreground">
+          Source file: isi perintah JSON, mis. <code>{'{"sheet": "Sheet1", "limit": 1000}'}</code>{" "}
+          (kosongkan untuk sheet pertama).
+        </p>
+      )}
       <div className="shrink-0" style={{ height: editorHeight }}>
         <Editor
           height="100%"
@@ -94,6 +102,7 @@ export function QueryEditorArea({
             <span className="text-[10px] text-muted-foreground whitespace-nowrap">
               {state.result.columns.length} col · {state.result.rowCount.toLocaleString()} rows ·{" "}
               {state.result.executionTimeMs}ms
+              {state.result.truncated ? " · dipotong" : ""}
             </span>
           )}
           <div className="flex-1" />

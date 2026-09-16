@@ -67,6 +67,7 @@ message QueryResponse {
   int32 row_count = 3;
   double execution_time_ms = 4;
   bool cached = 5;
+  bool truncated = 6;
 }
 
 message Row {

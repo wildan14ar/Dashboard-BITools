@@ -4,7 +4,6 @@ import {
   AlertCircle,
   ChevronLeft,
   ChevronRight,
-  Globe,
   Loader2,
   MonitorSmartphone,
   Search,
@@ -14,7 +13,7 @@ import { Suspense, useState } from "react"
 import { Protected } from "@/components/Protected"
 import { AccessDenied } from "@/components/shared/AccessDenied"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import {
   Table,
@@ -77,17 +76,6 @@ function SessionsContent() {
 
       {/* Sessions Table */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <Globe className="h-5 w-5" />
-              List Session
-            </span>
-            <span className="text-sm font-normal text-muted-foreground">
-              {total} {total === 1 ? "session" : "sessions"}
-            </span>
-          </CardTitle>
-        </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="flex items-center justify-center py-12">

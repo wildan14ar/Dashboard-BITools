@@ -27,6 +27,42 @@ export const apiConfigSchema = z.object({
   body: z.string().optional(),
 })
 
+export const fileConfigSchema = z
+  .object({
+    kind: z.enum(["upload", "url", "sheets"]),
+    // upload: path relatif DATA_DIR dari POST /api/sources/upload, mis. uploads/<id>.xlsx
+    path: z.string().optional(),
+    // url: alamat file publik + format opsional (otomatis bila kosong)
+    file_url: z.string().url("URL tidak valid").optional().or(z.literal("")),
+    format: z.enum(["csv", "xlsx"]).optional(),
+    // sheets: ID atau share-link spreadsheet + selektor sheet
+    spreadsheet_id: z.string().optional(),
+    sheet: z.string().optional(),
+    gid: z.string().optional(),
+    auth: z.enum(["none", "api_key", "service_account"]).optional(),
+    api_key: z.string().optional(),
+    service_account_json: z.string().optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.kind === "upload" && !val.path) {
+      ctx.addIssue({ code: "custom", message: "Required", path: ["path"] })
+    }
+    if (val.kind === "url" && !val.file_url) {
+      ctx.addIssue({ code: "custom", message: "Required", path: ["file_url"] })
+    }
+    if (val.kind === "sheets") {
+      if (!val.spreadsheet_id) {
+        ctx.addIssue({ code: "custom", message: "Required", path: ["spreadsheet_id"] })
+      }
+      if (val.auth === "api_key" && !val.api_key) {
+        ctx.addIssue({ code: "custom", message: "Required", path: ["api_key"] })
+      }
+      if (val.auth === "service_account" && !val.service_account_json) {
+        ctx.addIssue({ code: "custom", message: "Required", path: ["service_account_json"] })
+      }
+    }
+  })
+
 export const CONFIG_SCHEMAS = {
   postgresql: sqlConfigSchema,
   mysql: sqlConfigSchema,
@@ -37,6 +73,7 @@ export const CONFIG_SCHEMAS = {
   bigquery: bigqueryConfigSchema,
   mongodb: mongodbConfigSchema,
   api: apiConfigSchema,
+  file: fileConfigSchema,
 } as const
 
 export const sourceTypeSchema = z.enum([
@@ -49,6 +86,7 @@ export const sourceTypeSchema = z.enum([
   "bigquery",
   "mongodb",
   "api",
+  "file",
 ])
 
 export const sourceSchema = z

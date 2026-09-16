@@ -4,6 +4,7 @@ export type RunData = {
   columns: string[]
   rows: { values: string[] }[]
   cached?: boolean
+  truncated?: boolean
   execution_time_ms?: number
   row_count?: number
 }

@@ -6,7 +6,7 @@ Platform Business Intelligence self-hosted: daftarkan koneksi database (**Source
 Browser ──▶ Next.js (src/app + src/app/api)
                 │  gRPC (src/lib/engine.ts)
                 ▼
-         Python Query Engine :50051 ──▶ Source DB user (PG/MySQL/MariaDB/MSSQL/SQLite/ClickHouse/BigQuery/Mongo/API)
+          Python Query Engine :50051 ──▶ Source DB user (PG/MySQL/MariaDB/MSSQL/SQLite/ClickHouse/BigQuery/Mongo/API) + File (upload CSV/XLSX, URL, Google Sheets)
                 │                              ▲
                 └─ cache hasil ─▶ Redis        │ definisi (SQL, koneksi,
                                                │ dashboard) ◀── Prisma ◀── meta DB
@@ -44,7 +44,7 @@ Atau semuanya via Docker: `docker compose up -d` (dashboard `:3000`, engine `:50
 
 ## Alur Pakai
 
-1. **Sources** (`/sources`) — tambah koneksi DB → *Test* → lihat *Schema* (tabel/kolom + ERD).
+1. **Sources** (`/sources`) — tambah koneksi DB → *Test* → lihat *Schema* (tabel/kolom + ERD). Tipe `File` menerima upload CSV/XLSX (chunked, maks 500 MB), URL publik, atau link Google Sheets (publik / API key / service account); dataset-nya berupa perintah JSON mis. `{"sheet": "Sheet1", "limit": 1000}`.
 2. **Datasets** (`/datasets`) — tulis SQL (editor Monaco) dengan variabel filter `{{nama}}`, mis. `WHERE kota = {{kota}}` → *Run* → simpan.
 3. **Dashboards** (`/`) — buat dashboard → tambah panel (pilih dataset + tipe chart + susun grid drag-and-drop) → tambah filter → share publik / ke member (Viewer/Editor) / embed via `/bi/public`, `/bi/embed`.
 4. Badge tiap panel menunjukkan **live/cached + waktu eksekusi** dari engine.
@@ -61,7 +61,7 @@ cd engine && pytest                       # 35 tes: sanitizer, executor, cache, 
 
 ## Environment
 
-Lihat `.env.example`. Kunci: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `QUERY_ENGINE_HOST` (`engine:50051` di compose), `REDIS_URL`, `QUERY_CACHE_TTL_SEC`, `SEED_ADMIN_*`/`SEED_USER_*` untuk akun awal.
+Lihat `.env.example`. Kunci: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `QUERY_ENGINE_HOST` (`engine:50051` di compose), `REDIS_URL`, `QUERY_CACHE_TTL_SEC`, `SEED_ADMIN_*`/`SEED_USER_*` untuk akun awal. File sources: `DATA_DIR` (./data lokal, /data di compose via volume `uploads_data`), `UPLOAD_MAX_BYTES` (500 MB), `FETCH_MAX_BYTES` (500 MB), `QUERY_CACHE_MAX_BYTES` (5 MB, payload di atas ini tidak di-cache).
 
 ## Konvensi (ringkas)
 

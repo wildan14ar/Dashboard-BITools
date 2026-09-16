@@ -79,6 +79,7 @@ for _mod in (
     "mongodb",
     "restfull",
     "sqlite",
+    "file",
 ):
     try:
         importlib.import_module(f".{_mod}", package=__package__)

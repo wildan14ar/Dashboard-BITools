@@ -245,6 +245,7 @@ export default function SourceSchemaPage({ params }: { params: Promise<{ id: str
                 tab={activeTabObj}
                 state={getState(activeTabObj.id)}
                 sourceId={id}
+                sourceType={source?.type}
                 onSqlChange={(sql) =>
                   setTabs((p) => p.map((t) => (t.id === activeTab ? { ...t, sql } : t)))
                 }

@@ -17,7 +17,7 @@ import { Protected } from "@/components/Protected"
 import { AccessDenied } from "@/components/shared/AccessDenied"
 import { Roles } from "@/components/shared/Roles"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -147,7 +147,6 @@ function UsersContent() {
   )
 
   const users = data?.items || []
-  const totalUsers = data?.pagination.total || 0
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-6">
@@ -165,17 +164,6 @@ function UsersContent() {
 
       {/* Users Table */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <UserIcon className="h-5 w-5" />
-              List User
-            </span>
-            <span className="text-sm font-normal text-muted-foreground">
-              {totalUsers} {totalUsers === 1 ? "user" : "users"}
-            </span>
-          </CardTitle>
-        </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="flex items-center justify-center py-12">

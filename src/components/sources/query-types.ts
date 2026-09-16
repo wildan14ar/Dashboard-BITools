@@ -3,6 +3,7 @@ export type QueryResult = {
   rows: { values: string[] }[]
   rowCount: number
   executionTimeMs: number
+  truncated?: boolean
 } | null
 export type TabKind = "table" | "query" | "erd"
 export type TabDef = { id: string; kind: TabKind; label: string; sql?: string; erdSchema?: string }

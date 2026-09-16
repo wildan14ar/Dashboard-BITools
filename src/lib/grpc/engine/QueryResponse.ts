@@ -8,6 +8,7 @@ export interface QueryResponse {
   'rowCount'?: (number);
   'executionTimeMs'?: (number | string);
   'cached'?: (boolean);
+  'truncated'?: (boolean);
 }
 
 export interface QueryResponse__Output {
@@ -16,4 +17,5 @@ export interface QueryResponse__Output {
   'rowCount'?: (number);
   'executionTimeMs'?: (number);
   'cached'?: (boolean);
+  'truncated'?: (boolean);
 }

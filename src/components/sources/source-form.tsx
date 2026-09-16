@@ -1,13 +1,14 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FlaskConical } from "lucide-react"
-import { useState } from "react"
+import { FlaskConical, Loader2, UploadCloud } from "lucide-react"
+import { useRef, useState } from "react"
 import { type FieldError as RHFFieldError, useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { FieldError, Label } from "@/components/ui/label"
 import { useTestSource, useTestSourceAdhoc } from "@/hooks/use-sources"
+import api from "@/lib/api"
 import { type SourceInput, sourceSchema } from "@/validations/source"
 
 const DB_TYPES = [
@@ -20,7 +21,99 @@ const DB_TYPES = [
   { value: "bigquery", label: "BigQuery" },
   { value: "mongodb", label: "MongoDB" },
   { value: "api", label: "API" },
+  { value: "file", label: "File (CSV/XLSX/Sheets)" },
 ]
+
+const UPLOAD_CHUNK_BYTES = 5 * 1024 * 1024
+
+function randomUploadId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID().replace(/-/g, "")
+  }
+  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 18)}`
+}
+
+/** Uploader chunked (5 MB/chunk) ke POST /api/sources/upload. */
+function FileUploader({
+  onDone,
+  disabled,
+}: {
+  onDone: (path: string) => void
+  disabled?: boolean
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [progress, setProgress] = useState<number | null>(null)
+  const [status, setStatus] = useState("")
+
+  async function handleFile(file: File) {
+    setStatus("")
+    setProgress(0)
+    const totalChunks = Math.max(1, Math.ceil(file.size / UPLOAD_CHUNK_BYTES))
+    const uploadId = randomUploadId()
+    try {
+      for (let i = 0; i < totalChunks; i++) {
+        const fd = new FormData()
+        fd.append("uploadId", uploadId)
+        fd.append("chunkIndex", String(i))
+        fd.append("totalChunks", String(totalChunks))
+        fd.append("filename", file.name)
+        fd.append("chunk", file.slice(i * UPLOAD_CHUNK_BYTES, (i + 1) * UPLOAD_CHUNK_BYTES))
+        const res = await api.post<{ path?: string; received?: number }>("/sources/upload", fd)
+        setProgress(Math.round(((res.data.received ?? i + 1) / totalChunks) * 100))
+        if (res.data.path) {
+          onDone(res.data.path)
+          setStatus(`Terunggah: ${res.data.path}`)
+        }
+      }
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : "Upload gagal")
+    } finally {
+      setProgress(null)
+      if (inputRef.current) inputRef.current.value = ""
+    }
+  }
+
+  const uploading = progress !== null
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          disabled={disabled || uploading}
+          onClick={() => inputRef.current?.click()}
+        >
+          {uploading ? (
+            <Loader2 className="size-3.5 animate-spin" />
+          ) : (
+            <UploadCloud className="size-3.5" />
+          )}
+          {uploading ? `Mengunggah ${progress}%` : "Pilih & Unggah File"}
+        </Button>
+        {uploading && (
+          <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
+            <div className="h-full bg-primary transition-all" style={{ width: `${progress}%` }} />
+          </div>
+        )}
+      </div>
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".csv,.xlsx"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0]
+          if (f) void handleFile(f)
+        }}
+      />
+      {status && <p className="text-xs text-muted-foreground">{status}</p>}
+      <p className="text-xs text-muted-foreground">
+        CSV/XLSX hingga 500 MB, dikirim 5 MB per chunk.
+      </p>
+    </div>
+  )
+}
 
 type Props = {
   defaultValues?: Partial<SourceInput>
@@ -46,6 +139,7 @@ export function SourceForm({
     handleSubmit,
     formState: { errors, isSubmitting },
     getValues,
+    setValue,
     watch,
   } = useForm<SourceInput>({
     resolver: zodResolver(sourceSchema),
@@ -57,6 +151,8 @@ export function SourceForm({
   })
 
   const selectedType = watch("type")
+  const fileKind = watch("config.kind")
+  const uploadedPath = watch("config.path")
 
   function handleTest() {
     setTestResult("")
@@ -211,7 +307,123 @@ export function SourceForm({
           </div>
         )}
 
-        {!["bigquery", "mongodb", "api"].includes(selectedType) && (
+        {selectedType === "file" && (
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block space-y-1 col-span-2">
+              <span className="text-xs font-medium">Sumber File</span>
+              <select {...register("config.kind")} className="input">
+                <option value="upload">Upload file</option>
+                <option value="url">URL publik</option>
+                <option value="sheets">Google Sheets</option>
+              </select>
+            </label>
+
+            {fileKind === "upload" && (
+              <div className="block space-y-1 col-span-2">
+                <Label className="text-xs">File CSV/XLSX</Label>
+                <FileUploader
+                  disabled={isSubmitting}
+                  onDone={(p) => setValue("config.path", p, { shouldValidate: true })}
+                />
+                <Input
+                  id="config-path"
+                  {...register("config.path")}
+                  placeholder="uploads/<id>.xlsx"
+                />
+                {typeof uploadedPath === "string" && uploadedPath !== "" && (
+                  <p className="text-xs text-muted-foreground">Path tersimpan: {uploadedPath}</p>
+                )}
+                {cfgErr("path") && <FieldError>{cfgErr("path")}</FieldError>}
+              </div>
+            )}
+
+            {fileKind === "url" && (
+              <>
+                <div className="block space-y-1 col-span-2">
+                  <Label htmlFor="config-file_url" className="text-xs">
+                    File URL (http/https publik)
+                  </Label>
+                  <Input
+                    id="config-file_url"
+                    {...register("config.file_url")}
+                    placeholder="https://example.com/data.csv"
+                  />
+                  {cfgErr("file_url") && <FieldError>{cfgErr("file_url")}</FieldError>}
+                </div>
+                <label className="block space-y-1">
+                  <span className="text-xs font-medium">Format (otomatis bila kosong)</span>
+                  <select {...register("config.format")} className="input">
+                    <option value="">Otomatis</option>
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">XLSX</option>
+                  </select>
+                </label>
+              </>
+            )}
+
+            {fileKind === "sheets" && (
+              <>
+                <div className="block space-y-1 col-span-2">
+                  <Label htmlFor="config-spreadsheet_id" className="text-xs">
+                    Spreadsheet ID atau share-link
+                  </Label>
+                  <Input
+                    id="config-spreadsheet_id"
+                    {...register("config.spreadsheet_id")}
+                    placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+                  />
+                  {cfgErr("spreadsheet_id") && <FieldError>{cfgErr("spreadsheet_id")}</FieldError>}
+                </div>
+                <div className="block space-y-1">
+                  <Label htmlFor="config-sheet" className="text-xs">
+                    Nama sheet (opsional)
+                  </Label>
+                  <Input id="config-sheet" {...register("config.sheet")} placeholder="Sheet1" />
+                </div>
+                <div className="block space-y-1">
+                  <Label htmlFor="config-gid" className="text-xs">
+                    GID (opsional)
+                  </Label>
+                  <Input id="config-gid" {...register("config.gid")} placeholder="0" />
+                </div>
+                <label className="block space-y-1">
+                  <span className="text-xs font-medium">Akses</span>
+                  <select {...register("config.auth")} className="input">
+                    <option value="none">Publik (anyone with link)</option>
+                    <option value="api_key">API key</option>
+                    <option value="service_account">Service account</option>
+                  </select>
+                </label>
+                <div className="block space-y-1">
+                  <Label htmlFor="config-api_key" className="text-xs">
+                    API key (bila akses API key)
+                  </Label>
+                  <Input
+                    id="config-api_key"
+                    {...register("config.api_key")}
+                    placeholder="AIza..."
+                  />
+                  {cfgErr("api_key") && <FieldError>{cfgErr("api_key")}</FieldError>}
+                </div>
+                <div className="block space-y-1 col-span-2">
+                  <Label htmlFor="config-service_account_json" className="text-xs">
+                    Service account JSON (bila akses service account)
+                  </Label>
+                  <Input
+                    id="config-service_account_json"
+                    {...register("config.service_account_json")}
+                    placeholder='{"type": "service_account", ...}'
+                  />
+                  {cfgErr("service_account_json") && (
+                    <FieldError>{cfgErr("service_account_json")}</FieldError>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {!["bigquery", "mongodb", "api", "file"].includes(selectedType) && (
           <>
             <div className="grid grid-cols-3 gap-3">
               <div className="block space-y-1">
