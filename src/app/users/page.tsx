@@ -1,162 +1,373 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { type User, useCreateUser, useDeleteUser, useUpdateUser, useUsers } from "@/hooks/use-users"
 import {
-  type CreateBiUserInput,
-  createUserSchema,
-  type UpdateBiUserInput,
-  updateUserSchema,
-} from "@/validations/user"
+  AlertCircle,
+  CheckCircle,
+  Loader2,
+  Pencil,
+  Plus,
+  Trash2,
+  User as UserIcon,
+  XCircle,
+} from "lucide-react"
+import Image from "next/image"
+import { useSearchParams } from "next/navigation"
+import { Suspense, useCallback, useState } from "react"
+import { Protected } from "@/components/Protected"
+import { AccessDenied } from "@/components/shared/AccessDenied"
+import { Roles } from "@/components/shared/Roles"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog-radix"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  type CreateUserInput,
+  type UpdateUserInput,
+  type User,
+  useCreateUser,
+  useDeleteUser,
+  useUpdateUser,
+  useUsers,
+} from "@/hooks/use-users"
+import { formatRelative } from "@/lib/utils"
+import { UserForm } from "./_components/UserForm"
 
-export default function UsersPage() {
-  const { data, isLoading } = useUsers()
-  const users = data?.items ?? []
+function UsersContent() {
+  const searchParams = useSearchParams()
+  const page = Number(searchParams.get("page")) || 1
+  const limit = Number(searchParams.get("limit")) || 10
+
+  const { data, isLoading, isError, error } = useUsers({
+    page,
+    limit,
+    isAdmin: true,
+  })
   const createUser = useCreateUser()
   const updateUser = useUpdateUser()
   const deleteUser = useDeleteUser()
-  const [editing, setEditing] = useState<User | null>(null)
-  const [showCreate, setShowCreate] = useState(false)
 
-  const createForm = useForm<CreateBiUserInput>({ resolver: zodResolver(createUserSchema) })
-  const editForm = useForm<UpdateBiUserInput>({ resolver: zodResolver(updateUserSchema) })
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editingUser, setEditingUser] = useState<User | null>(null)
 
-  function onDelete(id: string) {
-    if (!confirm("Delete user?")) return
-    deleteUser.mutate(id)
-  }
+  const handleOpenCreate = useCallback(() => {
+    setEditingUser(null)
+    setIsFormOpen(true)
+  }, [])
 
-  function startEdit(user: User) {
-    setEditing(user)
-    editForm.reset({ fullname: "", email: user.email })
-  }
+  const handleOpenEdit = useCallback((user: User) => {
+    setEditingUser(user)
+    setIsFormOpen(true)
+  }, [])
+
+  const handleCloseForm = useCallback(() => {
+    setIsFormOpen(false)
+    setEditingUser(null)
+  }, [])
+
+  const handleSubmit = useCallback(
+    async (userData: {
+      email?: string
+      password?: string
+      fullname: string
+      username: string
+      isActive?: boolean
+      isSuperAdmin?: boolean
+      isPublic?: boolean
+      quote?: string
+      avatar?: string
+      roleIds?: string[]
+    }) => {
+      try {
+        if (editingUser) {
+          const updatePayload: UpdateUserInput = {
+            id: editingUser.id,
+            username: editingUser.username,
+            fullname: userData.fullname,
+            email: userData.email,
+            isActive: userData.isActive,
+            isSuperAdmin: userData.isSuperAdmin,
+            isPublic: userData.isPublic,
+            quote: userData.quote,
+            avatar: userData.avatar,
+            roleIds: userData.roleIds,
+          }
+          if (userData.password) {
+            updatePayload.password = userData.password
+          }
+          await updateUser.mutateAsync(updatePayload)
+        } else {
+          const createPayload: CreateUserInput = {
+            email: userData.email!,
+            password: userData.password!,
+            fullname: userData.fullname,
+            username: userData.username,
+            isActive: userData.isActive,
+            isSuperAdmin: userData.isSuperAdmin,
+            isPublic: userData.isPublic,
+            quote: userData.quote,
+            avatar: userData.avatar,
+            roleIds: userData.roleIds,
+          }
+          await createUser.mutateAsync(createPayload)
+        }
+        handleCloseForm()
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    [editingUser, createUser, updateUser, handleCloseForm],
+  )
+
+  const handleDelete = useCallback(
+    async (user: User) => {
+      if (confirm(`Apakah Anda yakin ingin menghapus user "${user.fullname || user.username}"?`)) {
+        await deleteUser.mutateAsync({ id: user.id })
+      }
+    },
+    [deleteUser],
+  )
+
+  const users = data?.items || []
+  const totalUsers = data?.pagination.total || 0
 
   return (
-    <div className="mx-auto max-w-4xl p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Users</h1>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={() => setShowCreate(!showCreate)}>
-            New User
-          </Button>
+    <div className="mx-auto max-w-5xl space-y-6 p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Users</h1>
+          <p className="text-muted-foreground mt-1">Manage user accounts and permissions</p>
         </div>
+        <Button onClick={handleOpenCreate}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add User
+        </Button>
       </div>
 
-      {showCreate && (
-        <form
-          onSubmit={createForm.handleSubmit((formData) =>
-            createUser.mutate(formData, {
-              onSuccess: () => {
-                setShowCreate(false)
-                createForm.reset()
-              },
-            }),
+      {/* Users Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <UserIcon className="h-5 w-5" />
+              List User
+            </span>
+            <span className="text-sm font-normal text-muted-foreground">
+              {totalUsers} {totalUsers === 1 ? "user" : "users"}
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : isError ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+              <h3 className="text-lg font-semibold">Error loading users</h3>
+              <p className="text-muted-foreground">{error?.message}</p>
+            </div>
+          ) : users.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold">Tidak ada user</h3>
+              <p className="text-muted-foreground mb-4">Mulai dengan membuat user pertama Anda</p>
+              <Button onClick={handleOpenCreate}>
+                <Plus className="h-4 w-4 mr-2" />
+                Tambah User
+              </Button>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Roles</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead className="w-12 text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((user) => {
+                  const roleIds = user.userRoles?.map((ur) => ur.role.id) || []
+                  const roles = user.userRoles?.map((ur) => ({
+                    id: ur.role.id,
+                    name: ur.role.name,
+                  }))
+                  return (
+                    <TableRow key={user.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted">
+                            {user.avatar ? (
+                              <Image
+                                src={user.avatar}
+                                alt={user.fullname || user.username}
+                                width={36}
+                                height={36}
+                                className="h-full w-full object-cover"
+                                unoptimized
+                              />
+                            ) : (
+                              <UserIcon className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate font-medium">
+                              {user.fullname || user.username}
+                              {user.isSuperAdmin && (
+                                <span className="ml-2 rounded bg-purple-100 px-1.5 py-0.5 text-[10px] font-semibold text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+                                  Super Admin
+                                </span>
+                              )}
+                            </p>
+                            <p className="truncate text-xs text-muted-foreground">
+                              @{user.username} · {user.email}
+                            </p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Roles roleIds={roleIds} roles={roles} />
+                      </TableCell>
+                      <TableCell>
+                        <span className="flex items-center gap-1.5 text-xs">
+                          {user.isActive ? (
+                            <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+                          ) : (
+                            <XCircle className="h-3.5 w-3.5 text-red-500" />
+                          )}
+                          {user.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
+                        {user.createdAt ? formatRelative(user.createdAt) : "N/A"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleOpenEdit(user)}>
+                              <Pencil className="h-4 w-4 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleDelete(user)}
+                              className="text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Hapus
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
           )}
-          className="mb-6 space-y-3 rounded-lg border p-4"
-        >
-          <div className="grid grid-cols-2 gap-3">
-            <Input {...createForm.register("username")} placeholder="Username" />
-            <Input {...createForm.register("fullname")} placeholder="Full Name" />
-            <Input {...createForm.register("email")} placeholder="Email" />
-            <Input {...createForm.register("password")} type="password" placeholder="Password" />
-          </div>
-          <div className="flex gap-2">
-            <Button type="submit" disabled={createUser.isPending}>
-              Create
-            </Button>
-            <Button variant="outline" onClick={() => setShowCreate(false)}>
-              Cancel
-            </Button>
-          </div>
-        </form>
-      )}
+        </CardContent>
+      </Card>
 
-      {editing && (
-        <form
-          onSubmit={editForm.handleSubmit((formData) =>
-            updateUser.mutate(
-              { id: editing.id, ...formData },
-              {
-                onSuccess: () => {
-                  setEditing(null)
-                  editForm.reset()
-                },
-              },
-            ),
-          )}
-          className="mb-6 space-y-3 rounded-lg border p-4"
+      {/* Create/Edit Dialog */}
+      <Dialog open={isFormOpen} onOpenChange={handleCloseForm}>
+        <DialogContent
+          className="w-[70vw] max-w-none! max-h-[90vh] overflow-y-auto scroll-hidden-y"
+          showCloseButton={false}
         >
-          <div className="grid grid-cols-2 gap-3">
-            <Input {...editForm.register("fullname")} placeholder="Full Name" />
-            <Input {...editForm.register("email")} placeholder="Email" />
-            <Input
-              {...editForm.register("password")}
-              type="password"
-              placeholder="New password (optional)"
-            />
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" {...editForm.register("isSuperAdmin")} />
-              Super Admin
-            </label>
-          </div>
-          <div className="flex gap-2">
-            <Button type="submit" disabled={updateUser.isPending}>
-              Save
-            </Button>
-            <Button variant="outline" onClick={() => setEditing(null)}>
-              Cancel
-            </Button>
-          </div>
-        </form>
-      )}
-
-      <div className="overflow-hidden rounded-lg border">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/50">
-            <tr>
-              <th className="px-4 py-2 text-left font-medium">Username</th>
-              <th className="px-4 py-2 text-left font-medium">Email</th>
-              <th className="px-4 py-2 text-left font-medium">Super Admin</th>
-              <th className="px-4 py-2 text-right font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
-                  Loading...
-                </td>
-              </tr>
-            ) : users.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
-                  No users found
-                </td>
-              </tr>
-            ) : (
-              users.map((u) => (
-                <tr key={u.id} className="border-t">
-                  <td className="px-4 py-2 font-medium">{u.username}</td>
-                  <td className="px-4 py-2">{u.email}</td>
-                  <td className="px-4 py-2">{u.isSuperAdmin ? "Yes" : "No"}</td>
-                  <td className="px-4 py-2 text-right">
-                    <Button variant="ghost" size="xs" onClick={() => startEdit(u)}>
-                      Edit
-                    </Button>
-                    <Button variant="ghost" size="xs" onClick={() => onDelete(u.id)}>
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+          <DialogHeader className="border-b border-border pb-4 mb-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <DialogTitle className="text-xl">
+                  {editingUser ? "Edit User" : "Tambah User Baru"}
+                </DialogTitle>
+                <DialogDescription className="text-sm">
+                  {editingUser
+                    ? "Edit informasi user dan permissions"
+                    : "Buat user baru dengan role dan permissions"}
+                </DialogDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  onClick={handleCloseForm}
+                  disabled={createUser.isPending || updateUser.isPending}
+                  size="sm"
+                  className="h-8"
+                >
+                  Batal
+                </Button>
+                <Button
+                  type="submit"
+                  form="user-form"
+                  disabled={createUser.isPending || updateUser.isPending}
+                  size="sm"
+                  className="h-8"
+                >
+                  {createUser.isPending || updateUser.isPending ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
+                      Menyimpan...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-3.5 w-3.5 mr-1" />
+                      Simpan
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </DialogHeader>
+          <UserForm
+            key={editingUser?.id || "create"}
+            editingUser={editingUser}
+            onSubmit={handleSubmit}
+            isSubmitting={createUser.isPending || updateUser.isPending}
+            onCancel={handleCloseForm}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
+  )
+}
+
+export default function UsersPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+      <Protected
+        permissions={["users:admin"]}
+        fallback={<AccessDenied description="Halaman Users hanya untuk admin." />}
+        loading={<div className="p-8 text-center">Loading...</div>}
+      >
+        <UsersContent />
+      </Protected>
+    </Suspense>
   )
 }
