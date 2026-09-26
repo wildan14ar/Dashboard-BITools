@@ -38,4 +38,18 @@ export const settings = {
     // Batas ukuran upload global (bytes). Default 10 MB.
     maxFileSize: Number(process.env.ATTACHMENTS_MAX_SIZE || 10 * 1024 * 1024),
   },
+
+  query: {
+    // Batas default eksekusi query engine.
+    maxRows: Number(process.env.QUERY_MAX_ROWS || 1000),
+    timeoutSec: Number(process.env.QUERY_TIMEOUT_SEC || 30),
+  },
+
+  uploads: {
+    // Direktori data untuk chunked upload source file. Default ./data.
+    dir: process.env.DATA_DIR || `${process.cwd()}/data`,
+    allowedExts: [".csv", ".xlsx"],
+    // Batas ukuran satu file upload (bytes). Default 10 MB.
+    maxBytes: Number(process.env.UPLOADS_MAX_BYTES || 10 * 1024 * 1024),
+  },
 }

@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!node_modules", "!.next", "!prisma/generated"]
+    "includes": ["**", "!node_modules", "!.next", "!prisma/generated", "!src/lib/grpc"]
   },
   "formatter": {
     "enabled": true,
