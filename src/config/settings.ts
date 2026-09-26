@@ -11,11 +11,6 @@ export const settings = {
       .filter(Boolean),
   },
 
-  google: {
-    gaId: process.env.NEXT_PUBLIC_GA_ID || "",
-    gtmId: process.env.NEXT_PUBLIC_GTM_ID || "",
-    verification: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || "",
-  },
   oauth: {
     google: {
       enabled: process.env.NEXT_PUBLIC_ENABLE_GOOGLE_AUTH === "true",

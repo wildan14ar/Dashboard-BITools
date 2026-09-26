@@ -282,7 +282,7 @@ function RecentActivity() {
             Aktivitas Terakhir
           </span>
           <Link
-            href="/dashboard/profile?tab=log"
+            href="/profile?tab=log"
             className="text-xs font-normal text-primary hover:underline"
           >
             View all activity

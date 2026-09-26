@@ -88,7 +88,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         en: "Dashboard",
       },
       icon: <LayoutDashboard size={20} />,
-      href: "/dashboard",
+      href: "/",
     },
     {
       key: "calendar",
@@ -97,7 +97,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         en: "Calendar",
       },
       icon: <CalendarDays size={20} />,
-      href: "/dashboard/calendar",
+      href: "/calendar",
     },
     {
       key: "files",
@@ -106,7 +106,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         en: "My Files",
       },
       icon: <FolderClosed size={20} />,
-      href: "/dashboard/attachment",
+      href: "/attachment",
     },
     ...(can(["attachments:admin"])
       ? [
@@ -117,7 +117,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
               en: "Storage",
             },
             icon: <HardDrive size={20} />,
-            href: "/dashboard/storage",
+            href: "/storage",
           },
         ]
       : []),
@@ -134,12 +134,12 @@ export default function DashboardShell({ children }: { children: React.ReactNode
               {
                 key: "users",
                 translations: { id: "Pengguna", en: "Users" },
-                href: "/dashboard/users",
+                href: "/users",
               },
               {
                 key: "roles",
                 translations: { id: "Role", en: "Roles" },
-                href: "/dashboard/roles",
+                href: "/roles",
               },
             ],
           },
@@ -158,12 +158,12 @@ export default function DashboardShell({ children }: { children: React.ReactNode
               {
                 key: "sessions",
                 translations: { id: "Session", en: "Sessions" },
-                href: "/dashboard/sessions",
+                href: "/sessions",
               },
               {
                 key: "logging",
                 translations: { id: "Logging", en: "Logging" },
-                href: "/dashboard/logging",
+                href: "/logging",
               },
             ],
           },
@@ -178,35 +178,29 @@ export default function DashboardShell({ children }: { children: React.ReactNode
               en: "API Keys",
             },
             icon: <KeyRound size={20} />,
-            href: "/dashboard/api-keys",
+            href: "/api-keys",
           },
         ]
       : []),
   ]
 
-  // Generate breadcrumbs based on current pathname
+  // Generate breadcrumbs based on current pathname (dashboard di root "/").
   // Hanya "Home" dirender sebagai ikon, sisanya teks seperti semula.
   const generateBreadcrumbs = () => {
     if (!pathname) return []
 
     const pathParts = pathname.split("/").filter((part) => part)
-    const breadcrumbs = [{ href: "/dashboard", label: "Home", segment: "home" }]
+    const breadcrumbs = [{ href: "/", label: "Home", segment: "home" }]
 
-    // Add dashboard as the base
-    if (pathParts[0] === "dashboard") {
-      breadcrumbs.push({ href: "/dashboard", label: "Dashboard", segment: "dashboard" })
+    let currentPath = ""
+    for (const part of pathParts) {
+      currentPath += `/${part}`
 
-      // Add subsequent parts if they exist
-      let currentPath = "/dashboard"
-      for (let i = 1; i < pathParts.length; i++) {
-        currentPath += `/${pathParts[i]}`
+      // Format label by capitalizing and replacing hyphens/underscores with spaces
+      let label = part.charAt(0).toUpperCase() + part.slice(1)
+      label = label.replace(/[-_]/g, " ")
 
-        // Format label by capitalizing and replacing hyphens/underscores with spaces
-        let label = pathParts[i].charAt(0).toUpperCase() + pathParts[i].slice(1)
-        label = label.replace(/[-_]/g, " ")
-
-        breadcrumbs.push({ href: currentPath, label, segment: pathParts[i] })
-      }
+      breadcrumbs.push({ href: currentPath, label, segment: part })
     }
 
     return breadcrumbs
@@ -220,7 +214,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       <div className="min-h-full">
         <Sidebar
           menuConfig={menuConfig}
-          validSidebar={["/dashboard/**"]}
+          validSidebar={["/**"]}
           isMenuOpen={sidebarOpen}
           onMenuToggle={toggleSidebar}
           widthClassName="sm:w-64"

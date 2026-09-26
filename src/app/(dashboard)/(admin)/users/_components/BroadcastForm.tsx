@@ -122,7 +122,7 @@ export function BroadcastForm({ open, onClose, preset }: BroadcastFormProps) {
               id="broadcast-link"
               value={link}
               onChange={(e) => setLink(e.target.value)}
-              placeholder="/dashboard atau https://... (opsional)"
+              placeholder="/ atau https://... (opsional)"
               maxLength={500}
             />
           </div>

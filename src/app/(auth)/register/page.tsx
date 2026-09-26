@@ -36,7 +36,7 @@ export default function RegisterPage() {
   const onSubmit = (data: RegisterInput) => {
     registerMutation.mutate(data, {
       onSuccess: () => {
-        router.push("/dashboard")
+        router.push("/")
       },
     })
   }
@@ -47,7 +47,7 @@ export default function RegisterPage() {
       <div className="flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md space-y-6">
           <div className="flex justify-center lg:hidden">
-            <Link href="/dashboard" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <span className="font-bold text-base text-gray-900 dark:text-white">BI Tools</span>
             </Link>
           </div>
@@ -156,7 +156,7 @@ export default function RegisterPage() {
 
           <p className="text-center">
             <Link
-              href="/dashboard"
+              href="/"
               className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" />

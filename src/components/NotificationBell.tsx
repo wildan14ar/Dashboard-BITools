@@ -88,7 +88,7 @@ function PanelList({
 function PanelFooter({ unreadCount, onNavigate }: { unreadCount: number; onNavigate: () => void }) {
   return (
     <Link
-      href="/dashboard/profile?tab=notifikasi"
+      href="/profile?tab=notifikasi"
       onClick={onNavigate}
       className="block px-3 py-2 text-xs text-center text-primary hover:underline"
     >
@@ -184,7 +184,7 @@ export default function NotificationBell() {
           )}
           <DropdownMenuSeparator />
           <Link
-            href="/dashboard/profile?tab=notifikasi"
+            href="/profile?tab=notifikasi"
             onClick={() => setOpen(false)}
             className="block px-3 py-2 text-xs text-center text-primary hover:underline"
           >

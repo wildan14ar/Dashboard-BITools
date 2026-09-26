@@ -42,7 +42,7 @@ type SidebarProps = {
 
 export default function Sidebar({
   menuConfig = [],
-  validSidebar = ["/dashboard/**"],
+  validSidebar = ["/**"],
   isMenuOpen: controlledMenu,
   defaultMenuOpen = true,
   onMenuToggle,
@@ -144,7 +144,7 @@ export default function Sidebar({
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4.5 py-2 border-b border-border">
-              <Link href="/dashboard" className="flex items-center gap-2 group no-underline">
+              <Link href="/" className="flex items-center gap-2 group no-underline">
                 <span className="font-bold text-xl text-foreground group-hover:text-primary transition-colors">
                   {brandName || "Dashboard"}
                 </span>
@@ -238,10 +238,10 @@ export default function Sidebar({
             <div className="p-5 border-t border-border space-y-2">
               {user && (
                 <Link
-                  href="/dashboard/profile"
+                  href="/profile"
                   title={user.fullname || user.username}
                   className={`flex items-center gap-3 p-2.5 rounded-xl border transition-colors ${
-                    pathname.endsWith("/dashboard/profile")
+                    pathname.endsWith("/profile")
                       ? "border-primary/30 bg-primary/10"
                       : "border-border bg-card hover:bg-accent"
                   }`}

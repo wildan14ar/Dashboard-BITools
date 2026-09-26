@@ -11,7 +11,7 @@ export default function AuthSplitPanel() {
 
   return (
     <aside className="hidden flex-col justify-between border-r bg-muted/40 p-10 lg:flex">
-      <Link href="/dashboard" className="flex items-center gap-2">
+      <Link href="/" className="flex items-center gap-2">
         <span className="font-bold text-base text-gray-900 dark:text-white">BI Tools</span>
       </Link>
 

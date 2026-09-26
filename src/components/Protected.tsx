@@ -30,7 +30,7 @@ export interface ProtectedProps {
  * @example
  * // Navigation (fallback = null untuk hide)
  * <Protected permissions={["users:admin"]} fallback={null}>
- *     <Link href="/dashboard/users">Users</Link>
+ *     <Link href="/users">Users</Link>
  * </Protected>
  */
 export function Protected({

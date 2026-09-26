@@ -136,12 +136,12 @@ export function useLogin() {
         ? await authClient.signIn.email({
             email: data.identifier,
             password: data.password,
-            callbackURL: "/dashboard",
+            callbackURL: "/",
           })
         : await authClient.signIn.username({
             username: data.identifier,
             password: data.password,
-            callbackURL: "/dashboard",
+            callbackURL: "/",
           })
       if (result.error) throw new Error(result.error.message || "Login gagal")
       return result.data
@@ -163,7 +163,7 @@ export function useRegister() {
         password: data.password,
         name: data.fullname,
         username: data.username,
-        callbackURL: "/dashboard",
+        callbackURL: "/",
       })
       if (result.error) throw new Error(result.error.message || "Registrasi gagal")
       return result.data

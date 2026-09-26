@@ -1,6 +1,6 @@
 "use client"
 
-import { AttachmentsBrowser } from "@/app/dashboard/_components/AttachmentsBrowser"
+import { AttachmentsBrowser } from "@/app/(dashboard)/_components/AttachmentsBrowser"
 import { Protected } from "@/components/Protected"
 
 export default function AdminAttachmentsPage() {

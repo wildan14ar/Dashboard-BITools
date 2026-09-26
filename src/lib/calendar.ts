@@ -131,7 +131,7 @@ export async function syncEventNotifications(
         userId,
         title: `Pengingat: ${event.title}`,
         body,
-        link: "/dashboard/calendar",
+        link: "/calendar",
         type: "calendar",
         calendarId: event.id,
       })),

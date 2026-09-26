@@ -367,7 +367,7 @@ export function CalendarContent() {
           open
           onClose={() => setBroadcastEvent(null)}
           preset={{
-            link: "/dashboard/calendar",
+            link: "/calendar",
             calendarId: broadcastEvent.id,
             eventTitle: broadcastEvent.title,
           }}

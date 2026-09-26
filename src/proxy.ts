@@ -11,9 +11,10 @@ import { checkRateLimit } from "@/middlewares/rate-limit"
  * Fungsi:
  * - API (`/api/*`): suntik `x-request-id`, rate-limit + header
  *   `X-RateLimit-*`.
- * - Halaman: TANPA landing publik. `/` → redirect `/dashboard`.
- *   Guard auth untuk `/dashboard/*`, redirect user login dari
- *   `/login|/register`. Locale tetap dideteksi (cookie → Accept-Language
+ * - Halaman: dashboard hidup di `/` (root). TANPA landing publik.
+ *   Guard auth untuk SEMUA halaman kecuali `/login|/register`;
+ *   redirect user login dari `/login|/register` ke `/`.
+ *   Locale tetap dideteksi (cookie → Accept-Language
  *   → default) dan disuntik via header `x-locale` untuk next-intl.
  * - Runs on Edge Runtime untuk low latency
  */
@@ -111,40 +112,18 @@ export default function proxy(request: NextRequest) {
   const reqHeaders = new Headers(request.headers)
   reqHeaders.set("x-locale", locale)
 
-  // Root kini milik dashboard: "/" → "/dashboard" (search dipertahankan).
-  if (pathname === "/") {
-    const url = request.nextUrl.clone()
-    url.pathname = "/dashboard"
-    url.search = search
-    return NextResponse.redirect(url)
-  }
-
-  // Halaman TANPA prefix locale: /dashboard/* (guard auth), /login|/register
-  // (redirect user login + toggle register). x-locale tetap disuntik.
+  // Halaman TANPA prefix locale: dashboard di `/` (guard auth),
+  // /login|/register (redirect user login + toggle register).
+  // x-locale tetap disuntik. URL legacy /dashboard/* ditangani
+  // redirect permanen di next.config.ts sebelum sampai sini.
   if (
-    pathname === "/dashboard" ||
-    pathname.startsWith("/dashboard/") ||
     pathname === "/login" ||
     pathname.startsWith("/login/") ||
     pathname === "/register" ||
     pathname.startsWith("/register/")
   ) {
-    const isAuthPage =
-      pathname === "/login" ||
-      pathname.startsWith("/login/") ||
-      pathname === "/register" ||
-      pathname.startsWith("/register/")
-
-    if (isAuthPage && sessionCookie) {
-      return NextResponse.redirect(new URL("/dashboard", request.url))
-    }
-
-    if (pathname === "/dashboard" || pathname.startsWith("/dashboard/")) {
-      if (!sessionCookie) {
-        const loginUrl = new URL("/login", request.url)
-        loginUrl.searchParams.set("callbackUrl", pathname + search)
-        return NextResponse.redirect(loginUrl)
-      }
+    if (sessionCookie) {
+      return NextResponse.redirect(new URL("/", request.url))
     }
 
     if (!FEATURES.REGISTER_ENABLED) {
@@ -160,17 +139,13 @@ export default function proxy(request: NextRequest) {
     return NextResponse.next({ request: { headers: reqHeaders } })
   }
 
-  // Sisa path (termasuk legacy /id/*, /en/*, /about, /contact, /privacy,
-  // /terms) tidak lagi ada: arahkan ke /dashboard agar bookmark lama tetap jalan.
-  // Pengecualian auth: user belum login yang membuka halaman tak dikenal
-  // diarahkan ke /login agar tidak memantul dashboard→login dua kali.
+  // Semua halaman lain = dashboard privat: wajib session.
   if (!sessionCookie) {
-    return NextResponse.redirect(new URL("/login", request.url))
+    const loginUrl = new URL("/login", request.url)
+    loginUrl.searchParams.set("callbackUrl", pathname + search)
+    return NextResponse.redirect(loginUrl)
   }
-  const url = request.nextUrl.clone()
-  url.pathname = "/dashboard"
-  url.search = search
-  return NextResponse.redirect(url)
+  return NextResponse.next({ request: { headers: reqHeaders } })
 }
 
 // Matcher: sertakan API (request-id/rate-limit) + halaman,

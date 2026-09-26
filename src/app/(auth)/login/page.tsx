@@ -37,7 +37,11 @@ export default function LoginPage() {
   const onSubmit = (data: LoginInput) => {
     loginMutation.mutate(data, {
       onSuccess: () => {
-        router.push("/dashboard")
+        // Hormati ?callbackUrl= dari proxy (guard auth); default ke root.
+        const params = new URLSearchParams(window.location.search)
+        const raw = params.get("callbackUrl")
+        const target = raw?.startsWith("/") && !raw.startsWith("//") ? raw : "/"
+        router.push(target)
         router.refresh()
       },
     })
@@ -49,7 +53,7 @@ export default function LoginPage() {
       <div className="flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md space-y-6">
           <div className="flex justify-center lg:hidden">
-            <Link href="/dashboard" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <span className="font-bold text-base text-gray-900 dark:text-white">BI Tools</span>
             </Link>
           </div>
@@ -132,7 +136,7 @@ export default function LoginPage() {
 
           <p className="text-center">
             <Link
-              href="/dashboard"
+              href="/"
               className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" />

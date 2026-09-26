@@ -16,7 +16,7 @@ export default function OAuthButtons({ googleEnabled, githubEnabled }: OAuthButt
   if (!googleEnabled && !githubEnabled) return null
 
   const handleOAuthSignIn = (provider: "google" | "github") => {
-    authClient.signIn.social({ provider, callbackURL: "/dashboard" })
+    authClient.signIn.social({ provider, callbackURL: "/" })
   }
 
   return (

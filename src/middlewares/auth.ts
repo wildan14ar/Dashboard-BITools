@@ -135,7 +135,7 @@ export const auth = betterAuth({
         after: async (user) => {
           await logActivity(user.id, "CREATE", "User", user.id, { email: user.email })
           createNotification(user.id, "Selamat Datang!", `Akun ${user.name} berhasil dibuat`, {
-            link: "/dashboard",
+            link: "/",
             type: "system",
           }).catch(() => {})
         },

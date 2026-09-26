@@ -75,16 +75,16 @@ const nextConfig: NextConfig = {
         destination: "/manifest.webmanifest",
         permanent: true,
       },
-      // Folder admin dijadikan route group (dashboard/(admin)) sehingga segmen
-      // URL /admin hilang — redirect agar bookmark lama tetap jalan.
+      // Dashboard pindah dari /dashboard ke root "/":
+      // redirect permanen agar bookmark lama tetap jalan.
       {
-        source: "/dashboard/admin",
-        destination: "/dashboard",
+        source: "/dashboard",
+        destination: "/",
         permanent: true,
       },
       {
-        source: "/dashboard/admin/:path*",
-        destination: "/dashboard/:path*",
+        source: "/dashboard/:path*",
+        destination: "/:path*",
         permanent: true,
       },
     ]

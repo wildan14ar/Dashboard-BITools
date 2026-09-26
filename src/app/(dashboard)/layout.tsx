@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   },
 }
 
-// Dashboard TANPA prefix locale (/dashboard/...).
+// Dashboard di root TANPA prefix locale (/, /calendar, /users, ...).
 // Locale: header x-locale (proxy) → cookie → default.
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const locale = await getRequestLocale()
