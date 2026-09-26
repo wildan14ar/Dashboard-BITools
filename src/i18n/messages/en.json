@@ -1,0 +1,114 @@
+{
+  "lang": {
+    "label": "Language",
+    "id": "Indonesia",
+    "en": "English"
+  },
+  "auth": {
+    "backToHome": "Back to home",
+    "login": {
+      "title": "Welcome Back",
+      "description": "Please sign in to your account to continue",
+      "identifier": "Username or Email",
+      "identifierPlaceholder": "johndoe or name@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "submit": "Sign In",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Register now",
+      "error": "A system error occurred. Please try again.",
+      "continueGoogle": "Continue with Google",
+      "continueGithub": "Continue with GitHub",
+      "orContinue": "or continue with"
+    },
+    "register": {
+      "title": "Create New Account",
+      "description": "Register to start using the platform",
+      "fullname": "Full Name",
+      "fullnamePlaceholder": "John Doe",
+      "username": "Username",
+      "usernamePlaceholder": "johndoe",
+      "email": "Email",
+      "emailPlaceholder": "name@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Minimum 6 characters",
+      "submit": "Register",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in now",
+      "error": "A system error occurred. Please try again."
+    }
+  },
+  "home": {
+    "hero": {
+      "badge": "Company Profile Boilerplate",
+      "aboutButton": "About Us",
+      "contactButton": "Contact Us"
+    },
+    "features": {
+      "eyebrow": "Why this boilerplate",
+      "title": "Everything you need to start",
+      "description": "A minimal starting point with content managed from the database.",
+      "items": [
+        {
+          "title": "Content from database",
+          "description": "Site name, tagline, contact info, and social links come from the Platform record."
+        },
+        {
+          "title": "Auth and RBAC ready",
+          "description": "Sign in, roles, and permissions are already wired for the dashboard."
+        },
+        {
+          "title": "SEO and i18n ready",
+          "description": "Metadata, sitemap, and English/Indonesian translations included."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Start with this template",
+      "description": "Replace the platform content from the admin dashboard and make it yours.",
+      "button": "Get in touch"
+    }
+  },
+  "about": {
+    "title": "About Us",
+    "eyebrow": "About",
+    "description": "A short profile of this organization. Manage this content from the admin dashboard.",
+    "overviewTitle": "Overview",
+    "visionTitle": "Vision",
+    "missionTitle": "Mission",
+    "contactTitle": "Contact Information",
+    "fallbackDescription": "Update the platform description from the admin dashboard to introduce your organization here.",
+    "fallbackVision": "Vision has not been set yet.",
+    "fallbackMission": "Mission has not been set yet."
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "description": "Have questions about our programs, membership, or want to collaborate? We'd love to hear from you.",
+    "infoTitle": "Contact Information",
+    "emailLabel": "Email Us",
+    "addressLabel": "Global HQ",
+    "phoneLabel": "Phone",
+    "notAvailable": "Not available",
+    "followUs": "Follow our journey",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "John",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Doe",
+    "email": "Email Address",
+    "emailPlaceholder": "john@example.com",
+    "subject": "Subject",
+    "subjectPlaceholder": "How can we help?",
+    "message": "Message",
+    "messagePlaceholder": "Write your message here...",
+    "sendButton": "Send Message",
+    "eyebrow": "Contact"
+  },
+  "footer": {
+    "explore": "Explore",
+    "about": "About",
+    "contact": "Contact",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  }
+}

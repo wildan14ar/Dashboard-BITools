@@ -17,7 +17,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const validation = await RequestHandler.validateRequest(
       z.object({
         params: z.object({
-          id: z.string().uuid(),
+          id: z.string().min(1),
         }),
         body: RoleSchema,
       }),
@@ -32,26 +32,46 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const updateData: {
       name?: string
       description?: string
-      permissions?: { set: { id: string }[] }
     } = {}
     if (name !== undefined) updateData.name = name
     if (description !== undefined) updateData.description = description
     if (permissions !== undefined) {
-      const existingPermissions = await prisma.rolePermission.findMany({
-        where: { action: { in: permissions } },
-        select: { id: true },
+      const catalog = await prisma.rolePermission.findMany({
+        where: { action: { in: permissions }, roleId: null },
+        select: { action: true, label: true, description: true },
       })
 
-      updateData.permissions = {
-        set: existingPermissions.map((p) => ({ id: p.id })),
+      // Ganti total set permission milik role ini (salinan baris, bukan assign katalog)
+      await prisma.rolePermission.deleteMany({ where: { roleId: id } })
+      if (catalog.length > 0) {
+        await prisma.rolePermission.createMany({
+          data: catalog.map((p) => ({
+            action: p.action,
+            label: p.label,
+            description: p.description,
+            roleId: id,
+          })),
+        })
       }
     }
 
-    const role = await prisma.role.update({
+    const updated = await prisma.role
+      .update({
+        where: { id },
+        data: updateData,
+      })
+      .catch(() => null)
+    if (!updated) {
+      return ResponseHandler.notFound("Role tidak ditemukan")
+    }
+
+    const role = await prisma.role.findUnique({
       where: { id },
-      data: updateData,
       include: { permissions: true },
     })
+    if (!role) {
+      return ResponseHandler.notFound("Role tidak ditemukan")
+    }
 
     const roleFormatted = {
       ...role,
@@ -83,7 +103,7 @@ export async function DELETE(
     const validation = await RequestHandler.validateRequest(
       z.object({
         params: z.object({
-          id: z.string().uuid(),
+          id: z.string().min(1),
         }),
       }),
       request,

@@ -5,45 +5,23 @@ interface SectionHeaderProps {
   eyebrow?: string
   title: string
   description?: string
-  align?: "left" | "center" | "between"
+  align?: "left" | "center"
   action?: ReactNode
-  /** Alias lama BI — tetap didukung agar pemanggil eksisting tidak rusak. */
-  actions?: ReactNode
   className?: string
-  /** Heading level — BI memakai h1 untuk judul halaman utama. */
+  /** Heading level — use 1 for the main page title (SEO/a11y) */
   level?: 1 | 2
 }
 
-export function SectionHeader({
+export default function SectionHeader({
   eyebrow,
   title,
   description,
-  align = "between",
+  align = "left",
   action,
-  actions,
   className,
-  level = 1,
+  level = 2,
 }: SectionHeaderProps) {
   const Heading = level === 1 ? "h1" : "h2"
-  const trailing = action ?? actions
-
-  if (align === "between") {
-    return (
-      <div className={cn("mb-6 flex items-start justify-between gap-4", className)}>
-        <div>
-          {eyebrow && (
-            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              {eyebrow}
-            </p>
-          )}
-          <Heading className="text-2xl font-bold tracking-tight">{title}</Heading>
-          {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
-        </div>
-        {trailing ? <div className="flex shrink-0 items-center gap-2">{trailing}</div> : null}
-      </div>
-    )
-  }
-
   return (
     <div
       className={cn(
@@ -63,9 +41,7 @@ export function SectionHeader({
           {description}
         </p>
       )}
-      {trailing}
+      {action}
     </div>
   )
 }
-
-export default SectionHeader

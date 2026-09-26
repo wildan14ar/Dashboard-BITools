@@ -1,10 +1,10 @@
 "use client"
 
 import { LogOut } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/i18n/navigation"
 import { authClient } from "@/lib/auth-client"
 
-type ButtonLogoutProps = {
+interface ButtonLogoutProps {
   className?: string
 }
 
@@ -19,7 +19,7 @@ export default function ButtonLogout({ className }: ButtonLogoutProps) {
         router.push("/login")
         router.refresh()
       }}
-      className={`flex w-full items-center justify-center gap-2 rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground transition-colors hover:bg-destructive/90 ${className || ""}`}
+      className={`w-full ${className || ""} flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors font-medium text-sm`}
     >
       <LogOut size={16} />
       <span>Logout</span>

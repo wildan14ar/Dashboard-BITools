@@ -8,7 +8,9 @@ export async function GET() {
   if (error) return error
 
   try {
+    // Hanya katalog (roleId null) — grant milik role tidak ditampilkan di picker.
     const permissions = await prisma.rolePermission.findMany({
+      where: { roleId: null },
       orderBy: [{ action: "asc" }, { label: "asc" }],
     })
 

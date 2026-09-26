@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
 import { authClient } from "@/lib/auth-client"
-import type { LoginInput, RegisterInput } from "@/validations"
+import type { Gender, LoginInput, RegisterInput } from "@/validations"
 
 export interface UserData {
   username: string
@@ -11,6 +11,11 @@ export interface UserData {
   fullname: string | null
   quote?: string | null
   avatar?: string | null
+  phone?: string | null
+  address?: string | null
+  birthDate?: string | null
+  birthPlace?: string | null
+  gender?: Gender | null
 }
 
 export interface UpdateProfileInput {
@@ -18,25 +23,30 @@ export interface UpdateProfileInput {
   username?: string
   quote?: string | null
   avatar?: string | null
-  currentPassword?: string
-  newPassword?: string
+  phone?: string | null
+  address?: string | null
+  birthDate?: string | null
+  birthPlace?: string | null
+  gender?: Gender | null
 }
 
 interface AuthMeResponse {
   user: UserData
-  roles: string[]
-  isSuperAdmin: boolean
-  permissions: string[]
 }
 
 export interface UseAuthReturn {
+  // Session
   session: {
     user: { id: string; name?: string | null; email?: string | null; image?: string | null }
   } | null
   status: "loading" | "authenticated" | "unauthenticated"
   isLoading: boolean
+
+  // User Data
   user: UserData | null
   isFetching: boolean
+
+  // Permissions
   roles: string[]
   permissions: string[]
   isSuperAdmin: boolean
@@ -44,7 +54,16 @@ export interface UseAuthReturn {
 }
 
 /**
- * Single hook untuk semua kebutuhan auth — pola PortoNext.
+ * Single hook untuk semua kebutuhan auth
+ *
+ * @example
+ * // Basic
+ * const { user, isLoading } = useAuth();
+ *
+ * @example
+ * // Permission check
+ * const { can } = useAuth();
+ * if (can(["blogs:create"])) { ... }
  */
 export function useAuth(): UseAuthReturn {
   const { data, isPending } = authClient.useSession()
@@ -55,6 +74,7 @@ export function useAuth(): UseAuthReturn {
       : "unauthenticated"
   const isAuthenticated = status === "authenticated"
 
+  // Fetch user data + permissions dari API
   const {
     data: me,
     isFetching,
@@ -66,13 +86,21 @@ export function useAuth(): UseAuthReturn {
       return res.data
     },
     enabled: isAuthenticated,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
-  const isSuperAdmin = me?.isSuperAdmin ?? false
-  const permissions = me?.permissions ?? []
-  const roles = me?.roles ?? []
+  // Extract session data — roles/permissions/isSuperAdmin datang dari
+  // payload session (customSession plugin), BUKAN dari /auth/me.
+  const sessionExtras = (data ?? {}) as {
+    roles?: string[]
+    permissions?: string[]
+    isSuperAdmin?: boolean
+  }
+  const isSuperAdmin = sessionExtras.isSuperAdmin ?? false
+  const permissions = sessionExtras.permissions ?? []
+  const roles = sessionExtras.roles ?? []
 
+  // Permission checker - Super admin auto pass
   const can = (checkPermissions: string[]): boolean => {
     if (!isAuthenticated) return false
     if (isSuperAdmin) return true
@@ -80,11 +108,16 @@ export function useAuth(): UseAuthReturn {
   }
 
   return {
+    // Session
     session: data ? { user: data.user } : null,
     status,
     isLoading: isPending || (isAuthenticated && isQueryLoading),
+
+    // User Data
     user: me?.user ?? null,
     isFetching,
+
+    // Permissions
     roles,
     permissions,
     isSuperAdmin,
@@ -92,6 +125,7 @@ export function useAuth(): UseAuthReturn {
   }
 }
 
+// Login mutation (identifier bisa email atau username)
 export function useLogin() {
   const queryClient = useQueryClient()
 
@@ -102,12 +136,12 @@ export function useLogin() {
         ? await authClient.signIn.email({
             email: data.identifier,
             password: data.password,
-            callbackURL: "/",
+            callbackURL: "/dashboard",
           })
         : await authClient.signIn.username({
             username: data.identifier,
             password: data.password,
-            callbackURL: "/",
+            callbackURL: "/dashboard",
           })
       if (result.error) throw new Error(result.error.message || "Login gagal")
       return result.data
@@ -118,6 +152,7 @@ export function useLogin() {
   })
 }
 
+// Register mutation
 export function useRegister() {
   const queryClient = useQueryClient()
 
@@ -128,7 +163,7 @@ export function useRegister() {
         password: data.password,
         name: data.fullname,
         username: data.username,
-        callbackURL: "/",
+        callbackURL: "/dashboard",
       })
       if (result.error) throw new Error(result.error.message || "Registrasi gagal")
       return result.data
@@ -139,6 +174,7 @@ export function useRegister() {
   })
 }
 
+// Update profile mutation
 export function useUpdateProfile() {
   const queryClient = useQueryClient()
 
@@ -149,6 +185,16 @@ export function useUpdateProfile() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auth"] })
+    },
+  })
+}
+
+// Reset password sendiri (wajib password lama)
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: async (data: { currentPassword: string; newPassword: string }) => {
+      const res = await api.post("/auth/reset-password", data)
+      return res.data
     },
   })
 }

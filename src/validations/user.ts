@@ -1,19 +1,21 @@
 import { z } from "zod"
 
-export const createUserSchema = z.object({
-  username: z.string().min(1),
-  fullname: z.string().optional(),
-  email: z.string().email(),
-  password: z.string().min(6),
-  isSuperAdmin: z.boolean().optional(),
+export const UserFilterSchema = z.object({
+  page: z.string().optional(),
+  limit: z.string().optional(),
+  search: z.string().optional(),
+  // Sort disanitasi via parseSort() (fallback ke default, tanpa 400).
+  sort: z.string().optional(),
+  order: z.string().optional(),
+  isAdmin: z.coerce.boolean().optional(),
+  // Postman: field selection — ?fields=fullname,avatar
+  fields: z.string().optional(),
 })
 
-export const updateUserSchema = z.object({
-  fullname: z.string().optional(),
-  email: z.string().email().optional(),
-  password: z.string().min(6).optional(),
-  isSuperAdmin: z.boolean().optional(),
+export const RoleSchema = z.object({
+  name: z.string().min(2, "Nama role minimal 2 karakter"),
+  description: z.string().optional(),
+  permissions: z.array(z.string()).optional(),
 })
 
-export type CreateBiUserInput = z.infer<typeof createUserSchema>
-export type UpdateBiUserInput = z.infer<typeof updateUserSchema>
+export type RoleInput = z.infer<typeof RoleSchema>

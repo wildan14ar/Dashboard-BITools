@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
 
-// Types — pola PortoNext
+// Types
 export interface Role {
   id: string
   name: string
@@ -24,6 +24,8 @@ export interface RolesResponse {
     page: number
     limit: number
     total: number
+    total_pages: number
+    has_more: boolean
   }
 }
 

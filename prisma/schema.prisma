@@ -1,6 +1,12 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client"
-  output   = "../src/lib/prisma"
+  output   = "./generated/client"
 }
 
 datasource db {
@@ -8,25 +14,27 @@ datasource db {
 }
 
 // ============================================================================
-// User & Access Control — pola PortoNext (Better Auth + RBAC)
-// Naming mengikuti Porto: fullname/username lowercase.
-// passwordHash dipertahankan opsional untuk migrasi bcrypt -> Account.
+// User & Access Control
 // ============================================================================
 model User {
-  id       String  @id @default(ulid())
-  email    String  @unique
-  username String  @unique
-  fullname String?
+  id       String @id @default(ulid())
+  email    String @unique
+  username String @unique
+  fullname String
   avatar   String?
   quote    String?
 
-  // Deprecated: dipakai NextAuth lama. Password baru di Account via setCredentialPassword.
-  passwordHash String?
+  phone      String?
+  address    String?
+  birthDate  DateTime?
+  birthPlace String?
+  gender     Gender?
 
-  isActive        Boolean @default(true)
-  isPublic        Boolean @default(true)
-  isSuperAdmin    Boolean @default(false)
-  isEmailVerified Boolean @default(false)
+  isActive     Boolean @default(true)
+  isPublic     Boolean @default(true)
+  isSuperAdmin Boolean @default(false)
+
+  isEmailVerified Boolean        @default(false)
 
   userRoles UserRole[]
 
@@ -37,15 +45,19 @@ model User {
   // Global
   notifications Notification[]
   activityLogs  ActivityLog[]
+  apiKeys       ApiKey[]
+  attachments   Attachment[]
+  calendarAssignments CalendarAssignment[]
+  calendarsCreated Calendar[]
 
-  // BI domain
-  biDashboards       BiDashboard[]
-  biDashboardMembers BiDashboardMember[]
-  biDatasets         BiDataset[]
+  // BI Domain (opposite sides of Bi* user relations)
+  biDashboards        BiDashboard[]
+  biDashboardMembers  BiDashboardMember[]
+  biDatasets          BiDataset[]
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  deletedAt      DateTime?
 }
 
 // Better Auth core models (managed by prismaAdapter)
@@ -54,6 +66,11 @@ enum AccountProvider {
   credential
   google
   github
+}
+
+enum Gender {
+  MALE
+  FEMALE
 }
 
 model Session {
@@ -70,9 +87,29 @@ model Session {
   @@index([userId])
 }
 
+model ActivityLog {
+  id        String   @id @default(ulid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String // e.g. "blog.create", "user.login", "drive.upload"
+  entity    String // e.g. "Blog", "User", "DriveFile"
+  entityId  String? // ID of the affected entity
+  metadata  Json? // Additional context (changes, request info, etc.)
+  ip        String? // Client IP address
+  userAgent String? // Client user agent
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([action])
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
+
 model Account {
   id                    String          @id
-  issuer                String
+  // Nullable: Better Auth tidak menulis kolom ini saat membuat Account
+  // (signup/login); diisi manual hanya untuk kredensial lokal ("local:credential").
+  issuer                String?
   providerId            AccountProvider
   accountId             String
   userId                String
@@ -87,6 +124,7 @@ model Account {
   createdAt             DateTime        @default(now())
   updatedAt             DateTime        @updatedAt
 
+  // ponytail: unique pada issuer+accountId — konvensi Better Auth v1.7
   @@unique([issuer, accountId])
   @@index([userId])
 }
@@ -102,12 +140,10 @@ model Verification {
   @@index([identifier])
 }
 
-// --- Role model ---
 model Role {
-  id          String  @id @default(uuid())
+  id          String  @id @default(ulid())
   name        String  @unique
   description String?
-  isPublic    Boolean @default(false)
 
   permissions RolePermission[]
   users       UserRole[]
@@ -117,7 +153,7 @@ model Role {
 }
 
 model UserRole {
-  id     String @id @default(uuid())
+  id     String @id @default(ulid())
   userId String
   roleId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -129,22 +165,72 @@ model UserRole {
   @@unique([userId, roleId])
 }
 
-// --- Role Permission Catalog ---
 model RolePermission {
   id          String  @id @default(ulid())
-  action      String  @unique // e.g., "users:view"
-  label       String // e.g., "View Users"
+  action      String // e.g., "users:read"
+  label       String // e.g., "Users - read"
   description String?
 
-  roles Role[] // Implicit M-N relation with Role
+  roleId String?
+  role   Role?   @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
+
+  @@index([roleId])
+  @@index([action])
 }
 
-// ============================================================================
-// Audit — pola PortoNext, fire-and-forget via lib/activity.ts
-// ============================================================================
+model Attachment {
+  id     String @id @default(ulid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  fileName String
+  fileUrl  String
+  filePath String
+  fileType String
+  fileSize Int
+  fileHash String
+
+  // Backend penyimpanan: "s3" (object storage) atau "db" (fallback Bytes).
+  storage String @default("db")
+  // Isi file mentah — hanya dipakai saat storage = "db".
+  data Bytes?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model ApiKey {
+  id      String @id @default(ulid())
+  name    String
+  prefix  String // 8 chars pertama token untuk identifikasi di UI & lookup
+  keyHash String @unique // argon2id(salt + raw key)
+  keySalt String // salt acak per-key, dipakai saat verifikasi
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Hak akses key = permission user pemilik saat request (bukan scope per-key).
+  isActive   Boolean  @default(true)
+  isMCP      Boolean   @default(false)
+  isRestfull Boolean   @default(true)
+  expiresAt  DateTime?
+  lastUsedAt DateTime?
+  usageCount Int       @default(0)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([userId])
+  @@index([prefix])
+  @@index([keyHash])
+}
+
 model Notification {
   id     String  @id @default(ulid())
   userId String
@@ -155,28 +241,56 @@ model Notification {
   isRead Boolean @default(false)
   type   String  @default("mention")
 
+  // Relasi langsung opsional ke Calendar (pengingat / broadcast per event).
+  calendarId String?
+  calendar   Calendar? @relation(fields: [calendarId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
 
   @@index([userId, isRead])
   @@index([userId, createdAt])
+  @@index([calendarId])
 }
 
-model ActivityLog {
-  id        String  @id @default(ulid())
-  userId    String
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  action    String // e.g. "bi.dashboard.create", "user.login"
-  entity    String // e.g. "BiDashboard", "User"
-  entityId  String?
-  metadata  Json?
-  ip        String?
-  userAgent String?
+model Calendar {
+  id          String    @id @default(ulid())
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+  allDay      Boolean   @default(false)
+  color       String    @default("#3B82F6")
+  isNotify    Boolean   @default(false)
+  isHoliday   Boolean   @default(false)
+  repeatType  String    @default("none")
+  repeatDays  String    @default("")
+  notes       String    @default("[]")
+
+  createdById String?
+  createdBy   User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  assignments CalendarAssignment[]
+
+  // Notifikasi terkait (pengingat otomatis / broadcast per event).
+  notifications Notification[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([startDate])
+}
+
+model CalendarAssignment {
+  id         String   @id @default(ulid())
+  calendarId String
+  userId     String
+  calendar   Calendar @relation(fields: [calendarId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
 
-  @@index([userId, createdAt])
-  @@index([action])
-  @@index([entity, entityId])
-  @@index([createdAt])
+  @@unique([calendarId, userId])
+  @@index([userId])
 }
 
 // ============================================================================
@@ -191,6 +305,7 @@ model BiDashboard {
   id          String              @id @default(ulid())
   name        String
   description String?
+  // Postgres mendukung list primitif (text[]) secara native.
   tags        String[]            @map("tags")
   isPublic    Boolean             @default(false) @map("is_public")
   panels      BiPanel[]

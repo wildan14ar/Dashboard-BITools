@@ -1,0 +1,92 @@
+name: portonext-base
+
+# Cara pakai (Postgres-only):
+#   Prod (build + start) : docker compose up --build app
+#   Dev (HMR)            : docker compose --profile dev up --build dev
+#   Unit test            : docker compose --profile test run --rm --build test
+#   Push schema manual   : docker compose exec app bun run db:push
+#   Seed manual          : docker compose exec app bun run db:seed
+#
+# Note: Dockerfile butuh ARG DATABASE_URL saat build (untuk db:generate + build).
+# Nilai dummy postgresql://... sudah cukup; DATABASE_URL asli dipakai saat run via env.
+
+services:
+  # Postgres 16 — dependensi utama app.
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: portonext
+      POSTGRES_PASSWORD: portonext
+      POSTGRES_DB: portonext
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portonext -d portonext"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # Production build (Next start) + Postgres. Butuh service db sehat.
+  app:
+    build:
+      context: .
+      args:
+        DATABASE_URL: postgresql://portonext:portonext@localhost:5432/portonext?sslmode=disable
+    image: portonext-base:app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://portonext:portonext@db:5432/portonext?sslmode=disable
+      BETTER_AUTH_URL: http://localhost:3000
+    restart: unless-stopped
+
+  # Development server (Turbopack HMR). Schema di-push otomatis saat start.
+  dev:
+    image: oven/bun:1
+    working_dir: /app
+    command: sh -c "bun install --frozen-lockfile && bun run db:push && bun run dev --hostname 0.0.0.0"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://portonext:portonext@db:5432/portonext?sslmode=disable
+    volumes:
+      - .:/app
+      - /app/node_modules
+    profiles:
+      - dev
+
+  # Unit test one-shot (bun test). Lihat folder test/.
+  test:
+    image: oven/bun:1
+    working_dir: /app
+    command: sh -c "bun install --frozen-lockfile && bun test"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: test
+    volumes:
+      - .:/app
+      - /app/node_modules
+    profiles:
+      - test
+
+volumes:
+  pgdata:

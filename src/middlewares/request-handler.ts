@@ -1,25 +1,13 @@
-import type { NextResponse } from "next/server"
+import type { NextRequest, NextResponse } from "next/server"
 import type { ZodSchema } from "zod"
 import { ResponseHandler } from "./response-handler"
 
-export async function formDataToObject<T = unknown>(
-  formData: FormData,
-  schema?: ZodSchema<T>,
-): Promise<T> {
+export async function formDataToObject(formData: FormData): Promise<Record<string, unknown>> {
   const obj: Record<string, unknown> = {}
   for (const [key, value] of formData.entries()) {
     obj[key] = value
   }
-
-  // Jika ada schema, validasi dan casting
-  if (schema) {
-    const parsed = schema.safeParse(obj)
-    if (!parsed.success) {
-      throw parsed.error
-    }
-    return parsed.data
-  }
-  return obj as T
+  return obj
 }
 
 export class RequestHandler {
@@ -35,7 +23,7 @@ export class RequestHandler {
    */
   static async validateRequest<T>(
     schema: ZodSchema<T>,
-    req: Request,
+    req: NextRequest,
     params: unknown | null = null,
   ): Promise<T | NextResponse> {
     // 1. Extract Params (dari context jika ada) - Prioritas pertama
@@ -46,19 +34,7 @@ export class RequestHandler {
 
     // 2. Extract Query - Prioritas kedua
     const url = new URL(req.url)
-    const query: Record<string, string | string[]> = {}
-    url.searchParams.forEach((value, key) => {
-      // Handle array notation: categories[]=A&categories[]=B becomes categories: ["A", "B"]
-      if (key.endsWith("[]")) {
-        const cleanKey = key.slice(0, -2)
-        if (!query[cleanKey]) {
-          query[cleanKey] = []
-        }
-        ;(query[cleanKey] as string[]).push(value)
-      } else {
-        query[key] = value
-      }
-    })
+    const query: Record<string, string> = Object.fromEntries(url.searchParams)
 
     // 3. Extract Body (jika bukan GET/HEAD) - Prioritas ketiga
     let body: unknown = {}
@@ -69,9 +45,7 @@ export class RequestHandler {
         // Support multipart/form-data (FormData) dan JSON
         const clone = req.clone()
         if (contentType.includes("multipart/form-data")) {
-          const formData = await clone.formData()
-          // Helper konversi FormData ke object (tanpa schema - akan divalidasi later)
-          body = await formDataToObject(formData)
+          body = await formDataToObject(await clone.formData())
         } else {
           body = await clone.json()
         }
@@ -91,7 +65,16 @@ export class RequestHandler {
     const validation = schema.safeParse(dataToValidate)
 
     if (!validation.success) {
-      // Flatten errors untuk memudahkan pembacaan frontend
+      // Postman best-practice: kembalikan SEMUA error validasi sekaligus
+      // dalam bentuk details[] { field, message } + code stabil.
+      const details = validation.error.issues.map((issue) => ({
+        field: issue.path.join(".") || "(root)",
+        message: issue.message,
+        code: issue.code,
+      }))
+
+      // Bentuk legacy { params?, query?, body? } tetap disertakan agar
+      // frontend lama tidak rusak.
       const formattedErrors: Record<string, unknown> = {}
       const errors = validation.error.format() as Record<
         string,
@@ -102,15 +85,13 @@ export class RequestHandler {
       if (errors.query) formattedErrors.query = errors.query
       if (errors.body) formattedErrors.body = errors.body
 
-      // Fallback jika error root
-      if (Object.keys(formattedErrors).length === 0) {
-        return ResponseHandler.badRequest(
-          "Validation Error",
-          validation.error.flatten().fieldErrors,
-        )
-      }
-
-      return ResponseHandler.badRequest("Validation Error", formattedErrors)
+      return ResponseHandler.badRequest(
+        "Validation Error",
+        { details, ...formattedErrors },
+        {
+          code: "VALIDATION_ERROR",
+        },
+      )
     }
 
     return validation.data

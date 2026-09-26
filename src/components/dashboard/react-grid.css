@@ -1,7 +1,0 @@
-@import "react-grid-layout/css/styles.css";
-
-.react-grid-item.react-grid-placeholder {
-  background: transparent;
-  border: 1px dashed color-mix(in oklch, var(--border), transparent 40%);
-  opacity: 1;
-}

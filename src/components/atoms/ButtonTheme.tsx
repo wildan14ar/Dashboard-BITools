@@ -1,14 +1,14 @@
 "use client"
 
 import { Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
+import { useTheme } from "@/components/theme-provider"
 
 type ButtonThemeProps = {
   variant?: "icon" | "text"
   className?: string
 }
 
-export function ButtonTheme({ variant = "icon", className = "" }: ButtonThemeProps) {
+export default function ButtonTheme({ variant = "icon", className = "" }: ButtonThemeProps) {
   const { setTheme, resolvedTheme } = useTheme()
   const toggleTheme = () => setTheme(resolvedTheme === "light" ? "dark" : "light")
 
@@ -17,7 +17,7 @@ export function ButtonTheme({ variant = "icon", className = "" }: ButtonThemePro
       <button
         type="button"
         onClick={toggleTheme}
-        className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground ${className}`}
+        className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors ${className}`}
       >
         <Sun size={18} className="dark:hidden" />
         <Moon size={18} className="hidden dark:block" />
@@ -31,7 +31,7 @@ export function ButtonTheme({ variant = "icon", className = "" }: ButtonThemePro
     <button
       type="button"
       onClick={toggleTheme}
-      className={`rounded-lg p-2 transition-colors hover:bg-accent ${className}`}
+      className={`p-2 rounded-lg hover:bg-accent transition-colors ${className}`}
       aria-label="Toggle theme"
     >
       <Sun size={20} className="dark:hidden" />

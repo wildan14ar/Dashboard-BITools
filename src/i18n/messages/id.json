@@ -1,0 +1,114 @@
+{
+  "lang": {
+    "label": "Bahasa",
+    "id": "Indonesia",
+    "en": "English"
+  },
+  "auth": {
+    "backToHome": "Kembali ke beranda",
+    "login": {
+      "title": "Selamat Datang Kembali",
+      "description": "Silakan masuk ke akun Anda untuk melanjutkan",
+      "identifier": "Username atau Email",
+      "identifierPlaceholder": "johndoe atau nama@example.com",
+      "password": "Kata Sandi",
+      "passwordPlaceholder": "Masukkan kata sandi Anda",
+      "submit": "Masuk",
+      "noAccount": "Belum punya akun?",
+      "registerLink": "Daftar sekarang",
+      "error": "Terjadi kesalahan sistem. Silakan coba lagi.",
+      "continueGoogle": "Lanjutkan dengan Google",
+      "continueGithub": "Lanjutkan dengan GitHub",
+      "orContinue": "atau lanjutkan dengan"
+    },
+    "register": {
+      "title": "Buat Akun Baru",
+      "description": "Daftar untuk mulai menggunakan platform",
+      "fullname": "Nama Lengkap",
+      "fullnamePlaceholder": "John Doe",
+      "username": "Nama Pengguna",
+      "usernamePlaceholder": "johndoe",
+      "email": "Email",
+      "emailPlaceholder": "nama@example.com",
+      "password": "Kata Sandi",
+      "passwordPlaceholder": "Minimal 6 karakter",
+      "submit": "Daftar",
+      "haveAccount": "Sudah punya akun?",
+      "loginLink": "Masuk sekarang",
+      "error": "Terjadi kesalahan sistem. Silakan coba lagi."
+    }
+  },
+  "home": {
+    "hero": {
+      "badge": "Boilerplate Profil Perusahaan",
+      "aboutButton": "Tentang Kami",
+      "contactButton": "Hubungi Kami"
+    },
+    "features": {
+      "eyebrow": "Kenapa boilerplate ini",
+      "title": "Semua yang Anda butuhkan untuk mulai",
+      "description": "Titik awal yang minimal dengan konten yang dikelola dari database.",
+      "items": [
+        {
+          "title": "Konten dari database",
+          "description": "Nama situs, tagline, info kontak, dan tautan sosial berasal dari record Platform."
+        },
+        {
+          "title": "Auth dan RBAC siap pakai",
+          "description": "Login, role, dan permission sudah terhubung untuk dashboard."
+        },
+        {
+          "title": "SEO dan i18n siap pakai",
+          "description": "Metadata, sitemap, dan terjemahan Indonesia/Inggris sudah termasuk."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Mulai dari template ini",
+      "description": "Ganti konten platform dari dashboard admin dan jadikan milik Anda.",
+      "button": "Hubungi Kami"
+    }
+  },
+  "about": {
+    "title": "Tentang Kami",
+    "eyebrow": "Tentang",
+    "description": "Profil singkat organisasi ini. Kelola konten ini dari dashboard admin.",
+    "overviewTitle": "Gambaran Umum",
+    "visionTitle": "Visi",
+    "missionTitle": "Misi",
+    "contactTitle": "Informasi Kontak",
+    "fallbackDescription": "Perbarui deskripsi platform dari dashboard admin untuk memperkenalkan organisasi Anda di sini.",
+    "fallbackVision": "Visi belum diatur.",
+    "fallbackMission": "Misi belum diatur."
+  },
+  "contact": {
+    "title": "Hubungi Kami",
+    "description": "Punya pertanyaan tentang program kami, keanggotaan, atau ingin berkolaborasi? Kami senang mendengar dari Anda.",
+    "infoTitle": "Informasi Kontak",
+    "emailLabel": "Kirim Email",
+    "addressLabel": "Kantor Pusat",
+    "phoneLabel": "Telepon",
+    "notAvailable": "Tidak tersedia",
+    "followUs": "Ikuti perjalanan kami",
+    "firstName": "Nama Depan",
+    "firstNamePlaceholder": "John",
+    "lastName": "Nama Belakang",
+    "lastNamePlaceholder": "Doe",
+    "email": "Alamat Email",
+    "emailPlaceholder": "john@example.com",
+    "subject": "Subjek",
+    "subjectPlaceholder": "Bagaimana kami bisa membantu?",
+    "message": "Pesan",
+    "messagePlaceholder": "Tulis pesan Anda di sini...",
+    "sendButton": "Kirim Pesan",
+    "eyebrow": "Kontak"
+  },
+  "footer": {
+    "explore": "Jelajahi",
+    "about": "Tentang",
+    "contact": "Kontak",
+    "legal": "Legal",
+    "privacy": "Kebijakan Privasi",
+    "terms": "Ketentuan Layanan"
+  }
+}

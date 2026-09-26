@@ -1,17 +1,23 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
+import type { Gender } from "@/validations"
 
-// Types — pola PortoNext
+// Types
 export interface User {
   id: string
   email: string
   fullname: string | null
   username: string
   isActive: boolean
-  isPublic: boolean
   isSuperAdmin: boolean
+  isPublic: boolean
   quote: string | null
   avatar: string | null
+  phone: string | null
+  address: string | null
+  birthDate: string | null
+  birthPlace: string | null
+  gender: Gender | null
   userRoles: { role: { id: string; name: string } }[]
   createdAt?: string
   updatedAt?: string
@@ -37,6 +43,11 @@ export interface CreateUserInput {
   isPublic?: boolean
   quote?: string
   avatar?: string
+  phone?: string
+  address?: string
+  birthDate?: string | Date
+  birthPlace?: string
+  gender?: Gender
   roleIds?: string[]
 }
 
@@ -51,6 +62,11 @@ export interface UpdateUserInput {
   isPublic?: boolean
   quote?: string
   avatar?: string
+  phone?: string | null
+  address?: string | null
+  birthDate?: string | Date | null
+  birthPlace?: string | null
+  gender?: Gender | null
   roleIds?: string[]
 }
 
@@ -101,8 +117,7 @@ export function useUpdateUser() {
 
   return useMutation({
     mutationFn: async (userData: UpdateUserInput) => {
-      const { id, ...payload } = userData
-      const { data } = await api.put(`/users/${id}`, payload)
+      const { data } = await api.put(`/users/${userData.id}`, userData)
       return data
     },
     onSuccess: () => {
@@ -117,6 +132,20 @@ export function useDeleteUser() {
   return useMutation({
     mutationFn: async ({ id }: DeleteUserInput) => {
       const { data } = await api.delete(`/users/${id}`)
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: usersKeys.lists() })
+    },
+  })
+}
+
+export function useAdminResetPassword() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, newPassword }: { id: string; newPassword: string }) => {
+      const { data } = await api.post(`/users/${id}/reset-password`, { newPassword })
       return data
     },
     onSuccess: () => {

@@ -7,16 +7,30 @@ export interface ProtectedProps {
   children: ReactNode
   fallback?: ReactNode
   loading?: ReactNode
-  permissions?: string[]
+  permissions?: string[] // Multiple permissions (OR logic - any one is enough)
 }
 
 /**
  * Component wrapper untuk conditional rendering berdasarkan permission
+ *
  * Note: Super admin otomatis punya akses ke semua permission
  *
  * @example
- * <Protected permissions={["dashboards:create"]}>
- *   <DashboardEditor />
+ * // Basic usage
+ * <Protected permissions={["blogs:create", "blogs:update"]}>
+ *     <BlogEditor />
+ * </Protected>
+ *
+ * @example
+ * // Dengan fallback
+ * <Protected permissions={["users:delete"]} fallback={<DisabledButton />}>
+ *     <DeleteButton />
+ * </Protected>
+ *
+ * @example
+ * // Navigation (fallback = null untuk hide)
+ * <Protected permissions={["users:admin"]} fallback={null}>
+ *     <Link href="/dashboard/users">Users</Link>
  * </Protected>
  */
 export function Protected({

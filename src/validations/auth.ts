@@ -1,4 +1,9 @@
 import { z } from "zod"
+import { NullableAttachmentUrlSchema, OptionalAttachmentUrlSchema } from "./attachment"
+
+export const GenderSchema = z.enum(["MALE", "FEMALE"])
+
+export type Gender = z.infer<typeof GenderSchema>
 
 export const loginSchema = z.object({
   identifier: z.string().min(3, "Username atau email minimal 3 karakter"),
@@ -18,7 +23,15 @@ export const UserSchema = z.object({
   email: z.string().email("Email tidak valid"),
   password: z.string().min(6, "Password minimal 6 karakter"),
   quote: z.string().optional(),
-  avatar: z.string().optional(),
+  avatar: OptionalAttachmentUrlSchema,
+  phone: z.string().max(30).optional(),
+  address: z.string().max(500).optional(),
+  birthDate: z.preprocess(
+    (v) => (v === "" || v === undefined ? undefined : v),
+    z.coerce.date().optional(),
+  ),
+  birthPlace: z.string().max(100).optional(),
+  gender: GenderSchema.optional(),
   isActive: z.coerce.boolean().optional(),
   isSuperAdmin: z.coerce.boolean().optional(),
   isPublic: z.coerce.boolean().optional(),
@@ -30,35 +43,25 @@ export const UpdateUserSchema = z.object({
   username: z.string().min(3, "Username minimal 3 karakter"),
   email: z.string().email("Email tidak valid"),
   quote: z.string().optional(),
-  avatar: z.string().optional(),
-  password: z.preprocess(
-    (val) => (val === "" ? undefined : val),
-    z.string().min(6, "Password minimal 6 karakter").optional(),
+  avatar: NullableAttachmentUrlSchema,
+  phone: z.string().max(30).optional().nullable(),
+  address: z.string().max(500).optional().nullable(),
+  birthDate: z.preprocess(
+    (v) => (v === "" || v === undefined ? undefined : v),
+    z.coerce.date().optional().nullable(),
   ),
+  birthPlace: z.string().max(100).optional().nullable(),
+  gender: GenderSchema.optional().nullable(),
   isActive: z.coerce.boolean().optional(),
   isSuperAdmin: z.coerce.boolean().optional(),
   isPublic: z.coerce.boolean().optional(),
   roleIds: z.array(z.string()).optional(),
 })
 
-export const UserFilterSchema = z.object({
-  page: z.string().optional(),
-  limit: z.string().optional(),
-  search: z.string().optional(),
-  sort: z.enum(["createdAt", "fullname", "username", "email"]).optional().default("createdAt"),
-  order: z.enum(["asc", "desc"]).optional().default("desc"),
-  isAdmin: z.coerce.boolean().optional(),
-})
-
-export const RoleSchema = z.object({
-  name: z.string().min(2, "Nama role minimal 2 karakter"),
-  description: z.string().optional(),
-  permissions: z.array(z.string()).optional(),
-})
+// PATCH parsial: semua field opsional (password diatur via reset-password).
+export const PartialUpdateUserSchema = UpdateUserSchema.partial()
 
 export type LoginInput = z.infer<typeof loginSchema>
 export type RegisterInput = z.infer<typeof registerSchema>
 export type UserInput = z.infer<typeof UserSchema>
 export type UpdateUserInput = z.infer<typeof UpdateUserSchema>
-export type UserFilterInput = z.infer<typeof UserFilterSchema>
-export type RoleInput = z.infer<typeof RoleSchema>

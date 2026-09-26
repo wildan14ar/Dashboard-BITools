@@ -1,11 +1,9 @@
-import { headers } from "next/headers"
 import { z } from "zod"
 import prisma from "@/config/prisma"
+import { deleteAttachmentByUrl, toAttachmentUrl } from "@/config/storage"
 import { logActivity } from "@/lib/activity"
-import { auth } from "@/lib/auth"
-import { dataUrlByteLength, MAX_AVATAR_SIZE } from "@/lib/image-upload"
 import { ResponseHandler, requireAuth } from "@/middlewares"
-import { fetchAndCachePermissions } from "@/middlewares/rbac"
+import { GenderSchema, NullableAttachmentUrlSchema } from "@/validations"
 
 const UpdateProfileSchema = z.object({
   fullname: z.string().min(1, "Nama tidak boleh kosong").max(100).optional(),
@@ -16,9 +14,13 @@ const UpdateProfileSchema = z.object({
     .regex(/^[a-z0-9_]+$/, "Username hanya boleh huruf kecil, angka, dan underscore")
     .optional(),
   quote: z.string().max(200).optional().nullable(),
-  avatar: z.string().optional().nullable(),
-  currentPassword: z.string().optional(),
-  newPassword: z.string().min(8, "Password minimal 8 karakter").optional(),
+  // Referensi attachment — upload via POST /api/attachments.
+  avatar: NullableAttachmentUrlSchema,
+  phone: z.string().max(30).optional().nullable(),
+  address: z.string().max(500).optional().nullable(),
+  birthDate: z.coerce.date().optional().nullable(),
+  birthPlace: z.string().max(100).optional().nullable(),
+  gender: GenderSchema.optional().nullable(),
 })
 
 export async function GET() {
@@ -28,7 +30,9 @@ export async function GET() {
       return error ?? ResponseHandler.unauthorized("Tidak terautentikasi")
     }
 
-    const [user, permission] = await Promise.all([
+    // Profil + ringkasan untuk header: 5 notifikasi terbaru (+unreadCount)
+    // dan 5 aktivitas terakhir milik sendiri (deep-link ke tab profil).
+    const [user, notifItems, unreadCount, recentLogs] = await Promise.all([
       prisma.user.findUnique({
         where: { id: session.user.id },
         select: {
@@ -37,17 +41,44 @@ export async function GET() {
           fullname: true,
           quote: true,
           avatar: true,
+          phone: true,
+          address: true,
+          birthDate: true,
+          birthPlace: true,
+          gender: true,
         },
       }),
-      fetchAndCachePermissions(session.user.id),
+      prisma.notification.findMany({
+        where: { userId: session.user.id },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+        select: {
+          id: true,
+          title: true,
+          body: true,
+          link: true,
+          isRead: true,
+          type: true,
+          calendarId: true,
+          createdAt: true,
+        },
+      }),
+      prisma.notification.count({
+        where: { userId: session.user.id, isRead: false },
+      }),
+      prisma.activityLog.findMany({
+        where: { userId: session.user.id },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+        select: { id: true, action: true, entity: true, createdAt: true },
+      }),
     ])
     if (!user) return ResponseHandler.notFound("User tidak ditemukan")
 
     return ResponseHandler.success("User data fetched successfully", {
-      user,
-      roles: permission?.roles ?? [],
-      isSuperAdmin: permission?.isSuperAdmin ?? false,
-      permissions: permission?.permissions ?? [],
+      user: { ...user, avatar: toAttachmentUrl(user.avatar) },
+      notifications: { items: notifItems, unreadCount },
+      recentLogs,
     })
   } catch (error) {
     await logActivity("system", "ERROR", "User", undefined, {
@@ -80,9 +111,10 @@ export async function PUT(request: Request) {
 
     const data = parsed.data
 
-    if (data.avatar && dataUrlByteLength(data.avatar) > MAX_AVATAR_SIZE) {
-      return ResponseHandler.badRequest("Ukuran foto profil maksimal 2 MB")
-    }
+    const previous = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { avatar: true },
+    })
 
     if (data.username) {
       const existing = await prisma.user.findFirst({
@@ -93,24 +125,6 @@ export async function PUT(request: Request) {
       }
     }
 
-    if (data.newPassword) {
-      if (!data.currentPassword) {
-        return ResponseHandler.badRequest("Password saat ini diperlukan untuk mengganti password")
-      }
-
-      const result = await auth.api.changePassword({
-        body: {
-          currentPassword: data.currentPassword,
-          newPassword: data.newPassword,
-          revokeOtherSessions: true,
-        },
-        headers: await headers(),
-      })
-      if (!result) {
-        return ResponseHandler.badRequest("Password saat ini salah")
-      }
-    }
-
     const user = await prisma.user.update({
       where: { id: session.user.id },
       data: {
@@ -118,6 +132,11 @@ export async function PUT(request: Request) {
         ...(data.username !== undefined && { username: data.username }),
         ...(data.quote !== undefined && { quote: data.quote }),
         ...(data.avatar !== undefined && { avatar: data.avatar }),
+        ...(data.phone !== undefined && { phone: data.phone }),
+        ...(data.address !== undefined && { address: data.address }),
+        ...(data.birthDate !== undefined && { birthDate: data.birthDate }),
+        ...(data.birthPlace !== undefined && { birthPlace: data.birthPlace }),
+        ...(data.gender !== undefined && { gender: data.gender }),
       },
       select: {
         username: true,
@@ -125,10 +144,19 @@ export async function PUT(request: Request) {
         fullname: true,
         quote: true,
         avatar: true,
+        phone: true,
+        address: true,
+        birthDate: true,
+        birthPlace: true,
+        gender: true,
       },
     })
 
     await logActivity(session.user.id, "UPDATE", "Profile", session.user.id)
+
+    if (data.avatar !== undefined && previous?.avatar && previous.avatar !== data.avatar) {
+      void deleteAttachmentByUrl(previous.avatar)
+    }
 
     return ResponseHandler.success("Profil berhasil diperbarui", user)
   } catch (error) {

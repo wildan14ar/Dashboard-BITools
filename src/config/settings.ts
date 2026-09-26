@@ -1,8 +1,7 @@
 export const settings = {
-  appName: "BI Dashboard",
   DATABASE_URL: process.env.DATABASE_URL!,
   BETTER_AUTH_URL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
-  BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET || "",
+  BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,
   NODE_ENV: process.env.NODE_ENV || "development",
 
   betterAuth: {
@@ -12,32 +11,36 @@ export const settings = {
       .filter(Boolean),
   },
 
-  /** Defaults for ad-hoc source queries (admin SQL runner). */
-  query: {
-    maxRows: 200,
-    timeoutSec: 30,
+  google: {
+    gaId: process.env.NEXT_PUBLIC_GA_ID || "",
+    gtmId: process.env.NEXT_PUBLIC_GTM_ID || "",
+    verification: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || "",
+  },
+  oauth: {
+    google: {
+      enabled: process.env.NEXT_PUBLIC_ENABLE_GOOGLE_AUTH === "true",
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    },
+    github: {
+      enabled: process.env.NEXT_PUBLIC_ENABLE_GITHUB_AUTH === "true",
+      clientId: process.env.GITHUB_CLIENT_ID || "",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
+    },
   },
 
-  engine: {
-    host: process.env.QUERY_ENGINE_HOST || "localhost:50051",
-    port: Number(process.env.QUERY_ENGINE_PORT || "50051"),
+  // Object storage (S3-compatible). Kosong = mode fallback simpan di DB.
+  s3: {
+    endpoint: process.env.S3_ENDPOINT || "",
+    region: process.env.S3_REGION || "auto",
+    bucket: process.env.S3_BUCKET || "",
+    accessKey: process.env.S3_ACCESS_KEY || "",
+    secretKey: process.env.S3_SECRET_KEY || "",
+    forcePathStyle: process.env.S3_FORCE_PATH_STYLE !== "false",
   },
 
-  redis: {
-    url: process.env.REDIS_URL || "redis://localhost:6379",
-    ttlSec: Number(process.env.QUERY_CACHE_TTL_SEC || "300"),
-    staleWindowSec: Number(process.env.QUERY_CACHE_STALE_WINDOW_SEC || "600"),
+  storage: {
+    // Batas ukuran upload global (bytes). Default 10 MB.
+    maxFileSize: Number(process.env.ATTACHMENTS_MAX_SIZE || 10 * 1024 * 1024),
   },
-
-  cron: {
-    secret: process.env.CRON_SECRET || "",
-  },
-
-  /** Upload file tabular (source kind=file). Disimpan di DATA_DIR/uploads. */
-  uploads: {
-    dir: process.env.DATA_DIR || "./data",
-    maxBytes: Number(process.env.UPLOAD_MAX_BYTES || 500 * 1024 * 1024),
-    chunkMaxBytes: 5 * 1024 * 1024,
-    allowedExts: [".csv", ".xlsx"],
-  },
-} as const
+}

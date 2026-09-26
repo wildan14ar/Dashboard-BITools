@@ -1,0 +1,5 @@
+# bun terinstall di ~/.bun/bin yang tidak ada di PATH non-interaktif git —
+# export di sini agar hook jalan di semua environment.
+export PATH="$HOME/.bun/bin:$PATH"
+
+bun run check-unused

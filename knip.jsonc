@@ -1,0 +1,9 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  // Ekspor yang hanya dipakai di file sendiri (query-key factories *Keys,
+  // helper/konstanta/tie internal, SYSTEM_USER seed) adalah API modul —
+  // bukan kode mati. Tanpa ini knip berisik false positive.
+  "ignoreExportsUsedInFile": true,
+  // Barrel shadcn/ui diekspor lengkap mengikuti konvensi shadcn.
+  "ignore": ["src/components/ui/**"]
+}

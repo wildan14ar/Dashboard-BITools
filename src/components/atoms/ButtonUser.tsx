@@ -2,9 +2,7 @@
 
 import { ChevronDown, LayoutDashboard } from "lucide-react"
 import Image from "next/image"
-import Link from "next/link"
 import { useState } from "react"
-import ButtonLogout from "@/components/atoms/ButtonLogout"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +10,17 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useAuth } from "@/hooks/use-auth"
+import { Link } from "@/i18n/navigation"
+import { authClient } from "@/lib/auth-client"
+import ButtonLogout from "./ButtonLogout"
+
+type ButtonUserMode = "dropdown" | "flow"
+
+interface ButtonUserProps {
+  mode?: ButtonUserMode
+  /** true = avatar + nama; false = avatar saja. */
+  showLabel?: boolean
+}
 
 function getInitials(name: string) {
   return name
@@ -61,23 +69,34 @@ function UserAvatar({
   )
 }
 
-export function ButtonUser({ mode = "dropdown" }: { mode?: "dropdown" | "flow" }) {
-  const { user, isLoading } = useAuth()
+export function ButtonUser({ mode = "dropdown", showLabel = true }: ButtonUserProps) {
+  const { data: session, isPending } = authClient.useSession()
   const [isOpen, setIsOpen] = useState(false)
 
-  if (isLoading) return null
-  if (!user) {
-    return (
-      <Link
-        href="/login"
-        className="text-sm font-medium text-muted-foreground hover:text-foreground"
-      >
-        Sign in
-      </Link>
-    )
-  }
+  if (isPending) return null
+  if (!session) return null
 
-  const displayName = user.fullname || user.username || user.email
+  const userName = session?.user?.name
+
+  const flowDropdown = (
+    <div className="w-full bg-muted/50 border border-border rounded-lg overflow-hidden">
+      <div className="px-4 py-3 border-b border-border">
+        <p className="text-sm font-medium text-foreground">{userName}</p>
+        <p className="text-xs text-muted-foreground truncate">{session?.user?.email}</p>
+      </div>
+      <div className="py-1">
+        <Link
+          href="/dashboard"
+          onClick={() => setIsOpen(false)}
+          className="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
+        >
+          <LayoutDashboard size={16} />
+          <span>Dashboard</span>
+        </Link>
+        <ButtonLogout className="mt-2" />
+      </div>
+    </div>
+  )
 
   if (mode === "flow") {
     return (
@@ -88,57 +107,50 @@ export function ButtonUser({ mode = "dropdown" }: { mode?: "dropdown" | "flow" }
           className="w-full flex items-center justify-between text-foreground hover:bg-accent rounded-lg px-4 py-3 transition-colors"
         >
           <div className="flex items-center gap-2">
-            <UserAvatar src={user.avatar} name={displayName} size={28} />
-            <span className="font-medium">{displayName}</span>
+            <div>
+              <UserAvatar src={session?.user?.image} name={userName} size={28} />
+            </div>
+            <span className="font-medium">{userName}</span>
           </div>
           <ChevronDown size={18} />
         </button>
-        {isOpen && (
-          <div className="w-full bg-muted/50 border border-border rounded-lg overflow-hidden">
-            <div className="px-4 py-3 border-b border-border">
-              <p className="text-sm font-medium text-foreground">{displayName}</p>
-              <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-            </div>
-            <div className="py-1">
-              <Link
-                href="/"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
-              >
-                <LayoutDashboard size={16} />
-                <span>Dashboard</span>
-              </Link>
-              <ButtonLogout className="mt-2" />
-            </div>
-          </div>
-        )}
+        {isOpen && flowDropdown}
       </div>
     )
   }
 
+  // Desktop dropdown mode
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
           type="button"
           className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent transition-colors outline-none"
+          aria-label={userName ?? "User menu"}
+          title={userName ?? undefined}
         >
-          <UserAvatar src={user.avatar} name={displayName} />
-          <span className="hidden md:inline-block text-sm font-medium text-foreground">
-            {displayName}
-          </span>
-          <ChevronDown size={16} className="hidden md:block" />
+          <div>
+            <UserAvatar src={session?.user?.image} name={userName} />
+          </div>
+          {showLabel && (
+            <>
+              <span className="hidden md:inline-block text-sm font-medium text-foreground">
+                {userName}
+              </span>
+              <ChevronDown size={16} className="hidden md:block" />
+            </>
+          )}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={4} className="w-56 shadow-lg">
         <DropdownMenuLabel className="font-normal mb-2 border-b border-border pb-2">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{displayName}</p>
-            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+            <p className="text-sm font-medium leading-none">{userName}</p>
+            <p className="text-xs leading-none text-muted-foreground">{session?.user?.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuItem asChild>
-          <Link href="/" className="w-full cursor-pointer flex items-center gap-2">
+          <Link href="/dashboard" className="w-full cursor-pointer flex items-center gap-2">
             <LayoutDashboard size={16} />
             <span>Dashboard</span>
           </Link>

@@ -1,8 +1,8 @@
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import prisma from "@/config/prisma"
-import { auth } from "@/lib/auth"
-import { getRedis, redisKey } from "@/lib/redis"
+import { API_KEY_HEADER, touchApiKey, verifyApiKey } from "./apikeys"
+import { auth } from "./auth"
 
 type BetterAuthSession = NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>
 
@@ -16,48 +16,23 @@ export type CachedPermissions = {
 }
 
 const CACHE_TTL_MS = 30_000
-const CACHE_TTL_SEC = 30
 
-// module-level Map, fallback bila Redis tak tersedia (single-instance).
+// ponytail: module-level Map, per-process cache; good enough for single-instance deploys
 const fallbackCache = new Map<string, CachedPermissions & { userId: string }>()
-
-async function readSharedCache(userId: string): Promise<CachedPermissions | null> {
-  const fallback = fallbackCache.get(userId)
-  if (fallback && Date.now() - fallback.fetchedAt < CACHE_TTL_MS) return fallback
-  try {
-    const redis = getRedis()
-    if (!redis) return fallback && Date.now() - fallback.fetchedAt < CACHE_TTL_MS ? fallback : null
-    const raw = await redis.get(redisKey("perms", userId))
-    if (!raw) return null
-    const parsed = JSON.parse(raw) as CachedPermissions
-    if (Date.now() - parsed.fetchedAt > CACHE_TTL_MS) return null
-    return parsed
-  } catch {
-    return fallback && Date.now() - fallback.fetchedAt < CACHE_TTL_MS ? fallback : null
-  }
-}
-
-async function writeSharedCache(userId: string, result: CachedPermissions) {
-  fallbackCache.set(userId, { ...result, userId })
-  try {
-    const redis = getRedis()
-    if (redis)
-      await redis.set(redisKey("perms", userId), JSON.stringify(result), "EX", CACHE_TTL_SEC)
-  } catch {
-    // Redis opsional; fallback memori sudah terisi.
-  }
-}
 
 function authErr(body: object, status: number): { error: NextResponse; session: AuthSession } {
   return {
     error: NextResponse.json(body, { status }),
+    // ponytail: caller always checks error first, session never accessed
     session: {} as AuthSession,
   }
 }
 
 export async function fetchAndCachePermissions(userId: string): Promise<CachedPermissions | null> {
-  const shared = await readSharedCache(userId)
-  if (shared) return shared
+  const entry = fallbackCache.get(userId)
+  if (entry && Date.now() - entry.fetchedAt < CACHE_TTL_MS) {
+    return entry
+  }
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -86,30 +61,19 @@ export async function fetchAndCachePermissions(userId: string): Promise<CachedPe
   }
 
   fallbackCache.set(userId, { ...result, userId })
-  await writeSharedCache(userId, result)
   return result
-}
-
-export async function invalidatePermissionCache(userId?: string) {
-  if (userId) {
-    fallbackCache.delete(userId)
-    try {
-      const redis = getRedis()
-      if (redis) await redis.del(redisKey("perms", userId))
-    } catch {
-      // abaikan; TTL 30 detik membersihkan sendiri
-    }
-  } else {
-    fallbackCache.clear()
-  }
 }
 
 export async function requireAuth(options?: {
   permissions?: string[]
 }): Promise<{ error: NextResponse | null; session: AuthSession }> {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const hdrs = await headers()
+  const session = await auth.api.getSession({ headers: hdrs })
 
   if (!session) {
+    // Fallback server-to-server: X-API-Key (scope-based, bukan role).
+    const rawKey = hdrs.get(API_KEY_HEADER)
+    if (rawKey) return requireApiKey(rawKey, options?.permissions ?? [])
     return authErr({ error: "Tidak terautentikasi" }, 401)
   }
 
@@ -132,5 +96,50 @@ export async function requireAuth(options?: {
     return authErr({ error: "Tidak memiliki izin akses" }, 403)
   }
 
+  return { error: null, session }
+}
+
+/**
+ * Auth via X-API-Key. Hak akses = permission user pemilik saat ini
+ * (superadmin bypass). Session disintesis tanpa cookie — caller yang butuh
+ * session cookie (ganti password, sesi saat ini) tidak didukung untuk key.
+ */
+async function requireApiKey(
+  rawKey: string,
+  required: string[],
+): Promise<{ error: NextResponse | null; session: AuthSession }> {
+  const verified = await verifyApiKey(rawKey)
+  if (!verified) {
+    return authErr({ error: "API key tidak valid atau kedaluwarsa" }, 401)
+  }
+
+  const record = await prisma.apiKey.findUnique({
+    where: { id: verified.id },
+    select: { isRestfull: true },
+  })
+  if (!record?.isRestfull) {
+    return authErr({ error: "API key ini tidak diizinkan untuk REST" }, 403)
+  }
+
+  // Hak key mengikuti pemiliknya — bukan scope per-key.
+  const cached = await fetchAndCachePermissions(verified.userId)
+  if (!cached) {
+    return authErr({ error: "Akun pemilik key tidak aktif" }, 401)
+  }
+  if (!cached.isSuperAdmin && required.length > 0) {
+    const allowed = required.some((p) => cached.permissions.includes(p))
+    if (!allowed) {
+      return authErr({ error: "Tidak memiliki izin akses" }, 403)
+    }
+  }
+
+  // Catat pemakaian tanpa menghambat respons.
+  void touchApiKey(verified.id)
+
+  const session = {
+    user: { id: verified.userId },
+    session: null,
+    apiKey: { id: verified.id },
+  } as unknown as AuthSession
   return { error: null, session }
 }

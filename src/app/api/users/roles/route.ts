@@ -2,6 +2,11 @@ import { type NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import prisma from "@/config/prisma"
 import { logActivity } from "@/lib/activity"
+import { applyFieldsMany, parseFields } from "@/lib/fields"
+import { idempotencyScope, rememberIdempotent, tryReplayIdempotent } from "@/lib/idempotency"
+import { paginateMeta, parsePagination } from "@/lib/pagination"
+import { getRequestId } from "@/lib/request-id"
+import { parseSort } from "@/lib/sort"
 import { RequestHandler, ResponseHandler, requireAuth } from "@/middlewares"
 import { RoleSchema } from "@/validations"
 
@@ -19,45 +24,59 @@ export async function GET(request: NextRequest) {
           page: z.string().optional(),
           limit: z.string().optional(),
           search: z.string().optional(),
-          sort: z.enum(["createdAt", "name"]).default("createdAt"),
-          order: z.enum(["asc", "desc"]).default("desc"),
+          // Sort disanitasi via parseSort() (fallback ke default, tanpa 400).
+          sort: z.string().optional(),
+          order: z.string().optional(),
+          // Postman: field selection — ?fields=name,permissions
+          fields: z.string().optional(),
         }),
       }),
       request,
     )
     if (validation instanceof NextResponse) return validation
+    const requestId = getRequestId(request)
 
-    const { page: pageStr, limit: limitStr } = validation.query
-    const page = Number(pageStr) || 1
-    const limit = Number(limitStr) || 10
-    const skip = (page - 1) * limit
+    const { page, limit, skip } = parsePagination({
+      page: validation.query.page,
+      limit: validation.query.limit,
+    })
     const take = limit
+    const { sort, order } = parseSort(validation.query, { allowed: ["createdAt", "name"] })
+
+    const allowedFields = ["id", "name", "description", "permissions", "createdAt", "updatedAt"]
+    const { fields, unknown } = parseFields(validation.query.fields, allowedFields)
+    if (validation.query.fields && fields !== null && fields.length === 0) {
+      return ResponseHandler.badRequest(
+        `Unknown fields: ${unknown.join(", ")}. Allowed: ${allowedFields.join(", ")}`,
+        { field: "fields" },
+        { code: "VALIDATION_ERROR", requestId },
+      )
+    }
+
     const [roles, total] = await Promise.all([
       prisma.role.findMany({
         take,
         skip,
         include: {
-          permissions: true,
+          permissions: true, // Grant langsung (FK roleId), bukan join table
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { [sort]: order },
       }),
       prisma.role.count(),
     ])
 
-    // Transform permissions relation to strings (actions) for frontend compatibility
+    // Transform ke array action untuk kompatibilitas frontend
     const rolesFormatted = roles.map((role) => ({
       ...role,
       permissions: role.permissions.map((p) => p.action),
     }))
 
-    return ResponseHandler.success("Roles fetched successfully", {
-      items: rolesFormatted,
-      pagination: {
-        page,
-        limit,
-        total,
-      },
-    })
+    return ResponseHandler.paginated(
+      "Roles fetched successfully",
+      applyFieldsMany(rolesFormatted, fields),
+      paginateMeta(page, limit, total),
+      { requestId },
+    )
   } catch (error) {
     await logActivity(userId, "ERROR", "Role", "list", {
       error: String(error),
@@ -72,6 +91,9 @@ export async function POST(request: NextRequest) {
   })
   if (error) return error
   const userId = session?.user?.id
+
+  const replay = await tryReplayIdempotent(request, idempotencyScope(session?.user?.id))
+  if (replay) return replay
 
   try {
     const validation = await RequestHandler.validateRequest(
@@ -89,30 +111,31 @@ export async function POST(request: NextRequest) {
     })
 
     if (existingRole) {
-      return ResponseHandler.badRequest("Nama role sudah digunakan")
+      return ResponseHandler.conflict("Nama role sudah digunakan", { field: "name" })
     }
 
-    // Map permission strings (actions) to connections
-    let permissionConnections = {}
+    // Map permission strings (actions) → salinan baris milik role ini.
+    // Katalog (roleId null) hanya referensi label/deskripsi, tidak di-assign.
+    let grantCreates: { action: string; label: string; description: string | null }[] = []
     if (permissions && permissions.length > 0) {
       // Find permissions that exist by action
-      const existingPermissions = await prisma.rolePermission.findMany({
-        where: { action: { in: permissions } },
-        select: { id: true, action: true },
+      const catalog = await prisma.rolePermission.findMany({
+        where: { action: { in: permissions }, roleId: null },
+        select: { action: true, label: true, description: true },
       })
 
-      if (existingPermissions.length > 0) {
-        permissionConnections = {
-          connect: existingPermissions.map((p) => ({ id: p.id })),
-        }
-      }
+      grantCreates = catalog.map((p) => ({
+        action: p.action,
+        label: p.label,
+        description: p.description,
+      }))
     }
 
     const role = await prisma.role.create({
       data: {
         name,
         description,
-        permissions: permissionConnections,
+        permissions: grantCreates.length > 0 ? { create: grantCreates } : undefined,
       },
       include: {
         permissions: true,
@@ -125,7 +148,11 @@ export async function POST(request: NextRequest) {
     }
 
     await logActivity(userId, "CREATE", "Role", role.id, { name })
-    return ResponseHandler.created("Role berhasil dibuat", roleFormatted)
+    return rememberIdempotent(
+      request,
+      idempotencyScope(session?.user?.id),
+      ResponseHandler.created("Role berhasil dibuat", roleFormatted),
+    )
   } catch (error) {
     await logActivity(userId, "ERROR", "Role", "create", {
       error: String(error),

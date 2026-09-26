@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test"
-import { hashPassword, verifyPassword } from "@/lib/hash"
+import { hashPassword, verifyPassword } from "@/lib/password"
 
 test("hashPassword returns argon2 hash", async () => {
   const hash = await hashPassword("password123")
