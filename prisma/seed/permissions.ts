@@ -2,6 +2,29 @@ import type { PrismaClient } from "../../src/config/prisma"
 
 const FEATURE_REGISTRY = [
   {
+    group: "BI Tools",
+    features: [
+      {
+        key: "sources",
+        label: "Sources",
+        description: "BI data sources management",
+        actions: ["read", "create", "update", "delete"],
+      },
+      {
+        key: "datasets",
+        label: "Datasets",
+        description: "BI datasets management",
+        actions: ["read", "create", "update", "delete"],
+      },
+      {
+        key: "dashboards",
+        label: "Dashboards",
+        description: "BI dashboards management",
+        actions: ["create", "update", "delete", "admin"],
+      },
+    ],
+  },
+  {
     group: "File Storage",
     features: [
       {

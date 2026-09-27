@@ -4,12 +4,15 @@ import {
   CalendarDays,
   ChevronRight,
   Clock,
+  Database,
   FolderClosed,
   HardDrive,
   House,
   KeyRound,
   LayoutDashboard,
   Menu,
+  Presentation,
+  Table,
   Users,
 } from "lucide-react"
 import Link from "next/link"
@@ -100,27 +103,32 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       href: "/calendar",
     },
     {
-      key: "files",
+      key: "bi-dashboards",
       translations: {
-        id: "File Saya",
-        en: "My Files",
+        id: "Dashboard BI",
+        en: "BI Dashboards",
       },
-      icon: <FolderClosed size={20} />,
-      href: "/attachment",
+      icon: <Presentation size={20} />,
+      href: "/dashboards",
     },
-    ...(can(["attachments:admin"])
-      ? [
-          {
-            key: "storage",
-            translations: {
-              id: "Storage",
-              en: "Storage",
-            },
-            icon: <HardDrive size={20} />,
-            href: "/storage",
-          },
-        ]
-      : []),
+    {
+      key: "bi-datasets",
+      translations: {
+        id: "Dataset",
+        en: "Datasets",
+      },
+      icon: <Table size={20} />,
+      href: "/datasets",
+    },
+    {
+      key: "bi-sources",
+      translations: {
+        id: "Source Data",
+        en: "Data Sources",
+      },
+      icon: <Database size={20} />,
+      href: "/sources",
+    },
     ...(can(["users:admin"])
       ? [
           {
@@ -142,6 +150,19 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                 href: "/roles",
               },
             ],
+          },
+        ]
+      : []),
+    ...(can(["attachments:admin"])
+      ? [
+          {
+            key: "storage",
+            translations: {
+              id: "Storage",
+              en: "Storage",
+            },
+            icon: <HardDrive size={20} />,
+            href: "/storage",
           },
         ]
       : []),
@@ -169,6 +190,15 @@ export default function DashboardShell({ children }: { children: React.ReactNode
           },
         ]
       : []),
+    {
+      key: "attachment",
+      translations: {
+        id: "File Saya",
+        en: "My Files",
+      },
+      icon: <FolderClosed size={20} />,
+      href: "/attachment",
+    },
     ...(can(["keys:read", "keys:create", "keys:update", "keys:delete"])
       ? [
           {

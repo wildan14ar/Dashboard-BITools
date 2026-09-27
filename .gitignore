@@ -50,3 +50,5 @@ graphify-out
 .opencode
 .playwright-mcp
 /engine/.venv/
+__pycache__/
+*.py[cod]
