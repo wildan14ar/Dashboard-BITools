@@ -139,6 +139,13 @@ export default function proxy(request: NextRequest) {
     return NextResponse.next({ request: { headers: reqHeaders } })
   }
 
+  // Viewer dashboard publik & embed (/bi/*) — TANPA session. Endpoint datanya
+  // sendiri yang mengunci: hanya dashboard ber-isPublic yang bisa dibaca, dan
+  // rate-limit proxy tetap berlaku untuk /api/*.
+  if (pathname === "/bi" || pathname.startsWith("/bi/")) {
+    return NextResponse.next({ request: { headers: reqHeaders } })
+  }
+
   // Semua halaman lain = dashboard privat: wajib session.
   if (!sessionCookie) {
     const loginUrl = new URL("/login", request.url)

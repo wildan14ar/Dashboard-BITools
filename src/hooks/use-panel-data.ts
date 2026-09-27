@@ -34,6 +34,13 @@ export function usePanelData(panels: PanelLike[] | null | undefined) {
 
   useEffect(() => {
     if (!panels?.length) return
+    // Tidak ada panel yang terikat dataset → tidak perlu memanggil engine.
+    if (!panels.some((p) => p.dataSetId)) {
+      setPanelData({})
+      return
+    }
+    // Tandai null lebih dulu supaya tidak tampil "loading" selama request.
+    setPanelData(emptyResults(panels))
     let cancelled = false
     const paramsOf = (panel: PanelLike) => {
       const own = filtersToParams((panel.config?.filters as FilterDef[]) ?? [])
@@ -44,7 +51,14 @@ export function usePanelData(panels: PanelLike[] | null | undefined) {
       try {
         // Satu round-trip untuk semua panel; fallback ke per-panel bila batch gagal.
         results = await runViaBatch(panels, paramsOf)
-      } catch {
+      } catch (err) {
+        // 401 = tidak punya sesi/API key. Fallback per-panel akan 401 juga,
+        // jadi jangan dibuang request sia-sia. Tandai `null` (bukan undefined)
+        // supaya PanelBody menampilkan "No data", bukan spinner abadi.
+        if (isAuthError(err)) {
+          if (!cancelled) setPanelData(emptyResults(panels))
+          return
+        }
         results = await runPerPanel(panels, paramsOf)
       }
       if (!cancelled) setPanelData(results)
@@ -60,18 +74,30 @@ export function usePanelData(panels: PanelLike[] | null | undefined) {
 
 type BatchItemResult = { datasetId: string; data: RunData | null; error: string | null }
 
+/** Pesan yang dilempar api.ts saat 401/403. */
+function isAuthError(err: unknown): boolean {
+  return err instanceof Error && /session expired|permission to access/i.test(err.message)
+}
+
+/** Semua panel ber-dataset → null ("no data"), bukan undefined (loading). */
+function emptyResults(panels: PanelLike[]): Record<string, RunData | null> {
+  return Object.fromEntries(panels.filter((p) => p.dataSetId).map((p) => [p.id, null]))
+}
+
 async function runViaBatch(
   panels: PanelLike[],
   paramsOf: (panel: PanelLike) => Record<string, string>,
 ): Promise<Record<string, RunData | null>> {
+  const items = panels.flatMap((p) =>
+    p.dataSetId ? [{ datasetId: p.dataSetId, params: paramsOf(p) }] : [],
+  )
+  // batchRunSchema mewajibkan items.min(1) — dashboard yang seluruh panelnya
+  // tanpa dataset (mis. panel teks) akan 400 bila tetap dikirim.
+  if (items.length === 0) return {}
+
   const res = await api.post<BatchItemResult[]>(
     "/datasets/run-batch",
-    {
-      items: panels.flatMap((p) =>
-        p.dataSetId ? [{ datasetId: p.dataSetId, params: paramsOf(p) }] : [],
-      ),
-      useCache: false,
-    },
+    { items, useCache: false },
     { timeoutMs: 300_000 },
   )
   const results: Record<string, RunData | null> = {}

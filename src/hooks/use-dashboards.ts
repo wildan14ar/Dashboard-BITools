@@ -80,6 +80,7 @@ export const dashboardKeys = {
   all: ["dashboards"] as const,
   list: () => [...dashboardKeys.all, "list"] as const,
   detail: (id: string) => [...dashboardKeys.all, "detail", id] as const,
+  public: (id: string) => [...dashboardKeys.all, "public", id] as const,
 }
 
 export function useDashboards() {
@@ -101,6 +102,36 @@ export function useDashboard(id: string | null) {
     },
     enabled: !!id,
   })
+}
+
+/**
+ * Dashboard PUBLIK tanpa session (dipakai /bi/[id] dan /bi/embed/[id]).
+ * Endpoint menyaring isPublic + hanya panel ber-dataset, dan tidak
+ * menyertakan userId/members.
+ */
+export function usePublicDashboard(id: string | null) {
+  return useQuery({
+    queryKey: dashboardKeys.public(id ?? ""),
+    queryFn: async () => {
+      const { data } = await api.get<PublicDashboard>(`/public/dashboards/${id}`, {
+        timeoutMs: 120_000,
+      })
+      return data
+    },
+    enabled: !!id,
+    staleTime: 60_000,
+    retry: false,
+  })
+}
+
+export type PublicDashboard = {
+  id: string
+  name: string
+  isPublic: boolean
+  panels: Pick<
+    BiPanel,
+    "id" | "dataSetId" | "title" | "chartType" | "config" | "x" | "y" | "w" | "h"
+  >[]
 }
 
 export function useCreateDashboard() {

@@ -193,8 +193,8 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     {
       key: "attachment",
       translations: {
-        id: "File Saya",
-        en: "My Files",
+        id: "Attachment",
+        en: "Attachments",
       },
       icon: <FolderClosed size={20} />,
       href: "/attachment",

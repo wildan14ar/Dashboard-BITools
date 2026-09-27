@@ -2,6 +2,7 @@ import "@/styles/globals.css"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { headers } from "next/headers"
+import Script from "next/script"
 import type { ReactNode } from "react"
 import { settings } from "@/config/settings"
 import { routing } from "@/i18n/routing"
@@ -20,6 +21,8 @@ type Props = {
   children: ReactNode
 }
 
+const THEME_INIT_SCRIPT = `;(function(){try{var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`
+
 // metadataBase di root agar semua rute (dashboard, login,
 // register) tidak warning "metadataBase not set" untuk OG/Twitter images.
 export const metadata: Metadata = {
@@ -37,14 +40,14 @@ export default async function RootLayout({ children }: Props) {
   return (
     <html lang={locale} suppressHydrationWarning className="scrollbar-hide">
       <head>
-        {/* Inline polos (bukan next/script): urutan eksekusi deterministik
-            sebelum body di-parse — anti-FOUC theme. Identik di SSR & client,
-            jadi tidak ada hydration error. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `;(function(){try{var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`,
-          }}
-        />
+        {/* Anti-FOUC theme. Pakai next/script beforeInteractive (bukan <script>
+            inline) supaya Next yang menyuntik ke HTML awal — React 19 memunculkan
+            "Encountered a script tag while rendering" untuk <script> yang
+            di-render sebagai komponen. beforeInteractive juga dijamin jalan
+            sebelum body di-parse, jadi tema tidak pernah flash. */}
+        <Script id="theme-init" strategy="beforeInteractive">
+          {THEME_INIT_SCRIPT}
+        </Script>
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased scrollbar-hide`}>
         {children}

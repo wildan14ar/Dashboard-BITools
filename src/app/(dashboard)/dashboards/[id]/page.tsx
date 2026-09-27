@@ -53,12 +53,14 @@ function DashboardViewContent({ id }: { id: string }) {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <Link href={`/bi/embed/${dashboard.id}`} target="_blank">
-              <Button variant="outline" size="sm">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Embed
-              </Button>
-            </Link>
+            <Protected permissions={["dashboards:admin"]}>
+              <Link href={`/bi/${dashboard.id}`} target="_blank">
+                <Button variant="outline" size="sm">
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Lihat Publik
+                </Button>
+              </Link>
+            </Protected>
             <Protected permissions={["dashboards:update"]}>
               <Link href={`/dashboards/${dashboard.id}/edit`}>
                 <Button size="sm">
