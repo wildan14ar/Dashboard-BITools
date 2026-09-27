@@ -67,7 +67,14 @@ export interface UpdatePanelInput {
   chartType?: string
   dataSetId?: string | null
   config?: Record<string, unknown>
+  x?: number
+  y?: number
+  w?: number
+  h?: number
 }
+
+/** Alias kompatibilitas untuk komponen visual editor. */
+export type Panel = BiPanel
 
 export interface CreateFilterInput {
   name: string
@@ -192,6 +199,27 @@ export function useDeletePanel() {
   return useMutation({
     mutationFn: async (vars: { dashboardId: string; panelId: string }) => {
       const { data } = await api.delete(`/dashboards/${vars.dashboardId}/panels/${vars.panelId}`)
+      return data
+    },
+    onSuccess: (_data, vars) => invalidateDetail(queryClient, vars.dashboardId),
+  })
+}
+
+export interface ReorderPanelInput {
+  id: string
+  x: number
+  y: number
+  w: number
+  h: number
+}
+
+/** Simpan posisi/ukuran panel (drag-drop editor). */
+export function useReorderPanels() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (vars: { dashboardId: string; panels: ReorderPanelInput[] }) => {
+      const { data } = await api.put(`/dashboards/${vars.dashboardId}/panels/reorder`, vars.panels)
       return data
     },
     onSuccess: (_data, vars) => invalidateDetail(queryClient, vars.dashboardId),

@@ -125,7 +125,11 @@ export interface RunDatasetInput {
 export function useRunDataset() {
   return useMutation({
     mutationFn: async ({ datasetId, params = {}, cache = true }: RunDatasetInput) => {
-      const { data } = await api.post<RunData>(`/datasets/${datasetId}/run`, { params, cache })
+      const { data } = await api.post<RunData>(
+        `/datasets/${datasetId}/run`,
+        { params, cache },
+        { timeoutMs: 180_000 },
+      )
       return data
     },
   })
@@ -135,7 +139,9 @@ export function useRunDataset() {
 export function useRunDatasetBatch() {
   return useMutation({
     mutationFn: async (input: { items: BatchRunItem[]; useCache?: boolean }) => {
-      const { data } = await api.post<BatchRunResult[]>("/datasets/run-batch", input)
+      const { data } = await api.post<BatchRunResult[]>("/datasets/run-batch", input, {
+        timeoutMs: 300_000,
+      })
       return data
     },
   })

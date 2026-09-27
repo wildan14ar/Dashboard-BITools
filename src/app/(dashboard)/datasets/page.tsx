@@ -1,6 +1,7 @@
 "use client"
 
 import { Loader2, Pencil, Play, Plus, Trash2 } from "lucide-react"
+import Link from "next/link"
 import { Suspense, useState } from "react"
 import ResultTable from "@/components/bi/ResultTable"
 import { Protected } from "@/components/Protected"
@@ -204,7 +205,12 @@ function DatasetsContent() {
                   className="rounded-lg border border-border p-4 hover:bg-accent/30 transition-colors"
                 >
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-semibold">{d.name}</span>
+                    <Link
+                      href={`/datasets/${d.id}`}
+                      className="text-sm font-semibold hover:text-primary hover:underline"
+                    >
+                      {d.name}
+                    </Link>
                     {d.isPublic && (
                       <span className="text-[11px] font-medium rounded bg-green-500/10 text-green-600 dark:text-green-400 px-2 py-0.5">
                         public

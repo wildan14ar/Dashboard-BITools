@@ -1,5 +1,7 @@
 from sqlalchemy import Engine, inspect
 
+from src.config import INTROSPECT_MAX_OBJECTS, INTROSPECT_SCHEMAS, SYSTEM_SCHEMAS
+
 
 def _get_columns(inspector, table_name: str, schema_name: str) -> list[dict]:
     pks = set(
@@ -34,28 +36,61 @@ def _get_columns(inspector, table_name: str, schema_name: str) -> list[dict]:
     return columns
 
 
+def _target_schemas(inspector) -> list[str]:
+    """Schema yang perlu diintrospeksi.
+
+    Introspeksi di SQLAlchemy}~3 query per objek, dan kueri katalog pada
+    schema sistem (information_schema) jauh lebih lambat karena view-nya
+    sendiri dihitung per-panggilan. Karena itu schema sistem selalu
+    dilewati, dan daftar schema yang dipindai bisa dipersempit lewat env
+    INTROSPECT_SCHEMAS (kosong = semua schema non-sistem).
+    """
+    available = [
+        s for s in sorted(inspector.get_schema_names()) if s not in SYSTEM_SCHEMAS
+    ]
+    if not INTROSPECT_SCHEMAS:
+        return available
+    wanted = [s.strip() for s in INTROSPECT_SCHEMAS.split(",") if s.strip()]
+    return [s for s in available if s in wanted]
+
+
 def get_schema(engine: Engine) -> list[dict]:
     inspector = inspect(engine)
-    items = []
+    items: list[dict] = []
+    truncated = False
 
-    for schema_name in sorted(inspector.get_schema_names()):
-        for table_name in sorted(inspector.get_table_names(schema=schema_name)):
+    for schema_name in _target_schemas(inspector):
+        objects: list[tuple[str, str]] = [
+            (name, "table")
+            for name in sorted(inspector.get_table_names(schema=schema_name))
+        ] + [
+            (name, "view")
+            for name in sorted(inspector.get_view_names(schema=schema_name))
+        ]
+
+        for name, kind in objects:
+            if len(items) >= INTROSPECT_MAX_OBJECTS:
+                truncated = True
+                break
             items.append(
                 {
-                    "name": table_name,
+                    "name": name,
                     "schema": schema_name,
-                    "type": "table",
-                    "columns": _get_columns(inspector, table_name, schema_name),
+                    "type": kind,
+                    "columns": _get_columns(inspector, name, schema_name),
                 }
             )
-        for view_name in sorted(inspector.get_view_names(schema=schema_name)):
-            items.append(
-                {
-                    "name": view_name,
-                    "schema": schema_name,
-                    "type": "view",
-                    "columns": _get_columns(inspector, view_name, schema_name),
-                }
-            )
+        if truncated:
+            break
+
+    if truncated:
+        items.append(
+            {
+                "name": f"...dipotong pada batas {INTROSPECT_MAX_OBJECTS} objek",
+                "schema": "",
+                "type": "notice",
+                "columns": [],
+            }
+        )
 
     return items

@@ -22,12 +22,18 @@ function clearAuthStorage(): void {
   }
 }
 
+type RequestOpts = {
+  idempotencyKey?: string
+  /** Timeout fetch per-request (ms). Default 10 detik. */
+  timeoutMs?: number
+}
+
 async function request<T>(
   method: string,
   path: string,
   body?: unknown,
   params?: Params,
-  opts?: { idempotencyKey?: string },
+  opts?: RequestOpts,
 ): Promise<ApiEnvelope<T>> {
   const url = new URL(`${API_PREFIX}${path}`, window.location.origin)
   if (params) {
@@ -47,9 +53,12 @@ async function request<T>(
       headers: Object.keys(headers).length > 0 ? headers : undefined,
       body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
       credentials: "same-origin",
-      signal: AbortSignal.timeout(10_000),
+      signal: AbortSignal.timeout(opts?.timeoutMs ?? 10_000),
     })
-  } catch {
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "TimeoutError") {
+      throw new Error("Permintaan timeout. Server/DB lambat merespons, coba lagi.")
+    }
     throw new Error("Network error. Please check your connection.")
   }
 
@@ -99,14 +108,16 @@ async function request<T>(
 }
 
 const api = {
-  get: <T = unknown>(path: string, config?: { params?: Params }) =>
-    request<T>("GET", path, undefined, config?.params),
-  post: <T = unknown>(path: string, body?: unknown, opts?: { idempotencyKey?: string }) =>
+  get: <T = unknown>(path: string, config?: { params?: Params; timeoutMs?: number }) =>
+    request<T>("GET", path, undefined, config?.params, { timeoutMs: config?.timeoutMs }),
+  post: <T = unknown>(path: string, body?: unknown, opts?: RequestOpts) =>
     request<T>("POST", path, body, undefined, opts),
-  put: <T = unknown>(path: string, body?: unknown) => request<T>("PUT", path, body),
-  patch: <T = unknown>(path: string, body?: unknown) => request<T>("PATCH", path, body),
-  delete: <T = unknown>(path: string, config?: { params?: Params }) =>
-    request<T>("DELETE", path, undefined, config?.params),
+  put: <T = unknown>(path: string, body?: unknown, opts?: RequestOpts) =>
+    request<T>("PUT", path, body, undefined, opts),
+  patch: <T = unknown>(path: string, body?: unknown, opts?: RequestOpts) =>
+    request<T>("PATCH", path, body, undefined, opts),
+  delete: <T = unknown>(path: string, config?: { params?: Params; timeoutMs?: number }) =>
+    request<T>("DELETE", path, undefined, config?.params, { timeoutMs: config?.timeoutMs }),
 }
 
 export default api

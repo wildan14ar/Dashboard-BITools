@@ -135,7 +135,9 @@ export function useDeleteSource() {
 export function useTestSourceConfig() {
   return useMutation({
     mutationFn: async (input: CreateSourceInput) => {
-      const { data } = await api.post<{ ok: boolean; error?: string }>("/sources/test", input)
+      const { data } = await api.post<{ ok: boolean; error?: string }>("/sources/test", input, {
+        timeoutMs: 60_000,
+      })
       return data
     },
   })
@@ -145,10 +147,69 @@ export function useTestSourceConfig() {
 export function useTestSource() {
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data } = await api.post<{ ok: boolean; error?: string }>(`/sources/${id}/test`)
+      const { data } = await api.post<{ ok: boolean; error?: string }>(
+        `/sources/${id}/test`,
+        undefined,
+        { timeoutMs: 60_000 },
+      )
       return data
     },
   })
+}
+
+export interface SchemaForeignKey {
+  table?: string
+  column?: string
+}
+
+export interface SchemaColumn {
+  name?: string
+  type?: string
+  nullable?: boolean
+  isPrimaryKey?: boolean
+  foreignKey?: SchemaForeignKey | null
+}
+
+export interface SchemaTable {
+  name?: string
+  schema?: string
+  type?: string
+  columns?: SchemaColumn[]
+}
+
+export interface SchemaInfo {
+  tables?: SchemaTable[]
+}
+
+/** Bentuk tabel yang sudah dinormalisasi untuk Database Explorer. */
+export interface TableItem {
+  name: string
+  schema: string
+  type: "table" | "view" | "notice"
+  columns: {
+    name: string
+    type: string
+    nullable: boolean
+    isPrimaryKey?: boolean
+    foreignKey?: { table: string; column: string } | null
+  }[]
+}
+
+function normalizeSchema(data: SchemaInfo | null | undefined): TableItem[] {
+  return (data?.tables ?? []).map((t) => ({
+    name: t.name ?? "",
+    schema: t.schema || "public",
+    type: (t.type as TableItem["type"]) ?? "table",
+    columns: (t.columns ?? []).map((c) => ({
+      name: c.name ?? "",
+      type: c.type ?? "",
+      nullable: c.nullable !== false,
+      isPrimaryKey: c.isPrimaryKey === true,
+      foreignKey: c.foreignKey?.table
+        ? { table: c.foreignKey.table, column: c.foreignKey.column ?? "" }
+        : null,
+    })),
+  }))
 }
 
 /** Ambil schema (daftar tabel + kolom) source tersimpan. */
@@ -156,12 +217,17 @@ export function useSourceSchema(id: string | null) {
   return useQuery({
     queryKey: sourceKeys.schema(id ?? ""),
     queryFn: async () => {
-      const { data } = await api.get<{
-        tables?: { name?: string; schema?: string; columns?: { name?: string; type?: string }[] }[]
-      }>(`/sources/${id}/schema`)
-      return data
+      // Introspeksi DB remote bisa >10 detik — timeout panjang + cache 5 menit.
+      const { data } = await api.get<SchemaInfo>(`/sources/${id}/schema`, {
+        timeoutMs: 120_000,
+      })
+      return normalizeSchema(data)
     },
     enabled: !!id,
+    staleTime: 5 * 60_1000,
+    gcTime: 10 * 60_1000,
+    retry: 1,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -175,7 +241,11 @@ export interface RunSourceInput {
 export function useRunSource() {
   return useMutation({
     mutationFn: async ({ id, sql, cache = true }: RunSourceInput) => {
-      const { data } = await api.post<RunData>(`/sources/${id}/run`, { sql, cache })
+      const { data } = await api.post<RunData>(
+        `/sources/${id}/run`,
+        { sql, cache },
+        { timeoutMs: 180_000 },
+      )
       return data
     },
   })

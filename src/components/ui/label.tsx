@@ -18,4 +18,10 @@ function Label({ className, ...props }: React.ComponentProps<typeof LabelPrimiti
   )
 }
 
-export { Label }
+function FieldError({ className, ...props }: React.ComponentProps<"p">) {
+  return (
+    <p data-slot="field-error" className={cn("text-xs text-destructive", className)} {...props} />
+  )
+}
+
+export { FieldError, Label }

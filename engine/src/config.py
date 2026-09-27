@@ -16,10 +16,21 @@ TIMEOUT_SEC_HARD = 300
 DB_POOL_SIZE = int(os.getenv("DB_POOL_SIZE", "5"))
 DB_MAX_OVERFLOW = int(os.getenv("DB_MAX_OVERFLOW", "10"))
 
+# Introspeksi schema (engine/src/introspector.py)
+# Schema sistem SELALU dilewati: view information_schema dihitung ulang per
+# query sehingga ~1,7s per objek dan membuat GetSchema timeout pada DB besar.
+SYSTEM_SCHEMAS = {"information_schema", "pg_catalog", "pg_toast"}
+# Daftar schema yang dipindai, dipisah koma. Kosong = semua schema non-sistem.
+INTROSPECT_SCHEMAS = os.getenv("INTROSPECT_SCHEMAS", "")
+# Pengaman agar introspeksi tidak meledak pada database dengan ribuan objek.
+INTROSPECT_MAX_OBJECTS = int(os.getenv("INTROSPECT_MAX_OBJECTS", "500"))
+
 # File/tabular sources (engine/src/conn/file.py)
 # Direktori data bersama dashboard (upload) — di compose: /data via volume.
 # Default lokal: ./data di repo root (sejajar dengan dashboard).
-DATA_DIR = os.getenv("DATA_DIR", str(Path(__file__).resolve().parent.parent.parent / "data"))
+DATA_DIR = os.getenv(
+    "DATA_DIR", str(Path(__file__).resolve().parent.parent.parent / "data")
+)
 # Batas fetch URL/Sheets per query (bytes). Parse berhenti lebih awal
 # begitu limit baris tercapai (early-stop), jadi ini hanya pagu darurat.
 FETCH_MAX_BYTES = int(os.getenv("FETCH_MAX_BYTES", str(500 * 1024 * 1024)))
