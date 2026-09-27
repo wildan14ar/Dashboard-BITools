@@ -1,0 +1,75 @@
+---
+name: Bug report
+description: Ada yang tidak behave seperti seharusnya
+labels: bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Terima kasih sudah melapor. **Jangan** gunakan issue ini untuk melaporkan
+        kerentanan keamanan — lihat [SECURITY.md](../blob/master/SECURITY.md).
+
+  - type: textarea
+    id: ringkasan
+    attributes:
+      label: Ringkasan
+      description: Apa yang salah, dalam satu kalimat.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Langkah reproduksi
+      description: Langkah bernomor dari kondisi awal sampai error muncul.
+      placeholder: |
+        1. Buka /sources/ID
+        2. Klik ikon schema
+        3. Lihat error
+    validations:
+      required: true
+
+  - type: textarea
+    id: diharapkan
+    attributes:
+      label: Perilaku yang diharapkan
+    validations:
+      required: true
+
+  - type: input
+    id: versi
+    attributes:
+      label: Versi
+      description: Commit hash + runtime
+      placeholder: "a1b2c3d · Bun 1.4.2 · Python 3.14.4"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Query engine (Python)
+        - Dashboard / panel / chart
+        - Dataset / query editor
+        - Source / koneksi
+        - Auth / permission
+        - Dashboard publik
+        - Infrastruktur / deploy
+        - Lainnya
+    validations:
+      required: true
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: Output relevan dari terminal Next.js dan/atau engine.
+      render: shell
+
+  - type: textarea
+    id: tambahan
+    attributes:
+      label: Informasi lain
+      description: Screenshot, konfigurasi (tanpa kredensial!), dll.

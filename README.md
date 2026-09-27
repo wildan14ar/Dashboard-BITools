@@ -1,8 +1,20 @@
-# PortoNext — Next.js 16 Boilerplate
+# Dashboard-BITools
 
-Production-ready full-stack template for company profiles, portfolios, and admin dashboards. Built with Next.js 16 (App Router, RSC, Edge proxy), TypeScript, and Bun.
+[![CI](https://github.com/wildan14ar/Dashboard-BITools/actions/workflows/ci.yml/badge.svg)](https://github.com/wildan14ar/Dashboard-BITools/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> Catatan nama paket: `package.json` saat ini bernama `nextjs-template` — ganti `name` saat clone untuk proyek baru.
+Full-stack **Business Intelligence dashboard**: hubungkan database/API/file, tulis query tersimpan, lalu rakit menjadi dashboard visual yang bisa dibagikan lewat link publik.
+
+Next.js 16 (App Router, RSC, Edge proxy) + TypeScript + Bun, dengan **query engine** Python di atas gRPC.
+
+> Catatan nama paket: `package.json` masih bernama `nextjs-template` — ganti `name` saat clone untuk proyek baru.
+
+## Kontribusi
+
+Kontribusi sangat welcome — baik PR, issue, maupun perbaikan dokumentasi. Mulai dari
+[CONTRIBUTING.md](CONTRIBUTING.md). Interaksi tunduk pada
+[Code of Conduct](CODE_OF_CONDUCT.md). Kerentanan keamanan dilaporkan lewat
+[SECURITY.md](SECURITY.md), **bukan** issue publik.
 
 ## Stack
 
@@ -10,202 +22,295 @@ Production-ready full-stack template for company profiles, portfolios, and admin
 |-------|------------|
 | **Framework** | Next.js 16.3, React 19, TypeScript 5.9, App Router |
 | **Runtime** | Bun (package manager + runtime, `bun.lock`) |
-| **Database** | Prisma 7 — SQLite (dev, libsql) / PostgreSQL (prod, `pg` pool) |
-| **Auth** | Better Auth v1.7 (credentials + OAuth Google/GitHub) + Argon2id (`@node-rs/argon2`) |
-| **UI** | Tailwind CSS v4 + shadcn/ui (New York) + Radix UI, `sonner`, `motion`, `lucide-react` |
+| **Database** | Prisma 7 — SQLite (dev) / PostgreSQL (prod, `pg` pool) |
+| **Query Engine** | Python 3.14 + `uv`, gRPC (`grpcio` + `SQLAlchemy`) |
+| **Auth** | Better Auth v1.7 (credentials + OAuth Google/GitHub) + Argon2id |
+| **UI** | Tailwind v4 + shadcn/ui (New York) + Radix, `sonner`, `motion`, `lucide-react` |
+| **Charts/Grid** | `echarts` + `echarts-for-react`, `react-grid-layout`, `@xyflow/react` (ERD) |
+| **SQL Editor** | `@monaco-editor/react` (Ctrl+Enter run) |
 | **State** | TanStack Query v5 (server state, tanpa global store) |
-| **Forms** | React Hook Form + Zod v4 (`@hookform/resolvers`) |
-| **i18n** | next-intl v4 (`id`, `en`; default `en`, `localePrefix: always`) |
-| **Lint/Format** | Biome v2 |
+| **Forms** | React Hook Form + Zod v4 |
+| **i18n** | next-intl v4 (`id`, `en`) |
+| **Lint/Format** | Biome v2 + Knip (dead-code gate saat push) |
 | **Git Hooks** | Husky + lint-staged + commitlint |
 
 ## Features
 
-- **Public Site** — Landing, About, Contact, Privacy/Terms (konten dari DB via `Platform`), SEO: `sitemap.ts`, `robots.ts`, `manifest.ts`, `opengraph-image.tsx`, GA/verification via env
-- **Authentication** — Email/password + username (plugin `username`), OAuth Google/GitHub (toggle env), account linking (email harus cocok), sesi 30 hari, reset password, kelola social accounts
-- **Dashboard user** — Profile (biodata, avatar upload, quote), password, linked accounts, activity log sendiri, kalender pribadi, notifikasi, API keys milik sendiri
-- **Admin Panel** — User/role/permission management, sessions, activity logs, platform settings (SEO, socials + drag-order via dnd-kit, favicon/logo, privacy/terms), broadcast notifikasi, kalender global, API keys
-- **RBAC** — Role-based access dengan katalog permission yang di-seed; Super Admin (`isSuperAdmin`) bypass semua cek; cek OR (salah satu cukup); cache permission 30 detik per proses
-- **API Keys (server-to-server)** — Format `sk_<64 hex>`, header `X-API-Key`, hash `argon2id(salt + raw)`, lookup via prefix 8 char; flag `isRestfull` / `isMCP`; hak key = permission pemilik saat request; tracking `lastUsedAt`/`usageCount`
-- **Platform Config** — Singleton `Platform(id="default")`: branding, kontak, map, SEO, legal pages + relasi `Social[]` (orderable)
-- **Calendar** — Event (all-day, repeat, warna, holiday), `CalendarAssignment` per user, notifikasi per event
-- **Audit Trail** — `ActivityLog` + `Notification` (fire-and-forget, ada user `system` id `"system"` agar FK log sistem valid)
-- **API konvensi Postman** — Envelope `{ success, message, data, code, requestId? }`, `code` stabil (`VALIDATION_ERROR`, `CONFLICT`, …), pagination `{ page, limit, total, total_pages, has_more }` + cursor `{ next_cursor, has_more }` untuk feed, `?fields=` sparse fieldset, `Idempotency-Key` untuk POST, path stabil tanpa versioning (`/api/*` tunggal), rate-limit edge per IP (`RATE_LIMIT_*`), `x-request-id` end-to-end, HSTS + CSP di production
+### BI Tools
+
+- **Sources** — 10 tipe koneksi: PostgreSQL, MySQL, MariaDB, SQL Server, SQLite, ClickHouse, BigQuery, MongoDB, REST API, dan File (CSV/XLSX/Google Sheets). Config divalidasi per tipe via Zod. Test koneksi sebelum simpan.
+- **Database Explorer** (`/sources/[id]`) — sidebar schema searchable, Monaco SQL editor dengan **Ctrl+Enter** untuk run, sistem tab (tab tabel auto-run / query bebas / ERD), drag-drop dataset ke kanvas, dan upload file **chunked 5 MB**.
+- **ERD** — diagram relasi React Flow; node tabel menampilkan kolom + tipe + badge PK/FK, garis panah untuk setiap foreign key.
+- **Datasets** — query tersimpan di atas sebuah source, lengkap dengan editor split (SQL ↔ hasil) dan toggle cache.
+- **Dashboards** — visual editor drag-drop (12 kolom grid) dengan 7 tipe chart: Text, KPI, Table, Table (pivot), Bar, Line, Pie, plus panel Filter. Konfigurasi per panel: judul (posisi/align/style/warna/ukuran), padding, orientasi bar, donut thickness, kolom tabel, sumbu pivot, dan agregasi.
+- **Panel filter** — `date_range` & `enum`, diteruskan ke dataset sebagai params (backend wajib pakai `{{COLUMN}}` binding).
+- **Dashboard publik** (`/bi/[id]`) — bisa dibagikan tanpa login; dilindungi flag `isPublic` (bukan publik → 404).
+- **Rate limit khusus run** — `RUN_RATE_LIMIT_MAX` per user, terpisah dari limit global API.
+
+### Platform
+
+- **Authentication** — Email/password + username (plugin `username`), OAuth Google/GitHub, account linking, sesi 30 hari, reset password, kelola social accounts.
+- **RBAC** — katalog permission yang di-seed; Super Admin bypass semua cek; cek OR; cache 30 detik per proses.
+- **API Keys (server-to-server)** — format `sk_<64 hex>`, header `X-API-Key`, hash `argon2id(salt + raw)`, lookup via prefix 8 char; hak key = permission pemilik.
+- **File & Storage** — attachment (kuota ukuran per env) + backend S3-compatible opsional.
+- **Kalender & Notifikasi** — event (all-day, repeat, warna, holiday), assignment per user, broadcast notifikasi.
+- **Audit Trail** — `ActivityLog` + `Notification` (fire-and-forget, ada user `system` agar FK log sistem valid).
+- **API konvensi Postman** — envelope `{ success, message, data, code, requestId? }`, `code` stabil, pagination + cursor, `?fields=` sparse fieldset, `Idempotency-Key` untuk POST, path stabil tanpa versioning, rate-limit edge per IP, `x-request-id` end-to-end, HSTS + CSP di production.
 
 ## Quick Start
 
 ```bash
-# Install deps (jangan npm — Dockerfile & CI pakai frozen lockfile Bun)
+# 1. Install deps (jangan npm — Dockerfile & CI pakai frozen lockfile Bun)
 bun install
 
-# Setup env
-cp .env.example .env
-# Edit .env dengan valoremu (lihat tabel Environment di bawah)
-
-# Database
+# 2. Setup env
+cp .env.example .env          # isi DATABASE_URL & BETTER_AUTH_SECRET
 bun run db:generate
-bun run db:push        # dev cepat; untuk prod pakai db:migrate
+bun run db:push
 bun run db:seed
+```
 
-# Dev server
+Akun seed: `admin` / `admin@example.com` dengan password `admin123` (Super Admin).
+Override tanpa mengedit kode:
+
+```bash
+bun run db:seed -- --admin-password "S3cret!" --user-password "An0ther!"
+```
+
+**Ganti password seed sebelum production.**
+
+```bash
+# 4. Jalankan query engine (terminal terpisah, wajib untuk fitur BI)
+cd engine
+uv sync --frozen
+uv run python -m src.server     # gRPC di :50051
+
+# 5. Dev server
 bun run dev
 ```
 
-> Nilai seed hardcoded di `prisma/seed/platform.ts` (branding) & `prisma/seed/users.ts` (akun) — edit langsung untuk ganti permanen, atau override per-seed via flag CLI.
-> Seed `platform` bersifat merge-only: seed ulang hanya meng-override field yang diisi via CLI, sehingga kustomisasi dashboard tidak tertimpa (`--force-platform` untuk tulis ulang semua).
-
-Akun seed: `admin@example.com` / `admin123` (Super Admin), `user@example.com` / `user123`. Ganti passwordnya setelah seed pertama di production.
-
-```bash
-bun run db:seed -- --help                        # semua flag
-bun run db:seed -- --users --admin-password "S3cret!"   # hanya users + override
-bun run db:seed -- --only=platform --platform-name "Acme" --force-platform
-bun run db:seed -- --skip=users --dry-run         # simulasi tanpa tulis DB
-```
+> Redis untuk engine bersifat **opsional**. Kalau tidak jalan, engine tetap serve
+> query — hanya cache schema/result yang nonaktif (log: `Redis unavailable, cache
+> disabled`). Nyalakan agar load berikutnya instan di sisi server juga.
 
 ## Commands
 
 ```bash
-bun run dev         # Dev server (Turbopack)
-bun run build       # Next build (dipakai pre-commit? TIDAK — lihat Git Hooks)
-bun run typecheck   # tsc --noEmit (ini yang dijalankan lint-staged)
-bun run lint        # bunx biome check src/ test/ prisma/
-bun run lint:fix    # biome check --write
-bun test            # Bun test — suite ada di test/ (fields, hash, idempotency, log-format, utils, seed-args, api-contract)
-bun run analyze     # ANALYZE=true next build (bundle-analyzer)
-bun run db:generate # Prisma generate
-bun run db:push     # Push schema to DB (dev)
-bun run db:migrate  # prisma migrate dev (prod-like)
-bun run db:studio   # Prisma Studio
-bun run db:seed     # seed semua (platform → permissions → users); lihat flag di atas
-bun run db:reset    # prisma migrate reset --force
+bun run dev            # Dev server (Turbopack)
+bun run build          # next build
+bun run typecheck      # tsc --noEmit (dijalankan lint-staged)
+bun run lint / lint:fix
+bun run check-unused   # knip — WAJIB bersih, hook pre-push memblokir
+bun test               # suite di test/
+bun run analyze        # bundle-analyzer build
+
+# Database
+bun run db:generate / db:push / db:migrate / db:studio / db:reset
+bun run db:seed                                  # permissions → users
+bun run db:seed -- --only permissions            # sync katalog permission saja
+bun run db:seed -- --admin-password "S3cret!"    # override user admin
+bun run db:seed -- --help                        # semua flag
+
+# Query engine
+cd engine && uv sync --frozen && uv run python -m src.server
 ```
 
 ## Project Structure
 
 ```
-src/
-├── app/
-│   ├── layout.tsx manifest.ts robots.ts sitemap.ts opengraph-image.tsx
-│   ├── (auth)/login/register      # Halaman auth (tanpa prefix locale)
-│   ├── [locale]/                  # Halaman publik ber-locale: / about contact privacy terms
-│   ├── dashboard/                 # Protected: page, profile, calendar, api-keys
-│   │   └── (admin)/                 # Route group (tanpa segmen URL): platform, users, roles, sessions, logging
-│   └── api/                       # Route handlers (path stabil /api/*, tanpa versioning)
-│       ├── auth/[...all] me reset-password social-accounts/[id]
-│       ├── users/route + [id]/ + [id]/reset-password + logs + roles/[id] + roles/permissions + sessions/[id]
-│       ├── platform/route privacy terms social/[id] social/order
-│       ├── calendar/route + [id]
-│       ├── notifications/route + [id]/read + read-all + broadcast
-│       ├── api-keys/route + [id]
-├── components/
-│   ├── ui/                        # shadcn/ui primitives (New York)
-│   ├── atoms/ shared/             # Primitive & composite
-│   ├── Navbar.tsx Footer.tsx Sidebar.tsx LayoutWrapper.tsx
-│   ├── Providers.tsx              # QueryClient + ThemeProvider + sonner
-│   ├── NotificationBell.tsx
-│   └── Protected.tsx              # Permission gate client (OR logic, superadmin bypass)
-├── config/settings.ts             # Env terpusat (auth, oauth, GA, trustedOrigins)
-├── config/prisma.ts               # Singleton Prisma + dual adapter (libsql/pg pool, sslmode verify-full)
-├── hooks/                         # use-auth use-users use-roles use-platform use-calendars use-notifications use-api-keys
-├── lib/
-│   ├── auth-client.ts             # Better Auth client (username + customSession)
-│   ├── activity.ts notifications.ts  # Audit & notif helpers
-│   ├── password.ts sessions.ts cookie.ts
-│   ├── api.ts                     # Fetch client frontend → /api + toast + 401/403/429 handling
-│   ├── metadata.ts socials.ts calendar.ts image-upload.ts
-│   ├── pagination.ts fields.ts idempotency.ts request-id.ts
-│   └── log-format.ts locale-server.ts utils.ts
-├── middlewares/                   # index re-export
-│   ├── auth.ts                    # Better Auth server, customSession roles+permissions
-│   ├── apikeys.ts rate-limit.ts   # API key utils + Edge/proxy rate limiter
-│   ├── rbac.ts                    # requireAuth() + requireApiKey() fallback, cache 30 dtk
-│   ├── request-handler.ts         # Validasi Zod { params?, query?, body? } (JSON + multipart), details[]
-│   └── response-handler.ts        # Envelope standar + paginated/created/422/dst.
-├── validations/auth.ts platform.ts user.ts index.ts
-├── i18n/routing.ts navigation.ts request.ts  # locales ["id","en"], default "en"
-├── proxy.ts                       # Edge: /api request-id+rate-limit; locale redirect; guard /dashboard & /login|/register + REGISTER toggle
-└── styles/globals.css
-prisma/
-├── schema.prisma                  # datasource sqlite tanpa url (URL dari prisma.config.ts); Platform Social User Session Account Verification Role UserRole RolePermission ApiKey Notification Calendar CalendarAssignment ActivityLog
-└── seed/index.ts platform.ts permissions.ts users.ts
-test/                               # bun test: fields hash idempotency log-format utils seed-args api-contract
+src/app/
+├── layout.tsx                  # <html>/<body> + Script beforeInteractive (anti-FOUC theme)
+├── (auth)/login/register      # auth, tanpa prefix locale
+├── (dashboard)/                # route group privat (session guard + intl + Providers)
+│   ├── page.tsx profile/ calendar/ api-keys/ attachment/
+│   ├── (admin)/users roles sessions logging storage
+│   ├── sources/                # + [id] = Database Explorer
+│   ├── datasets/               # + new + [id] editor SQL
+│   └── dashboards/             # + new + [id] + [id]/edit
+├── bi/[id]/                    # viewer dashboard PUBLIK (tanpa session)
+└── api/
+    ├── auth/ users/ calendar/ notifications/ api-keys/ attachments/
+    ├── sources/                # CRUD + test, schema, run, upload chunked
+    ├── datasets/               # CRUD + run + run-batch
+    ├── dashboards/             # CRUD + panels, filters, members, public
+    └── public/dashboards/[id]  # SATU-SATUNYA endpoint tanpa requireAuth
+
+src/components/
+├── ui/                         # shadcn/ui (New York)
+├── charts/                     # EChart, KPI, Table, TablePivot, Text, Filter
+├── dashboard/                  # grid drag-drop, viewer publik, panel-title, run-meta
+├── editor/                     # sidebar config chart, palet dataset, axis-drop, preview
+├── sources/                    # query-editor (Monaco), schema-sidebar, schema-erd, source-form
+├── bi/                         # ResultTable
+├── atoms/ shared/              # ButtonLogout, ButtonTheme, ConfirmDialog, dll
+├── Sidebar.tsx DashboardShell.tsx NotificationBell.tsx Protected.tsx Providers.tsx
+
+src/hooks/                      # use-sources use-datasets use-dashboards use-panel-data
+                                # use-panel-editor use-dashboard-filters + use-auth dll
+src/lib/
+├── api.ts                      # fetch client: timeoutMs per-request, toast, 401/403/429
+├── engine.ts                   # Klien gRPC (execute/getSchema/testConnection/invalidateCache)
+├── chart.ts                    # buildChartOption + aggregate (ECharts option)
+├── rate-limit.ts               # rate limit khusus endpoint run
+└── grpc/                       # TIPE GENERATE proto-loader (biome + knip ignore)
+
+engine/                         # Query engine (Python 3.14, uv)
+├── src/server.py               # Servicer gRPC
+├── src/introspector.py         # GetSchema (skip schema sistem, allowlist, batas objek)
+├── src/executor.py src/sanitizer.py src/cache.py src/factory.py
+├── src/conn/                   # postgres mysql mssql sqlite clickhouse bigquery mongodb file restfull
+└── tests/                      # pytest
+
+proto/engine.proto              # Kontrak gRPC
+prisma/schema.prisma            # + BiSource BiDataset BiDashboard BiPanel BiFilter BiDashboardMember
+test/                           # bun test
 ```
+
+## Query Engine
+
+Engine adalah service gRPC terpisah yang mengeksekusi query baca-only terhadap
+source yang dikonfigurasi di dashboard. Alasannya dipisah: introspeksi schema dan
+eksekusi query bisa berjalan **puluhan detik** pada database remote, dan
+prosesnya butuh manage connection pool sendiri.
+
+```bash
+cd engine
+uv sync --frozen
+uv run python -m src.server
+# → QueryEngine gRPC server running on port 50051
+```
+
+Docker (sendiri, tanpa compose):
+
+```bash
+# WAJIB context = ./engine (pyproject.toml & generated/ ada di sana,
+# sedangkan proto/engine.proto berada di root repo dan tidak dipakai saat runtime)
+docker build -f engine/Dockerfile -t bi-engine engine
+docker run --rm -p 50051:50051 -v ./data:/data -e DATA_DIR=/data bi-engine
+```
+
+Stack lengkap (Postgres + Redis + engine + dashboard):
+
+```bash
+cp .env.example .env && $EDITOR .env   # isi POSTGRES_PASSWORD & BETTER_AUTH_SECRET
+docker compose up -d --build
+docker compose exec app bun run db:push
+docker compose exec app bun run db:seed
+```
+
+`app` dan `engine` **share volume `data`** karena app menulis upload ke
+`DATA_DIR` dan engine membacanya dari folder yang sama. Kalau dipisah, source
+bertipe `file` gagal dengan `Path upload di luar DATA_DIR`. Profile `dev`
+(HMR) dan `test` tersedia lewat `docker compose --profile dev|test`.
+
+**Keamanan:** engine hanya menerima query baca. Setiap eksekusi melewati
+sanitizer (parser SQL, menolak DML/DDL) **dan** transaksi `READ ONLY` di level
+database, lalu `rollback()` eksplisit — jadi lolos sanitizer pun tetap tak bisa
+menulis. Detail error driver mentah tidak pernah diteruskan ke client.
+
+**Kenapa `GetSchema` butuh waktu:** introspeksi = ~3 query katalog per objek.
+View di `information_schema` dihitung ulang tiap query sehingga ~1,7 detik per
+objek; karena itu engine **selalu melewati** schema sistem. Persempit lagi dengan
+`INTROSPECT_SCHEMAS=public,reporting`.
+
+**Cache:** `REDIS_URL` untuk cache schema + hasil query. Tanpanya, engine tetap
+berfungsi tanpa cache, dan sisi dashboard memakai cache 5 menit untuk schema.
 
 ## API Overview
 
 Semua respons memakai envelope `ResponseHandler`:
 
 ```json
-{ "success": true, "message": "OK", "data": { "items": [], "pagination": {} }, "code": "OK", "requestId": "..." }
+{ "success": true, "message": "OK", "data": {}, "code": "OK", "requestId": "..." }
 ```
 
-- **Auth** — `POST /api/auth/*` (Better Auth handler), `GET /api/auth/me`, `POST /api/auth/reset-password`, `GET/DELETE /api/auth/social-accounts/[id]`
-- **Users** — CRUD by id + `?search=&sort=&order=&isAdmin=` (butuh `users:admin` untuk field sensitif), `POST /users/[id]/reset-password`, `GET /users/logs` (`logs:read`), sessions (`sessions:read/revoke`)
-- **Roles & Permissions** — CRUD role (`roles:*`), `GET /users/roles/permissions` katalog (`permissions:read`)
-- **Platform** — `GET /platform` publik, `PUT` (`platform:update`), `GET/PUT /platform/privacy|terms`, CRUD `/platform/social` + `PUT /platform/social/order` (`social:create/update/delete`)
-- **Calendar** — CRUD + assignment (`GET /calendar`, `POST/PUT/DELETE /calendar/[id]`)
-- **Notifications** — `GET /notifications`, `PUT /notifications/[id]/read`, `PUT /notifications/read-all`, `POST /notifications/broadcast` (`notifications:broadcast`)
-- **API Keys** — `GET/POST /api-keys` (`keys:read/create`), `PUT/DELETE /api-keys/[id]` (`keys:update/delete`); key mentah hanya terlihat sekali saat create
+- **Auth** — `POST /api/auth/*`, `GET /api/auth/me`, `POST /api/auth/reset-password`, `/auth/social-accounts/[id]`
+- **Users** — CRUD + `?search=&sort=&order=`, reset password, `/users/logs`, `/users/roles/*`, `/users/sessions/*`
+- **Sources** — `GET/POST /api/sources` (`sources:read/create`), `GET/PUT/DELETE /api/sources/[id]`, `POST /api/sources/test` (config adhoc), `POST /api/sources/[id]/test`, `GET /api/sources/[id]/schema`, `POST /api/sources/[id]/run`, `POST /api/sources/upload` (chunked)
+- **Datasets** — `GET/POST /api/datasets`, `GET/PUT/DELETE /api/datasets/[id]`, `POST /api/datasets/[id]/run`, `POST /api/datasets/run-batch` (satu round-trip untuk N dataset, error terisolasi per item)
+- **Dashboards** — `GET/POST /api/dashboards`, `GET/PUT/DELETE /api/dashboards/[id]`, `+ /panels`, `/panels/[panelId]`, `/panels/reorder`, `/filters`, `/filters/[filterId]`, `/members`, `/public`
+- **Public** — `GET /api/public/dashboards/[id]` — **satu-satunya** endpoint tanpa `requireAuth`; hanya dashboard `isPublic: true`, hanya panel ber-dataset, field dibatasi eksplisit
+- **Platform** — Calendar, Notifications, API Keys, Attachments
 
-Pattern route handler baru:
+> **Data panel publik tetap butuh autentikasi.** `/api/datasets/run-batch`
+> mengeksekusi SQL, jadi tetap di-guard `datasets:read`. Pengunjung anonim
+> melihat layout + judul panel, tetapi data memerlukan sesi login atau API key.
+> Jangan pernah membuat endpoint run publik.
 
-```ts
-const parsed = await RequestHandler.validateRequest(schema, req, params)
-if (parsed instanceof NextResponse) return parsed
-const { error, session } = await requireAuth({ permissions: ["users:update"] })
-if (error) return error
-return ResponseHandler.success("OK", data, { requestId: req.headers.get("x-request-id") })
-```
-
-## Permission Catalog (seeded, `prisma/seed/permissions.ts`)
+## Permission Catalog (seeded)
 
 ```
-Platform: platform:read, platform:update, social:create, social:update, social:delete
-Users:    users:create, users:update, users:delete, users:admin
-Roles:    roles:read, roles:create, roles:update, roles:delete
+BI Tools:   sources:read, sources:create, sources:update, sources:delete
+            datasets:read, datasets:create, datasets:update, datasets:delete
+            dashboards:create, dashboards:update, dashboards:delete, dashboards:admin
+Storage:    attachments:read, attachments:create, attachments:update, attachments:delete, attachments:admin
+Users:      users:create, users:update, users:delete, users:admin
+Roles:      roles:read, roles:create, roles:update, roles:delete
 Permissions: permissions:read
-Sessions: sessions:read, sessions:revoke
-Logs:     logs:read
+Sessions:   sessions:read, sessions:revoke
+Logs:       logs:read
 Notifications: notifications:broadcast
-API Keys: keys:read, keys:create, keys:update, keys:delete
+API Keys:   keys:read, keys:create, keys:update, keys:delete
 ```
 
-Konvensi aksi: `read/update` (jangan `view/edit`). Katalog = baris `RolePermission` dengan `roleId NULL`; grant per-role menunjuk `roleId`. Permission yang tak pernah dicek kode tidak masuk katalog; seed menghapus legacy (`sessions:view`, `logs:view`, `platform:admin`, `roles:admin`, `users:read`) otomatis.
+Konvensi aksi: `read/update` (jangan `view/edit`). Katalog = baris
+`RolePermission` dengan `roleId NULL`; grant per-role menunjuk `roleId`.
+`dashboards` **tidak punya `:read`** — list/detail hanya butuh login, mutasi butuh
+`dashboards:update`, publikasi & member butuh `dashboards:admin`. Role non-superadmin
+perlu diberi permission BI lewat halaman Roles agar tidak kena 403.
 
 ## Environment Variables
+
+Salin `.env.example` — semua key sudah terdaftar di sana dengan nilai default
+yang aman untuk development. Tabel di bawah menjelaskan tiap key.
 
 | Key | Keterangan |
 |-----|------------|
 | `DATABASE_URL` | `file:./prisma/dev.db` (SQLite) atau `postgresql://...` (adapter dipilih dari prefix `file:`) |
-| `BETTER_AUTH_SECRET` / `BETTER_AUTH_URL` / `BETTER_AUTH_TRUSTED_ORIGINS` | Secret, base URL, origins tambahan (comma-separated, utk tunnel `*.trycloudflare.com,*.ngrok-free.app`) |
-| `NEXT_PUBLIC_ALLOW_REGISTER` | `"false"` mematikan `/register` (redirect ke login). Default on |
-| `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW_MS` | Rate limit edge per IP, default `120` / `60000`. In-memory — untuk prod multi-instance ganti Redis/Upstash |
+| `BETTER_AUTH_SECRET` / `BETTER_AUTH_URL` / `BETTER_AUTH_TRUSTED_ORIGINS` | Secret, base URL, origins tambahan (comma-separated) |
+| `NEXT_PUBLIC_ALLOW_REGISTER` | `"false"` mematikan `/register` |
+| `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW_MS` | Rate limit edge per IP (default `120`/`60000`). In-memory — multi-instance butuh Redis/Upstash |
 | `NEXT_PUBLIC_ENABLE_GOOGLE_AUTH`, `GOOGLE_CLIENT_ID/SECRET` | Toggle + kredensial OAuth Google |
 | `NEXT_PUBLIC_ENABLE_GITHUB_AUTH`, `GITHUB_CLIENT_ID/SECRET` | Toggle + kredensial OAuth GitHub |
-| `NEXT_PUBLIC_GA_ID`, `NEXT_PUBLIC_GTM_ID`, `NEXT_PUBLIC_GOOGLE_VERIFICATION` | SEO/analytics (`@next/third-parties`) |
+| `S3_*`, `ATTACHMENTS_MAX_SIZE` | Backend S3 opsional + kuota attachment (default 10 MB) |
+| `QUERY_ENGINE_HOST` | Host:port engine (default `localhost:50051`) |
+| `QUERY_MAX_ROWS` / `QUERY_TIMEOUT_SEC` | Batas default eksekusi query (1000 / 30) |
+| `RUN_RATE_LIMIT_MAX` / `RUN_RATE_LIMIT_WINDOW_MS` | Rate limit endpoint run (30 / 60000) |
+| `DATA_DIR` / `UPLOADS_MAX_BYTES` | Folder upload bersama engine (default `./data`) + batas ukuran (10 MB) |
 
-Lihat `.env.example` sebagai sumber kebenaran. (Catatan: `NEXT_PUBLIC_DEFAULT_LOCALE` yang disebut di docs lama **tidak dipakai** — default locale `en` di-hardcode di `src/i18n/routing.ts`.)
+Engine (`engine/src/config.py`): `QUERY_ENGINE_PORT` (50051) · `REDIS_URL` ·
+`INTROSPECT_SCHEMAS` · `INTROSPECT_MAX_OBJECTS` (500) · `DB_POOL_SIZE`/`DB_MAX_OVERFLOW` ·
+`FETCH_MAX_BYTES` · `QUERY_CACHE_MAX_BYTES` · `FILE_*` · `SHEETS_PAGE_ROWS`.
+
+`NEXT_PUBLIC_DEFAULT_LOCALE` **tidak dipakai** — default locale `en` di-hardcode di
+`src/i18n/routing.ts`.
 
 ## Git Hooks & CI
 
-- `pre-commit` → lint-staged: `biome check --write` untuk `*.{ts,tsx,mjs,css,json,md}` + **`bunx tsc --noEmit`** untuk `*.{ts,tsx}` (bukan full `next build`)
-- `commit-msg` → commitlint Conventional Commits (`feat fix chore docs style refactor perf test build ci revert`, tanpa batas panjang header)
-- CI (`.github/workflows/ci.yml`): `bun install --frozen-lockfile` → `db:generate` → `lint` → `build`. Deploy (`deploy.yml`): push ke `prod` → pull + build + `pm2 restart` di self-hosted runner
+- `pre-commit` → lint-staged: `biome check --write` + **`bunx tsc --noEmit`** untuk `*.{ts,tsx}`
+- `pre-push` → **`bun run check-unused` (knip)** — push diblokir kalau ada devDep/ekspor mati
+- `commit-msg` → commitlint Conventional Commits
+- CI: `bun install --frozen-lockfile` → `db:generate` → `lint` → `build`. Deploy: push ke `prod` → build → `pm2 restart`
 
 ## Deployment
 
-**Docker** (multi-stage Bun, user non-root `nextjs`):
+**Docker** (multi-stage Bun, runner non-root `bun`):
 
 ```bash
-docker build --build-arg DATABASE_URL="postgresql://..." -t portonext .
-docker run -p 3000:3000 --env-file .env portonext
+docker build --build-arg DATABASE_URL="postgresql://..." -t bitools .
+docker run -p 3000:3000 --env-file .env bitools
 ```
 
 > `ARG DATABASE_URL` dibutuhkan saat build karena `db:generate`/build Next membaca env.
 
-**Vercel** — Connect repo, tambah env vars, deploy. Untuk Postgres (Neon/Supabase) pastikan `DATABASE_URL` memakai `sslmode=verify-full` (ditambahkan otomatis oleh `src/config/prisma.ts` jika belum ada).
+Jalankan engine sebagai service terpisah (port 50051) lalu set `QUERY_ENGINE_HOST`
+ke host engine. Untuk Postgres (Neon/Supabase) pastikan `DATABASE_URL` memakai
+Tambahkan `?sslmode=verify-full` sendiri ke `DATABASE_URL` untuk Postgres
+managed (TLS dikontrol sepenuhnya oleh connection string — tidak ada default
+TLS di kode).
 
 ## License
 
-MIT — Use freely for your projects.
+[MIT](LICENSE) — © 2026 <COPYRIGHT_HOLDER>
+
+Ganti `<COPYRIGHT_HOLDER>` di `LICENSE` dengan nama Anda sebelum publish.

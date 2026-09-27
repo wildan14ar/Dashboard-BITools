@@ -1,8 +1,22 @@
-name: Deploy to Production
+# Template deploy — aktifkan bila Anda punya runner self-hosted.
+#
+# Repo ini memakai branch `master` sebagai default. Workflow di bawah memicu
+# pada branch `prod` (Atur branch trigger sesuai alur Anda).
+#
+# SEBELUM mengaktifkan:
+#  1. Ganti `working-directory` ke lokasi checkout di runner Anda.
+#  2. Ganti `pm2 restart` ke nama proses Anda (atau `pm2 reload`).
+#  3. Pastikan branch `prod` sudah ada dan ter-track.
+#
+# Query engine (port 50051) sengaja TIDAK dideploy di sini — jalankan sebagai
+# service terpisah (systemd / supervisor / container) dan set `QUERY_ENGINE_HOST`.
+
+name: Deploy
 
 on:
   push:
     branches: [prod]
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -12,10 +26,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy
-        working-directory: ~/PORTOFOLIO
+        working-directory: ~/Dashboard-BITools
         run: |
           git pull origin prod
-          bun install
-          bun db:generate
+          bun install --frozen-lockfile
+          bun run db:generate
           bun run build
-          pm2 restart 2
+          pm2 restart bitools

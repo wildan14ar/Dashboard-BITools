@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   lint:
@@ -45,3 +45,20 @@ jobs:
       - run: bun run build
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+  engine:
+    name: Engine (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install dependencies
+        working-directory: engine
+        run: uv sync --frozen --all-extras --dev
+
+      - name: Test (SQLite, tanpa service eksternal)
+        working-directory: engine
+        run: uv run pytest -q

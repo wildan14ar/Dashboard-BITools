@@ -1,73 +1,96 @@
-# AGENTS.md — PortoNext Boilerplate
+# AGENTS.md — Dashboard-BITools
 
-Next.js 16 (App Router, TypeScript) full-stack **boilerplate/template** for company profiles, portfolios, and admin dashboards. `package.json` name saat ini `nextjs-template` — ganti saat clone.
+Next.js 16 (App Router, TypeScript) full-stack **BI dashboard**: admin panel + query engine (gRPC) + visual dashboard builder. Paket masih bernama `nextjs-template` — ganti saat clone.
 
 ## Commands (use `bun`, never npm — bun.lock, Docker/CI frozen)
 
 - `bun run dev` — dev server (Turbopack)
 - `bun run build` — `next build` saja (BUKAN typecheck gate)
-- `bun run typecheck` — `tsc --noEmit` (ini yang dipakai lint-staged)
+- `bun run typecheck` — `tsc --noEmit` (dipakai lint-staged)
 - `bun run lint` / `lint:fix` — `biome check [--write] src/ test/ prisma/`
-- `bun test` — Bun test, suite ADA di `test/` (fields, hash, idempotency, log-format, utils)
+- `bun run check-unused` — `knip` (dijalankan hook `pre-push`; WAJIB bersih)
+- `bun test` — Bun test, suite di `test/` (api-contract, attachments, fields, hash, idempotency, log-format, sort, utils)
 - `bun run analyze` — bundle-analyzer build
-- DB (Prisma 7): `db:generate` `db:push` (dev) `db:migrate` `db:studio` `db:reset`; `db:seed -- [flags]` — parser + entry satu file `prisma/seed/index.ts` (logika di `platform.ts`/`permissions.ts`/`users.ts`, urutan platform → permissions → users). Nilai hardcoded di file seed (bukan env); flag override: `--platform|--permissions|--users`, `--only/--skip`, `--platform-*`, `--admin-*`, `--user-*`, `--force-platform`, `--no-system-user`, `--dry-run`, `--help`, `--list`. Prioritas: CLI > hardcoded.
+- DB (Prisma 7): `db:generate` `db:push` (dev) `db:migrate` `db:studio` `db:reset`; `db:seed -- [flags]` — parser + entry `prisma/seed/index.ts` (logika di `permissions.ts`/`users.ts`, urutan permissions → users). Nilai hardcoded di file seed; flag: `--permissions|--users`, `--only/--skip`, `--admin-*`, `--user-*`, `--no-system-user`, `--dry-run`, `--help`, `--list`.
+- Engine (Python): `cd engine && uv sync --frozen && uv run python -m src.server` (gRPC, default port 50051)
 
-## Pre-commit (husky)
+## Git Hooks
 
-- `pre-commit` → lint-staged: `biome check --write` untuk `*.{ts,tsx,mjs,css,json,md}` DAN `bunx tsc --noEmit` untuk `*.{ts,tsx}`. Bukan full `next build`.
-- `commit-msg` → commitlint Conventional Commits; types: `feat fix chore docs style refactor perf test build ci revert` (tanpa batas panjang header).
-- CI (`ci.yml`): install frozen → `db:generate` → `lint` → `build`. Deploy (`deploy.yml`): push `prod` → self-hosted `pm2 restart`.
+- `pre-commit` → lint-staged: `biome check --write` untuk `*.{ts,tsx,mjs,css,json,md}` DAN `bunx tsc --noEmit` untuk `*.{ts,tsx}`.
+- `pre-push` → `bun run check-unused` (knip). Tembolok push kalau ada devDep/ekspor mati.
+- `commit-msg` → commitlint Conventional Commits; types: `feat fix chore docs style refactor perf test build ci revert`.
+- CI: install frozen → `db:generate` → `lint` → `build`. Deploy: push `prod` → self-hosted `pm2 restart`.
 
 ## Env & DB
 
-- `.env` required, gitignored. `prisma.config.ts` loads dotenv dan supply `DATABASE_URL` — `schema.prisma` datasource `sqlite` tanpa url; env only. `.env.example` = sumber kebenaran.
-- Keys: `DATABASE_URL` (`file:` → SQLite/libsql dev, `postgresql:` → Postgres prod via `pg` pool, `sslmode=verify-full` auto-append), `BETTER_AUTH_SECRET/URL/TRUSTED_ORIGINS`, `NEXT_PUBLIC_ALLOW_REGISTER`, `RATE_LIMIT_MAX/WINDOW_MS` (in-memory edge, single-instance only), `NEXT_PUBLIC_ENABLE_GOOGLE/GITHUB_AUTH` + `GOOGLE/GITHUB_CLIENT_ID/SECRET`, `NEXT_PUBLIC_GA_ID/GTM_ID/GOOGLE_VERIFICATION`. (Seed tidak pakai env — hardcoded di `prisma/seed/`.)
-- `NEXT_PUBLIC_DEFAULT_LOCALE` TIDAK dipakai — default locale `en` hardcoded di `src/i18n/routing.ts` (locales `["id","en"]`, `localePrefix: always`).
-- Seed: platform merge-only (hanya override field yg diisi CLI; `--force-platform` tulis ulang semua); permissions hapus legacy otomatis; users + user `system` (`id="system"`, lewati via `--no-system-user`). Password seed hardcoded di `users.ts` (min 6) — ganti setelah seed pertama di production.
+- `.env` required, gitignored. `.env.example` = sumber kebenaran daftar env (jangan tambah key baru hanya di docs — perbarui keduanya). `prisma.config.ts` load dotenv & supply `DATABASE_URL`; `schema.prisma` datasource tanpa url (env only).
+- App: `DATABASE_URL` (`file:` → SQLite/libsql, `postgresql:` → pg pool; `sslmode` **tidak** di-auto-append — caller wajib tulis sendiri di connection string), `BETTER_AUTH_SECRET/URL/TRUSTED_ORIGINS`, `NEXT_PUBLIC_ALLOW_REGISTER`, `RATE_LIMIT_MAX/WINDOW_MS` (in-memory edge, single-instance), `NEXT_PUBLIC_ENABLE_GOOGLE/GITHUB_AUTH` + `GOOGLE/GITHUB_CLIENT_ID/SECRET`. `NEXT_PUBLIC_GA_ID/GTM_ID/GOOGLE_VERIFICATION` **tidak dibaca kode mana pun** — jangan set sia-sia.
+- BI: `QUERY_ENGINE_HOST` (default `localhost:50051`), `QUERY_MAX_ROWS` (1000), `QUERY_TIMEOUT_SEC` (30), `RUN_RATE_LIMIT_MAX` (30), `RUN_RATE_LIMIT_WINDOW_MS` (60000), `DATA_DIR` (default `<cwd>/data`), `UPLOADS_MAX_BYTES` (10 MB), `ATTACHMENTS_MAX_SIZE`, `S3_*`.
+- Engine (`engine/src/config.py`): `QUERY_ENGINE_PORT` (50051), `REDIS_URL`, `INTROSPECT_SCHEMAS` (comma; kosong = semua schema non-sistem), `INTROSPECT_MAX_OBJECTS` (500), `DB_POOL_SIZE/DB_MAX_OVERFLOW`, `FETCH_MAX_BYTES`, `QUERY_CACHE_MAX_BYTES`, `FILE_*`, `SHEETS_PAGE_ROWS`.
+- `NEXT_PUBLIC_DEFAULT_LOCALE` TIDAK dipakai — default `en` hardcoded di `src/i18n/routing.ts`.
+- Seed: user `system` (`id="system"`, lewati via `--no-system-user`). Password hardcoded di `users.ts` (min 6) — ganti setelah seed pertama di production.
 
 ## Architecture
 
-- Pages: `/` → redirect `/{locale}`; publik `[locale]/` (home/about/contact/privacy/terms); auth tanpa locale `(auth)/login|register`; proteksi `dashboard/` (profile, calendar, api-keys) + route group `(admin)/` tanpa segmen URL (platform, users, roles, sessions, logging). URL lama `/dashboard/admin/*` di-redirect permanen di `next.config.ts`. SEO: `sitemap/robots/manifest/opengraph-image`.
-- API path stabil `/api/*` tanpa versioning (sengaja dicabut). Envelope `{ success, message, data, code, requestId? }`, pagination `{ page, limit, total, total_pages, has_more }` + cursor `{ next_cursor, has_more }` (notifikasi), `?fields=`, `Idempotency-Key` (POST). Kontrak diuji di `test/api-contract.test.ts` (envelope, validasi, pagination, rate-limit, request-id).
-- `src/proxy.ts` (Next 16: middleware → proxy, Edge): `/api/*` → suntik `x-request-id`, rate-limit per IP + header `X-RateLimit-*`; halaman → locale redirect (cookie `locale` → Accept-Language → default), guard `/dashboard` via session cookie, redirect user login dari `/login|/register`, toggle `NEXT_PUBLIC_ALLOW_REGISTER`. Matcher: `/api/:path*` + semua halaman kecuali `_next`/file statis.
-- Auth (`src/middlewares/auth.ts`): Better Auth v1.7, adapter Prisma (`sqlite`/`postgresql` dari prefix `file:`), email+password (Argon2id `@node-rs/argon2` override, min 6), plugin `username` + `customSession` (inject `roles/permissions/isSuperAdmin` ke sesi — spread full object balik, query inline hindari cycle auth↔rbac) + `nextCookies()` WAJIB terakhir; `accountLinking.allowDifferentEmails: false`; sesi 30 hari; `generateId: ulid()`; `databaseHooks` log CREATE user + notif welcome.
-- RBAC (`middlewares/rbac.ts`): `requireAuth({ permissions })` — cek OR (satu cukup), cache Map per-proses 30 dtk (`fetchAndCachePermissions`), tolak user non-aktif/soft-deleted, superadmin bypass. Tanpa cookie tapi ada `X-API-Key` → `requireApiKey()`: verifikasi `argon2id(salt + raw)`, lookup prefix 8 char, tolak expired/non-aktif/`isRestfull=false`, hak = permission pemilik, `touchApiKey` fire-and-forget.
-- API Keys (`src/middlewares/apikeys.ts`): format `sk_<64 hex>` (`pk_` legacy diterima), tampil sekali saat create; flag `isRestfull`/`isMCP`.
-- Models: `Platform(singleton "default")+Social(orderable)`, `User(Session,Account,UserRole)`, `Role-ULID/UserRole-ULID/RolePermission-ULID(katalog roleId null + grant per-role)`, `ApiKey(prefix/keyHash/keySalt, soft-delete)`, `Notification(+calendarId)`, `Calendar(+assignments)`, `ActivityLog(action/entity/entityId/metadata/ip/userAgent)`, soft-delete `User/ApiKey.deletedAt`.
-- `RequestHandler.validateRequest(schema, req, params)`: envelope `{ params?, query?, body? }` (JSON + multipart), error → `400 { details: [{field,message,code}], ...legacy }`. `ResponseHandler`: `success/paginated/created/noContent/badRequest/unprocessable/unauthorized/forbidden/notFound/conflict/tooManyRequests/internalError` (stack hanya non-prod).
-- Frontend: `lib/api.ts` → `/api`, timeout 10s, toast sonner utk non-GET, event `auth:unauthorized/forbidden` + clear storage (kecuali theme) saat 401; `Providers.tsx` (QueryClient + ThemeProvider + sonner); `<Protected permissions>` OR-gate client. Tema via `components/theme-provider.tsx` (custom, tanpa `<script>` — next-themes sengaja tidak dipakai karena memicu React 19 error "script tag while rendering"; anti-FOUC oleh script `<head>` di `app/layout.tsx`).
+- **Pages** (dashboard di root, TANPA prefix locale): `(auth)/login|register` · `(dashboard)/` = page, profile, calendar, api-keys, attachment, storage, users, roles, sessions, logging · `(dashboard)/sources|datasets|dashboards` (BI) · `(admin)/` route group tanpa segmen URL · `bi/[id]` viewer dashboard publik (**tanpa session**).
+- `src/proxy.ts` (Next 16: middleware → proxy, Edge): `/api/*` → suntik `x-request-id` + rate-limit per IP + header `X-RateLimit-*`; halaman → suntik `x-locale`, exempt `/bi/*`, guard session untuk semua halaman lain kecuali `/login|/register`, redirect user login, toggle `NEXT_PUBLIC_ALLOW_REGISTER`.
+- API path stabil `/api/*` tanpa versioning. Envelope `{ success, message, data, code, requestId? }`, pagination `{ page, limit, total, total_pages, has_more }`, `?fields=`, `Idempotency-Key` (POST). Kontrak di `test/api-contract.test.ts`.
+- Auth (`src/middlewares/auth.ts`): Better Auth v1.7, adapter Prisma, email+password (Argon2id), plugin `username` + `customSession` (inject `roles/permissions/isSuperAdmin`) + `nextCookies()` terakhir; sesi 30 hari; `generateId: ulid()`.
+- RBAC (`middlewares/rbac.ts`): `requireAuth({ permissions })` cek OR, cache 30 dtk, superadmin bypass. Tanpa cookie tapi ada `X-API-Key` → `requireApiKey()` (hash `argon2id(salt + raw)`, lookup prefix 8 char, hak = permission pemilik).
+- `RequestHandler.validateRequest(schema, req, params)`: `{ params?, query?, body? }` (JSON + multipart), error → `400 { details: [{field,message,code}] }`. `ResponseHandler`: `success/paginated/created/noContent/badRequest/unprocessable/unauthorized/forbidden/notFound/conflict/tooManyRequests/internalError`.
+- Frontend: `lib/api.ts` → `/api`, **timeout 10s default dengan override `timeoutMs` per-request**, toast sonner utk non-GET, event `auth:unauthorized/forbidden` saat 401/403; `Providers.tsx` (QueryClient + ThemeProvider + sonner + LanguageSync); `<Protected permissions>` OR-gate client.
+- Tema: `components/theme-provider.tsx` (custom, next-themes sengaja tidak dipakai). Anti-FOUC pakai **`next/script` + `strategy="beforeInteractive"`** di `app/layout.tsx` — JANGAN balik ke `<script dangerouslySetInnerHTML>`, React 19 akan memunculkan "Encountered a script tag while rendering".
+
+### Halaman yang BUKAN di route group dashboard → butuh `NextIntlClientProvider` sendiri
+
+`Providers` memanggil `useLocale()`, jadi halaman yang render `Providers` di luar `(dashboard)`/`(auth)` **wajib** dibungkus provider (lihat `src/app/bi/layout.tsx`). Tanpa itu: runtime error "No intl context found".
+
+## Modul BI
+
+- **Engine** (Python, `engine/`): server gRPC `QueryEngine` di `proto/engine.proto` — `Execute`, `ExecuteStream`, `GetSchema`, `TestConnection`, `InvalidateCache`. Klien: `src/lib/engine.ts` + tipe generate `src/lib/grpc/**` (biome & knip **ignore** folder ini).
+- **Introspeksi** (`engine/src/introspector.py`): schema sistem (`information_schema`/`pg_catalog`/`pg_toast`) **selalu dilewati** — view katalog di sana ~1,7s per objek sehingga `GetSchema` timeout pada DB besar. Persempit via `INTROSPECT_SCHEMAS`.
+- **Tipe source** (`src/validations/source.ts`): `postgresql|mysql|mariadb|mssql|sqlite|clickhouse|bigquery|mongodb|api|file`, tiap tipe punya schema config sendiri (validasi via `superRefine`).
+- **Hooks**: `use-sources` (CRUD, test, schema, upload chunked) · `use-datasets` (CRUD, run, run-batch) · `use-dashboards` (CRUD dashboard/panel/filter/member/public + `usePublicDashboard`) · `use-panel-data` (batch + fallback per-panel, hormati filter global) · `use-panel-editor` (state editor panel) · `use-dashboard-filters` (context filter dashboard).
+- **Komponen**: `components/charts/` (EChart/KPI/Table/Pivot/Text/Filter) · `components/dashboard/` (grid drag-drop, viewer, panel-title, run-meta) · `components/editor/` (sidebar config chart, palet dataset, axis-drop, preview) · `components/sources/` (Database Explorer: Monaco query-editor, schema-sidebar, schema-erd, source-form) · `components/bi/ResultTable.tsx`.
+- **Halaman**: `/sources` (tabel + form) · `/sources/[id]` (**Database Explorer**: sidebar schema + tab tabel/query/ERD, Monaco SQL dengan Ctrl+Enter, upload chunked) · `/datasets`, `/datasets/new`, `/datasets/[id]` (editor SQL + run) · `/dashboards`, `/dashboards/new`, `/dashboards/[id]`, `/dashboards/[id]/edit` (visual editor) · `/bi/[id]` (viewer publik).
+- **Viewer publik**: `proxy.ts` exempt `/bi/*`; data diambil dari `GET /api/public/dashboards/[id]` (tanpa `requireAuth`, hanya `isPublic: true`, non-publik → **404** bukan 403, panel tanpa `dataSetId` difilter, field dibatasi eksplisit). **Data panel tetap butuh session/API key** karena `run-batch` mengeksekusi SQL — jangan pernah membuat endpoint run publik.
+- **Editor publik & loop**: `dashboard-viewer`/`use-panel-data` wajib memoize array `panels` (dependensi efek `[panels]`) — identitas baru tiap render ⇒ request loop tanpa batas.
 
 ## Conventions
 
 - Path alias `@/*` → `src/*` (+ `prisma/generated/client/*`).
-- Tailwind v4 + shadcn/ui New York (`components.json`, css `src/styles/globals.css`), `tw-animate-css`.
-- Forms: React Hook Form + Zod v4. State: TanStack Query v5 (`src/hooks/use-*`), no client global store.
-- Schema change: edit `prisma/schema.prisma` → `bun run db:generate` (+ `db:push`/`db:migrate` sesuai env).
-- IDs: ULID default (`ulid()`) untuk semua model; `Account/Session/Verification` dari Better Auth (`generateId: ulid()`).
-- Security headers di `next.config.ts` (nosniff, referrer, permissions-policy), `removeConsole` prod, `optimizePackageImports`, image remote `https: **`, redirects (favicon, manifest, sessions/logging lama).
-- Dockerfile multi-stage Bun: `ARG DATABASE_URL` utk generate+build; runner non-root `nextjs`, copy `.next/public/node_modules/prisma`.
+- Tailwind v4 + shadcn/ui New York (`components.json`, `src/styles/globals.css`).
+- Forms: React Hook Form + Zod v4. State: TanStack Query v5, no client global store.
+- Schema change: edit `prisma/schema.prisma` → `bun run db:generate` (+ `db:push`/`db:migrate`).
+- IDs: ULID default (`ulid()`) untuk semua model.
+- Security headers di `next.config.ts`, `removeConsole` prod, `optimizePackageImports`.
+- **knip harus bersih**: jangan tambah ekspor tanpa konsumen. `ignoreExportsUsedInFile: true` untuk query-key factory/helper internal; `ignore` untuk `components/ui/**` + `lib/grpc/**` (generate). Kalau sebuah ekspor memang API modul yang sengaja (mis. `engine.ts#executeStream` yang membungkus RPC), pakai `ignoreIssues` dengan komentar alasannya — jangan diam-diam dihapus.
+- Dockerfile multi-stage Bun: `ARG DATABASE_URL` utk generate+build; runner non-root `bun` (uid 1000 — `oven/bun:1` tak punya `adduser`).
+- `.dockerignore` root WAJIB ada: tanpa itu `node_modules`/`.next` ikut build context dan `.env` bisa ter-bake ke image. `engine/Dockerfile` build context **harus `./engine`**.
+- Compose (`docker-compose.yml`): `db` + `redis` + `engine` + `app` (+ profile `dev`/`test`). `app` & `engine` **wajib share volume `data`** — app tulis upload ke `DATA_DIR`, engine baca dari folder sama dan validasi path di dalamnya. `QUERY_ENGINE_HOST=engine:50051` (bukan localhost).
 
 ## Permission Catalog (seeded — `prisma/seed/permissions.ts`)
 
 ```
-Platform: platform:read, platform:update,
-          social:create, social:update, social:delete
-Users:    users:create, users:update, users:delete, users:admin
-Roles:    roles:read, roles:create, roles:update, roles:delete
+BI Tools:   sources:read, sources:create, sources:update, sources:delete
+            datasets:read, datasets:create, datasets:update, datasets:delete
+            dashboards:create, dashboards:update, dashboards:delete, dashboards:admin
+Storage:    attachments:read, attachments:create, attachments:update, attachments:delete, attachments:admin
+Users:      users:create, users:update, users:delete, users:admin
+Roles:      roles:read, roles:create, roles:update, roles:delete
 Permissions: permissions:read
-Sessions: sessions:read, sessions:revoke
-Logs:     logs:read
+Sessions:   sessions:read, sessions:revoke
+Logs:       logs:read
 Notifications: notifications:broadcast
-API Keys: keys:read, keys:create, keys:update, keys:delete
+API Keys:   keys:read, keys:create, keys:update, keys:delete
 ```
-Konvensi aksi: `read/update` (jangan `view/edit`). Permission yang tak pernah
-dicek kode tidak dimasukkan katalog; seed menghapus legacy
-(`sessions:view`, `logs:view`, `platform:admin`, `roles:admin`, `users:read`) otomatis.
-Super Admin (`isSuperAdmin: true`) bypasses all checks.
+
+Konvensi aksi: `read/update` (jangan `view/edit`). Katalog = baris `RolePermission` dengan `roleId NULL`; grant per-role menunjuk `roleId`. `dashboards` **tidak punya `:read`** — list/detail hanya butuh login (`requireAuth()` tanpa permission), mutasi butuh `dashboards:update`, publikasi & member butuh `dashboards:admin`. Seed menghapus legacy (`platform:*`, `social:*`, `sessions:view`, `logs:view`, `roles:admin`, `users:read`) otomatis. Super Admin (`isSuperAdmin: true`) bypass all checks.
 
 ## Adding Features
 
 1. **New API route** — `src/app/api/*/route.ts`: `RequestHandler.validateRequest` (return langsung jika `NextResponse`) + `requireAuth({ permissions })` + `ResponseHandler.*` (teruskan `requestId` dari header).
-2. **New permission** — tambah ke `FEATURE_REGISTRY` di `prisma/seed/permissions.ts` → `bun run db:seed` → pakai di `requireAuth` dan `<Protected permissions>`.
-3. **New page** — publik di `src/app/[locale]/`, auth di `src/app/(auth)/`, proteksi di `src/app/dashboard/`; gate UI dengan `<Protected permissions={["perm:name"]}>` (OR logic).
-4. **New UI component** — `components/ui/` (shadcn) atau `components/atoms|shared/`; fetch via `hooks/use-*.ts` (TanStack Query) ke `lib/api.ts` (`/api`).
+2. **New permission** — tambah ke `FEATURE_REGISTRY` di `prisma/seed/permissions.ts` → `bun run db:seed -- --only permissions` → pakai di `requireAuth` dan `<Protected permissions>`.
+3. **New page** — di dalam `src/app/(dashboard)/` (route group) agar dapat `Providers` + intl + guard session. Halaman di luar route group wajib bungkus `NextIntlClientProvider` sendiri.
+4. **New UI component** — `components/ui/` (shadcn), `components/bi|dashboard|editor|charts|sources/` (domain BI), atau `components/atoms|shared/`; fetch via `hooks/use-*.ts`.
+5. **Request lambat** — endpoint BI (schema/run) perlu `timeoutMs` eksplisit di `api.post/get`; default 10s tidak cukup untuk DB remote.

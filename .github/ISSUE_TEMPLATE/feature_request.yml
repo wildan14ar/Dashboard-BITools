@@ -1,0 +1,40 @@
+---
+name: Feature request
+description: Usulan fitur atau peningkatan
+labels: enhancement
+body:
+  - type: textarea
+    id: masalah
+    attributes:
+      label: Masalah yang diselesaikan
+      description: Apa yang tidak bisa dilakukan sekarang? Jelaskan situasinya, bukan hanya solusinya.
+    validations:
+      required: true
+
+  - type: textarea
+    id: usulan
+    attributes:
+      label: Usulan
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatif
+    attributes:
+      label: Alternatif yang pernah dicoba
+      description: Workaround atau cara lain yang pernah Anda coba.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Query engine (Python)
+        - Dashboard / panel / chart
+        - Dataset / query editor
+        - Source / koneksi
+        - Auth / permission
+        - Dashboard publik
+        - Dokumentasi / DX
+    validations:
+      required: true

@@ -1,0 +1,51 @@
+# Penting: JANGAN pernah masukkan .env ke build context — hanya placeholder di .env.example.
+.env
+.env.*
+!.env.example
+
+# Dependency & build cache — membuild ulang dari host memperlambat & tidak berguna
+node_modules
+.next
+out
+.turbo
+*.tsbuildinfo
+
+# Data runtime & upload (JANGAN di-bake ke image — bisa berisi data pelanggan)
+data
+!data/.gitkeep
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Python (engine punya .dockerignore sendiri, ini untuk konteks root)
+.venv
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.ruff_cache
+.mypy_cache
+
+# Git & tooling
+.git
+.gitignore
+.github
+
+# Env editor / OS
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Docs & config yang tidak dibutuhkan runtime image
+*.md
+!README.md
+LICENSE
+.env.example
+docker-compose.yml
+docker-compose.*.yml
+Dockerfile
+.dockerignore
+knip.jsonc
+biome.jsonc

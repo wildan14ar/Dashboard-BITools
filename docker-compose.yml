@@ -1,92 +1,187 @@
-name: portonext-base
+name: dashboard-bi
 
-# Cara pakai (Postgres-only):
-#   Prod (build + start) : docker compose up --build app
-#   Dev (HMR)            : docker compose --profile dev up --build dev
-#   Unit test            : docker compose --profile test run --rm --build test
-#   Push schema manual   : docker compose exec app bun run db:push
-#   Seed manual          : docker compose exec app bun run db:seed
+# Stack lengkap: Postgres + Redis + query engine (Python/gRPC) + dashboard (Next.js).
 #
-# Note: Dockerfile butuh ARG DATABASE_URL saat build (untuk db:generate + build).
-# Nilai dummy postgresql://... sudah cukup; DATABASE_URL asli dipakai saat run via env.
+# Cara pakai:
+#   docker compose up -d --build              # stack produksi (semua service)
+#   docker compose --profile dev up --build   # dev server + HMR (port 3000)
+#   docker compose --profile test run --rm test
+#   docker compose exec app bun run db:push   # push schema
+#   docker compose exec app bun run db:seed   # seed user awal
+#   docker compose down -v                    # HAPUS juga volume (data hilang)
+#
+# CATATAN PENTING — shared volume `data`:
+#   App menulis file upload (CSV/XLSX) ke DATA_DIR, engine membacanya dari
+#   DATA_DIR yang sama dan memvalidasi path-nya di dalam folder tersebut.
+#   Karena itu app dan engine WAJIB share volume yang sama. Kalau dipisah,
+#   source bertipe "file" akan gagal dengan "Path upload di luar DATA_DIR".
+
+x-app-env: &app-env
+  NODE_ENV: production
+  NEXT_TELEMETRY_DISABLED: "1"
+  # Host engine dari sudut pandang container app — BUKAN localhost.
+  QUERY_ENGINE_HOST: engine:50051
+  DATA_DIR: /data
+  QUERY_MAX_ROWS: ${QUERY_MAX_ROWS:-1000}
+  QUERY_TIMEOUT_SEC: ${QUERY_TIMEOUT_SEC:-30}
+  RUN_RATE_LIMIT_MAX: ${RUN_RATE_LIMIT_MAX:-30}
+  RUN_RATE_LIMIT_WINDOW_MS: ${RUN_RATE_LIMIT_WINDOW_MS:-60000}
+  ATTACHMENTS_MAX_SIZE: ${ATTACHMENTS_MAX_SIZE:-10485760}
+  UPLOADS_MAX_BYTES: ${UPLOADS_MAX_BYTES:-10485760}
+  BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
+  BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET wajib diisi (lihat .env.example)}
+  BETTER_AUTH_TRUSTED_ORIGINS: ${BETTER_AUTH_TRUSTED_ORIGINS:-}
+  NEXT_PUBLIC_ALLOW_REGISTER: ${NEXT_PUBLIC_ALLOW_REGISTER:-true}
+  RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-120}
+  RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-60000}
+
+x-engine-env: &engine-env
+  QUERY_ENGINE_PORT: "50051"
+  REDIS_URL: redis://redis:6379
+  DATA_DIR: /data
+  # Kosong = semua schema non-sistem. Wajib diisi bila DB punya banyak schema,
+  # karena view katalog information_schema sangat lambat (~1,7s per objek).
+  INTROSPECT_SCHEMAS: ${INTROSPECT_SCHEMAS:-}
+  INTROSPECT_MAX_OBJECTS: ${INTROSPECT_MAX_OBJECTS:-500}
+  DB_POOL_SIZE: ${DB_POOL_SIZE:-5}
+  DB_MAX_OVERFLOW: ${DB_MAX_OVERFLOW:-10}
 
 services:
-  # Postgres 16 — dependensi utama app.
+  # ── Postgres ───────────────────────────────────────────────────────────────
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: portonext
-      POSTGRES_PASSWORD: portonext
-      POSTGRES_DB: portonext
+      POSTGRES_USER: ${POSTGRES_USER:-bi}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD wajib diisi (lihat .env.example)}
+      POSTGRES_DB: ${POSTGRES_DB:-bi}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U portonext -d portonext"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bi} -d ${POSTGRES_DB:-bi}"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 12
+      start_period: 10s
     restart: unless-stopped
 
-  # Production build (Next start) + Postgres. Butuh service db sehat.
+  # ── Redis (cache schema & hasil query untuk engine) ─────────────────────────
+  # Opsional: engine catch-all saat Redis mati (engine/src/cache.py) dan
+  # otomatis jatuh ke mode tanpa cache. Hapus blok env REDIS_URL + service ini
+  # kalau tidak ingin cache sama sekali.
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  # ── Query engine (Python gRPC) ─────────────────────────────────────────────
+  engine:
+    build:
+      # Context WAJIB ./engine: pyproject.toml, uv.lock, src/, generated/ ada di sana.
+      # (proto/engine.proto berada di root repo dan tidak dipakai saat runtime.)
+      context: ./engine
+      dockerfile: Dockerfile
+    image: dashboard-bi:engine
+    environment:
+      <<: *engine-env
+    volumes:
+      # WAJIB sama dengan app — inilah yang membuat source "file" berfungsi.
+      - data:/data
+    ports:
+      - "${ENGINE_PORT:-50051}:50051"
+    restart: unless-stopped
+
+  # ── Dashboard (Next.js) ────────────────────────────────────────────────────
   app:
     build:
       context: .
+      dockerfile: Dockerfile
       args:
-        DATABASE_URL: postgresql://portonext:portonext@localhost:5432/portonext?sslmode=disable
-    image: portonext-base:app
+        # Hanya dipakai saat build (db:generate + next build). Nilai di bawah
+        # tidak pernah konek ke DB — Prisma generate/build tidak butuh koneksi.
+        DATABASE_URL: postgresql://build:build@localhost:5432/build?sslmode=disable
+    image: dashboard-bi:app
     depends_on:
       db:
         condition: service_healthy
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env
+      engine:
+        condition: service_healthy
     environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://portonext:portonext@db:5432/portonext?sslmode=disable
-      BETTER_AUTH_URL: http://localhost:3000
+      <<: *app-env
+      # Host DB dari sudut pandang container app.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-bi}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-bi}?sslmode=disable
+    volumes:
+      - data:/data
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    # oven/bun tidak punya curl/wget, jadi pakai fetch bawaan Bun.
+    # Route mana pun cukup: yang penting server bisa menerima koneksi & render.
+    # Redirect (302) juga dianggap "up", jadi tidak perlu endpoint /api/health.
+    healthcheck:
+      test:
+        - CMD
+        - bun
+        - -e
+        - "await fetch('http://127.0.0.1:3000/', { redirect: 'manual' }).then(r => process.exit(r.status ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      start_period: 40s
+      retries: 5
     restart: unless-stopped
 
-  # Development server (Turbopack HMR). Schema di-push otomatis saat start.
+  # ── Dev server (Turbopack + HMR) ───────────────────────────────────────────
+  # Pakai profile, jadi TIDAK ikut jalan saat `docker compose up` biasa.
   dev:
     image: oven/bun:1
     working_dir: /app
-    command: sh -c "bun install --frozen-lockfile && bun run db:push && bun run dev --hostname 0.0.0.0"
+    command: >-
+      sh -c "bun install --frozen-lockfile
+      && bun run db:generate
+      && bun run db:push
+      && bun run dev --hostname 0.0.0.0"
     depends_on:
       db:
         condition: service_healthy
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env
+      engine:
+        condition: service_healthy
     environment:
+      <<: *app-env
       NODE_ENV: development
-      DATABASE_URL: postgresql://portonext:portonext@db:5432/portonext?sslmode=disable
+      DATABASE_URL: postgresql://${POSTGRES_USER:-bi}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-bi}?sslmode=disable
     volumes:
       - .:/app
+      - data:/data
+      # node_modules di-bind dari host supaya HMR tidak invalidated tiap
+      # `bun install` di dalam container.
       - /app/node_modules
+    ports:
+      - "${APP_PORT:-3000}:3000"
     profiles:
       - dev
 
-  # Unit test one-shot (bun test). Lihat folder test/.
+  # ── Unit test (satu-shot) ───────────────────────────────────────────────────
+  # Tidak butuh db: 41 test di test/ semuanya pure unit (termasuk yang mock Prisma).
   test:
     image: oven/bun:1
     working_dir: /app
-    command: sh -c "bun install --frozen-lockfile && bun test"
-    depends_on:
-      db:
-        condition: service_healthy
-    env_file:
-      - .env
-    environment:
-      NODE_ENV: test
+    command: sh -c "bun install --frozen-lockfile && bun run typecheck && bun test"
     volumes:
       - .:/app
       - /app/node_modules
+    environment:
+      NODE_ENV: test
     profiles:
       - test
 
 volumes:
   pgdata:
+  # Shared antara app & engine — JANGAN dihapus kecuali memang ingin lose upload.
+  data:
