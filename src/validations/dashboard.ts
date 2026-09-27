@@ -29,4 +29,3 @@ export const panelReorderSchema = z.array(
 )
 
 export type DashboardInput = z.infer<typeof dashboardSchema>
-export type PanelInput = z.infer<typeof panelSchema>

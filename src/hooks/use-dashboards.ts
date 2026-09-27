@@ -76,16 +76,6 @@ export interface UpdatePanelInput {
 /** Alias kompatibilitas untuk komponen visual editor. */
 export type Panel = BiPanel
 
-export interface CreateFilterInput {
-  name: string
-  label: string
-  type?: string
-  config?: Record<string, unknown>
-  position?: number
-}
-
-export const CHART_TYPES = ["table", "bar", "line", "area", "pie"] as const
-
 export const dashboardKeys = {
   all: ["dashboards"] as const,
   list: () => [...dashboardKeys.all, "list"] as const,
@@ -220,32 +210,6 @@ export function useReorderPanels() {
   return useMutation({
     mutationFn: async (vars: { dashboardId: string; panels: ReorderPanelInput[] }) => {
       const { data } = await api.put(`/dashboards/${vars.dashboardId}/panels/reorder`, vars.panels)
-      return data
-    },
-    onSuccess: (_data, vars) => invalidateDetail(queryClient, vars.dashboardId),
-  })
-}
-
-export function useCreateFilter() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async ({ dashboardId, ...input }: CreateFilterInput & { dashboardId: string }) => {
-      const { data } = await api.post<BiFilter>(`/dashboards/${dashboardId}/filters`, input, {
-        idempotencyKey: ulid(),
-      })
-      return data
-    },
-    onSuccess: (_data, vars) => invalidateDetail(queryClient, vars.dashboardId),
-  })
-}
-
-export function useDeleteFilter() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async (vars: { dashboardId: string; filterId: string }) => {
-      const { data } = await api.delete(`/dashboards/${vars.dashboardId}/filters/${vars.filterId}`)
       return data
     },
     onSuccess: (_data, vars) => invalidateDetail(queryClient, vars.dashboardId),

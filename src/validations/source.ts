@@ -106,4 +106,3 @@ export const sourceSchema = z
 
 export type SourceType = z.infer<typeof sourceTypeSchema>
 export type SourceInput = z.infer<typeof sourceSchema>
-export type SourceConfig = Record<string, unknown>

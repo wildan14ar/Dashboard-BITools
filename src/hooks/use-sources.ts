@@ -1,41 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ulid } from "ulid"
 import api from "@/lib/api"
-import type { RunData } from "@/lib/chart"
-
-export type SourceType =
-  | "postgresql"
-  | "mysql"
-  | "mariadb"
-  | "mssql"
-  | "sqlite"
-  | "clickhouse"
-  | "bigquery"
-  | "mongodb"
-  | "api"
-  | "file"
-
-export const SOURCE_TYPES: SourceType[] = [
-  "postgresql",
-  "mysql",
-  "mariadb",
-  "mssql",
-  "sqlite",
-  "clickhouse",
-  "bigquery",
-  "mongodb",
-  "api",
-  "file",
-]
-
-export const SQL_SOURCE_TYPES: SourceType[] = [
-  "postgresql",
-  "mysql",
-  "mariadb",
-  "mssql",
-  "sqlite",
-  "clickhouse",
-]
+import type { SourceType } from "@/validations/source"
 
 export interface BiSource {
   id: string
@@ -228,26 +194,6 @@ export function useSourceSchema(id: string | null) {
     gcTime: 10 * 60_1000,
     retry: 1,
     refetchOnWindowFocus: false,
-  })
-}
-
-export interface RunSourceInput {
-  id: string
-  sql: string
-  cache?: boolean
-}
-
-/** Jalankan SQL adhoc terhadap source tersimpan. */
-export function useRunSource() {
-  return useMutation({
-    mutationFn: async ({ id, sql, cache = true }: RunSourceInput) => {
-      const { data } = await api.post<RunData>(
-        `/sources/${id}/run`,
-        { sql, cache },
-        { timeoutMs: 180_000 },
-      )
-      return data
-    },
   })
 }
 

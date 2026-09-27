@@ -32,17 +32,6 @@ export interface UpdateDatasetInput {
   isPublic?: boolean
 }
 
-export interface BatchRunItem {
-  datasetId: string
-  params?: Record<string, string>
-}
-
-export interface BatchRunResult {
-  datasetId: string
-  data: RunData | null
-  error: string | null
-}
-
 export const datasetKeys = {
   all: ["datasets"] as const,
   list: () => [...datasetKeys.all, "list"] as const,
@@ -130,18 +119,6 @@ export function useRunDataset() {
         { params, cache },
         { timeoutMs: 180_000 },
       )
-      return data
-    },
-  })
-}
-
-/** Satu round-trip untuk N dataset (multi-panel dashboard). */
-export function useRunDatasetBatch() {
-  return useMutation({
-    mutationFn: async (input: { items: BatchRunItem[]; useCache?: boolean }) => {
-      const { data } = await api.post<BatchRunResult[]>("/datasets/run-batch", input, {
-        timeoutMs: 300_000,
-      })
       return data
     },
   })

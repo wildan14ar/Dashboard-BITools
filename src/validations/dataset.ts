@@ -19,5 +19,3 @@ export const batchRunSchema = z.object({
   items: z.array(batchRunItemSchema).min(1).max(50),
   useCache: z.boolean().optional(),
 })
-
-export type BatchRunInput = z.infer<typeof batchRunSchema>

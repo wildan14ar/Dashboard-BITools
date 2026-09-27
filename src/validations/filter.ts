@@ -7,5 +7,3 @@ export const filterSchema = z.object({
   config: z.record(z.string(), z.unknown()).optional(),
   position: z.number().int().min(0).default(0),
 })
-
-export type FilterInput = z.infer<typeof filterSchema>

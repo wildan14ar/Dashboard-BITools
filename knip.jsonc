@@ -5,5 +5,11 @@
   // bukan kode mati. Tanpa ini knip berisik false positive.
   "ignoreExportsUsedInFile": true,
   // Barrel shadcn/ui diekspor lengkap mengikuti konvensi shadcn.
-  "ignore": ["src/components/ui/**"]
+  "ignore": ["src/components/ui/**", "src/lib/grpc/**"],
+  "ignoreIssues": {
+    // executeStream membungkus RPC ExecuteStream di engine (proto + sisi
+    // Python sudah ada) — sengaja disimpan sebagai API klien meski belum
+    // ada route yang memakainya.
+    "src/lib/engine.ts": ["exports"],
+  },
 }
